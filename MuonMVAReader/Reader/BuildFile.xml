@@ -1,0 +1,12 @@
+<use name="root"/>
+<use name="roottmva"/>
+<use name="rootrflx"/>
+<use name="roofitcore"/>
+<use name="clhep"/>
+<use name="rootcore"/>
+<use name="FWCore/ParameterSet"/>
+<use name="RecoEgamma/EgammaTools"/>
+
+<export>
+  <lib   name="1"/>
+</export>
