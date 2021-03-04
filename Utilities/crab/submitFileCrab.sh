@@ -9,7 +9,7 @@ rm *.DAT
 rm br.sm*
 rm -rf Pdfdata
 cp -r ${CMSSW_BASE}/src/ZZMatrixElement/MELA/data/Pdfdata ${CMSSW_BASE}/src/
-MCFM_LIBS_PATH=${CMSSW_BASE}/src/ZZMatrixElement/MELA/data/slc6_amd64_gcc700/
+MCFM_LIBS_PATH=${CMSSW_BASE}/src/ZZMatrixElement/MELA/data/slc7_amd64_gcc700/
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCFM_LIBS_PATH}
 echo ${LD_LIBRARY_PATH}
 echo "================= DONE =========================="
@@ -31,6 +31,10 @@ mv ${CMSSW_BASE}/ParamZ1 ${CMSSW_BASE}/src/KinZfitter/KinZfitter/
 rm -rf ${CMSSW_BASE}/src/KinZfitter/HelperFunction/hists/
 mv ${CMSSW_BASE}/hists ${CMSSW_BASE}/src/KinZfitter/HelperFunction/
 
+echo "================= Dumping PSet =================="
+
+python -c "import PSet; print PSet.process.dumpPython()"
+
 echo "================= DONE =========================="
 
-cmsRun -j FrameworkJobReport.xml -p PSet.py 
+cmsRun -j FrameworkJobReport.xml -p PSet.py

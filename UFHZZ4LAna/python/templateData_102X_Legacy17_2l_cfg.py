@@ -31,14 +31,14 @@ myfilelist = cms.untracked.vstring(
 
 process.source = cms.Source("PoolSource",fileNames = myfilelist,
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
-                            eventsToProcess = cms.untracked.VEventRange('304062:1844:2257734751')
+                            #eventsToProcess = cms.untracked.VEventRange('304062:1844:2257734751')
                             )
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("DUMMYFILENAME.root")
 )
 
-# clean muons by segments 
+# clean muons by segments
 process.boostedMuons = cms.EDProducer("PATMuonCleanerBySegments",
 				     src = cms.InputTag("slimmedMuons"),
 				     preselection = cms.string("track.isNonnull"),
@@ -90,14 +90,14 @@ process.calibratedPatElectrons.src = cms.InputTag("slimmedElectrons")
 ##  # add them to the VID producer
 ##  for idmod in my_id_modules:
 ##      setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-##  
+##
 ##  #process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('calibratedPatElectrons')
 ##  #process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('calibratedPatElectrons')
 ##  #process.electronMVAValueMapProducer.srcMiniAOD= cms.InputTag('calibratedPatElectrons')
 ##  process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('selectedElectrons')
 ##  process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('selectedElectrons')
 ##  process.electronMVAValueMapProducer.srcMiniAOD= cms.InputTag('selectedElectrons')
-##  
+##
 ##  process.electronsMVA = cms.EDProducer("SlimmedElectronMvaIDProducer",
 ##                                        mvaValuesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17IsoV2Values"),
 ##                                        #electronsCollection = cms.InputTag("calibratedPatElectrons"),
@@ -132,7 +132,7 @@ process.jec = cms.ESSource("PoolDBESSource",
             label= cms.untracked.string("AK4PFchs")
             ),
 
-        cms.PSet( 
+        cms.PSet(
             record = cms.string("JetCorrectionsRecord"),
             tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK8PFchs"),
             label= cms.untracked.string("AK8PFchs")
@@ -146,12 +146,12 @@ process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
 
 process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJets"),
-    levels = ['L1FastJet', 
-              'L2Relative', 
+    levels = ['L1FastJet',
+              'L2Relative',
               'L3Absolute',
               'L2L3Residual'
               ],
-    payload = 'AK4PFchs' ) 
+    payload = 'AK4PFchs' )
 
 process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJetsAK8"),
@@ -183,36 +183,35 @@ process.pileupJetIdUpdated = process.pileupJetId.clone(
 process.slimmedJetsJEC.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
 process.slimmedJetsJEC.userData.userInts.src += ['pileupJetIdUpdated:fullId']
 
-
-## JER
-#process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
+JER
+process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 ## for hpc
 ##dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Summer15_25nsV6_MC_JER.db"
-#dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Fall17_V3_94X_MC.db"
+dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Fall17_V3_94X_MC.db"
 ## for crab
 #dBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Fall17_V3_94X_MC.db"
-#process.jer = cms.ESSource("PoolDBESSource",
-#        CondDBSetup,
-#        connect = cms.string("sqlite_file:"+dBJERFile),
-#        toGet = cms.VPSet(
-#            cms.PSet(
-#                record = cms.string('JetResolutionRcd'),
-#                tag    = cms.string('JR_Fall17_V3_94X_MC_PtResolution_AK4PFchs'),
-#                label  = cms.untracked.string('AK4PFchs_pt')
-#                ),
-#            cms.PSet(
-#                record = cms.string('JetResolutionRcd'),
-#                tag    = cms.string('JR_Fall17_V3_94X_MC_PhiResolution_AK4PFchs'),
-#                label  = cms.untracked.string('AK4PFchs_phi')
-#                ),
-#            cms.PSet(
-#                record = cms.string('JetResolutionScaleFactorRcd'),
-#                tag    = cms.string('JR_Fall17_V3_94X_MC_SF_AK4PFchs'),
-#                label  = cms.untracked.string('AK4PFchs')
-#                )
-#            )
-#        )
-#process.es_prefer_jer = cms.ESPrefer('PoolDBESSource', 'jer')
+process.jer = cms.ESSource("PoolDBESSource",
+        CondDBSetup,
+        connect = cms.string("sqlite_file:"+dBJERFile),
+        toGet = cms.VPSet(
+            cms.PSet(
+                record = cms.string('JetResolutionRcd'),
+                tag    = cms.string('JR_Fall17_V3_94X_MC_PtResolution_AK4PFchs'),
+                label  = cms.untracked.string('AK4PFchs_pt')
+                ),
+            cms.PSet(
+                record = cms.string('JetResolutionRcd'),
+                tag    = cms.string('JR_Fall17_V3_94X_MC_PhiResolution_AK4PFchs'),
+                label  = cms.untracked.string('AK4PFchs_phi')
+                ),
+            cms.PSet(
+                record = cms.string('JetResolutionScaleFactorRcd'),
+                tag    = cms.string('JR_Fall17_V3_94X_MC_SF_AK4PFchs'),
+                label  = cms.untracked.string('AK4PFchs')
+                )
+            )
+        )
+process.es_prefer_jer = cms.ESPrefer('PoolDBESSource', 'jer')
 
 
 #QGTag
@@ -243,7 +242,7 @@ process.QGTagger.srcVertexCollection=cms.InputTag("offlinePrimaryVertices")
 # compute corrected pruned jet mass
 process.corrJets = cms.EDProducer ( "CorrJetsProducer",
                                     jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
-                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ), 
+                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
                                     rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
                                     payload = cms.string  ( "AK8PFchs" ),
                                     isData  = cms.bool    (  True ),
@@ -314,7 +313,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               reweightForPU = cms.untracked.bool(True),
                               triggerSrc = cms.InputTag("TriggerResults","","HLT"),
                               triggerObjects = cms.InputTag("slimmedPatTrigger"),
-                              doJER = cms.untracked.bool(False),
+                              doJER = cms.untracked.bool(True),
                               doJEC = cms.untracked.bool(True),
                               doTriggerMatching = cms.untracked.bool(False),
                               triggerList = cms.untracked.vstring(
@@ -337,9 +336,9 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_Ele40_WPTight_Gsf_v',
                                   'HLT_IsoMu27_v',
                               ),
-                              verbose = cms.untracked.bool(False),              
-                              skimLooseLeptons = cms.untracked.int32(2),              
-                              skimTightLeptons = cms.untracked.int32(2),              
+                              verbose = cms.untracked.bool(False),
+                              skimLooseLeptons = cms.untracked.int32(2),
+                              skimTightLeptons = cms.untracked.int32(2),
                               #bestCandMela = cms.untracked.bool(False),
                               year = cms.untracked.int32(2017),
                               isCode4l = cms.untracked.bool(False),
@@ -368,4 +367,3 @@ process.p = cms.Path(process.fsrPhotonSequence*
 #                     process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
                      process.Ana
                      )
-

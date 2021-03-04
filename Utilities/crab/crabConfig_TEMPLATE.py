@@ -1,7 +1,7 @@
 import cjson
 import json
 from WMCore.Configuration import Configuration
-from CRABClient.UserUtilities import config, getUsernameFromSiteDB
+from CRABClient.UserUtilities import config, getUsernameFromCRIC
 
 config = Configuration()
 
@@ -21,7 +21,8 @@ config.JobType.psetName = 'CFGFILE'
 config.JobType.pluginName = 'Analysis'
 config.JobType.disableAutomaticOutputCollection = True
 config.JobType.outputFiles = ['OUTFILENAME.root']
-config.JobType.maxMemoryMB = 2500
+config.JobType.numCores = 2
+config.JobType.maxMemoryMB = 5000
 
 config.section_('Data')
 config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader/'
@@ -48,15 +49,15 @@ else:
   elif (('GluGlu' in 'DATASETNAME') and (not 'MCFM701' in 'DATASETNAME')): config.Data.unitsPerJob = 1
   elif ('HToZZ' in 'DATASETNAME'): config.Data.unitsPerJob = 1
   elif ('ZZ' in 'DATASETNAME'): config.Data.unitsPerJob = 4
-  elif ('TT' in 'DATASETNAME'): config.Data.unitsPerJob = 5
-  else: config.Data.unitsPerJob = 5
+  elif ('TT' in 'DATASETNAME'): config.Data.unitsPerJob = 1
+  else: config.Data.unitsPerJob = 2
 
 config.Data.publication = False
-config.Data.outLFNDirBase = '/store/user/%s/2018data/UFHZZAnalysisRun2/JOBTAG/' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/guoj/UFHZZAnalysisRun2/skim2l_new/JOBTAG/'
 config.Data.ignoreLocality = True
 config.Data.allowNonValidInputDataset = True
 
 config.section_('User')
 config.section_('Site')
-config.Site.storageSite = 'T2_US_Florida'
+config.Site.storageSite = 'T2_CN_Beijing'
 config.Site.whitelist = ['T2_US_*']
