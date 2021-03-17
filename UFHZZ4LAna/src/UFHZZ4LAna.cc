@@ -396,11 +396,16 @@ private:
   vector<float> mergedjet_btag;
   vector<float> mergedjet_ZvsQCD;
   vector<float> mergedjet_ZbbvsQCD;
+  vector<float> mergedjet_WvsQCD;
+  vector<float> mergedjet_ZHbbvsQCD;
+  vector<float> mergedjet_HbbvsQCD;
+  vector<float> mergedjet_H4qvsQCD;
 
   vector<float> mergedjet_L1;
   vector<float> mergedjet_prunedmass; vector<float> mergedjet_softdropmass;
 
   vector<int> mergedjet_nsubjet;
+  vector<float> mergedjet_subjet_softDropMass;
   vector<vector<float> > mergedjet_subjet_pt; vector<vector<float> > mergedjet_subjet_eta;
   vector<vector<float> > mergedjet_subjet_phi; vector<vector<float> > mergedjet_subjet_mass;
   vector<vector<float> > mergedjet_subjet_btag;
@@ -586,6 +591,8 @@ private:
   edm::EDGetTokenT<edm::ValueMap<int> > multSrc_;
   edm::EDGetTokenT<edm::ValueMap<float> > ptDSrc_;
   edm::EDGetTokenT<edm::View<pat::Jet> > mergedjetSrc_;
+  //==========================deep jet===========================================
+  //edm::EDGetTokenT<edm::View<pat::Jet> > Deepjets_;
   edm::EDGetTokenT<edm::View<pat::MET> > metSrc_;
   //edm::InputTag triggerSrc_;
   edm::EDGetTokenT<edm::TriggerResults> triggerSrc_;
@@ -641,6 +648,8 @@ private:
 
   int year;///use to choose Muon BDT
 
+  bool isCode4l;
+
   // register to the TFileService
   edm::Service<TFileService> fs;
 
@@ -672,6 +681,8 @@ axis2Src_(consumes<edm::ValueMap<float>>(edm::InputTag("QGTagger", "axis2"))),
 multSrc_(consumes<edm::ValueMap<int>>(edm::InputTag("QGTagger", "mult"))),
 ptDSrc_(consumes<edm::ValueMap<float>>(edm::InputTag("QGTagger", "ptD"))),
 mergedjetSrc_(consumes<edm::View<pat::Jet> >(iConfig.getUntrackedParameter<edm::InputTag>("mergedjetSrc"))),
+//===================================deep jet===================================================
+//Deepjets_(consumes<edm::View<pat::Jet> >(iConfig.getUntrackedParameter<edm::InputTag>("deepjet"))),
 metSrc_(consumes<edm::View<pat::MET> >(iConfig.getUntrackedParameter<edm::InputTag>("metSrc"))),
 triggerSrc_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerSrc"))),
 triggerObjects_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("triggerObjects"))),
@@ -741,7 +752,8 @@ triggerList(iConfig.getUntrackedParameter<std::vector<std::string>>("triggerList
 skimLooseLeptons(iConfig.getUntrackedParameter<int>("skimLooseLeptons",2)),
 skimTightLeptons(iConfig.getUntrackedParameter<int>("skimTightLeptons",2)),
 verbose(iConfig.getUntrackedParameter<bool>("verbose",false)),
-year(iConfig.getUntrackedParameter<int>("year",2018))////for year put 2016,2017, or 2018 to select correct training
+year(iConfig.getUntrackedParameter<int>("year",2018)),////for year put 2016,2017, or 2018 to select correct training
+isCode4l(iConfig.getUntrackedParameter<bool>("isCode4l",false))
 {
   if(!isMC){reweightForPU = false;}
 
@@ -767,7 +779,7 @@ year(iConfig.getUntrackedParameter<int>("year",2018))////for year put 2016,2017,
   tableEwk = readFile_and_loadEwkTable("ZZBG");
 
   kinZfitter = new KinZfitter(!isMC , year);
-  if(doMela){
+  if(isCode4l && doMela){
     mela = new Mela(13.0, 125.0,TVar::SILENT);
     mela->setCandidateDecayMode(TVar::CandidateDecay_ZZ);
   }
@@ -969,6 +981,10 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<edm::View<pat::Jet> > mergedjets;
   iEvent.getByToken(mergedjetSrc_,mergedjets);
 
+  //=======================deep jet=============================================
+  //edm::Handle<edm::View<pat::Jet> > Deepjets;
+  //iEvent.getByToken(Deepjets_,Deepjets);
+
   // GEN collections
   edm::Handle<reco::GenParticleCollection> prunedgenParticles;
   iEvent.getByToken(prunedgenParticlesSrc_, prunedgenParticles);
@@ -989,7 +1005,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   iEvent.getByToken(lheInfoSrc_, lheInfo);
 
   // STXS info
-  if (isMC) {
+  if (isCode4l && isMC) {
       edm::Handle<HTXS::HiggsClassification> htxs;
       iEvent.getByToken(htxsSrc_,htxs);
       stage0cat = htxs->stage0_cat;
@@ -1127,6 +1143,11 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   mergedjet_btag.clear();
   mergedjet_ZvsQCD.clear();
   mergedjet_ZbbvsQCD.clear();
+  mergedjet_ZHbbvsQCD.clear();
+  mergedjet_WvsQCD.clear();
+  mergedjet_ZHbbvsQCD.clear();
+  mergedjet_HbbvsQCD.clear();
+  mergedjet_H4qvsQCD.clear();
 
   mergedjet_nsubjet.clear();
   mergedjet_subjet_pt.clear(); mergedjet_subjet_eta.clear();
@@ -1870,8 +1891,8 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     //Fake Rate Study (Z+1L Control Region)
     if (verbose) cout<<"begin Z+1L fake rate study"<<endl;
     // Z+1L selection
-    findZ1LCandidate(iEvent);
-    if(foundZ1LCandidate){
+    if(isCode4l) findZ1LCandidate(iEvent);
+    if(isCode4l && foundZ1LCandidate){
       passedZ4lZ1LSelection = true;
       if (passedTrig) passedZ1LSelection = true;
     }
@@ -1882,7 +1903,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     vector<pat::Electron> selectedElectrons;
 
     if (verbose) cout<<"begin looking for higgs candidate"<<endl;
-    findHiggsCandidate(selectedMuons,selectedElectrons,iEvent);
+    if(isCode4l) findHiggsCandidate(selectedMuons,selectedElectrons,iEvent);
     if (verbose) {cout<<"found higgs candidate? "<<foundHiggsCandidate<<endl; }
 
     //===============================================================================
@@ -1978,6 +1999,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     vector<pat::Jet> selectedMergedJets;
 
+
     for(unsigned int i = 0; i < mergedjets->size(); ++i) { // all merged jets
 
         const pat::Jet & mergedjet = mergedjets->at(i);
@@ -1985,16 +2007,19 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         double eta = double(mergedjet.eta());
 
         //if(pt>60 && abs(eta)<2.5) selectedMergedJets.push_back(mergedjet);
-        if(pt>170 && abs(eta)<4.7) selectedMergedJets.push_back(mergedjet);
+        if(pt>200 && abs(eta)<4.7) selectedMergedJets.push_back(mergedjet);
 
     } // all merged jets
+
+
+    //
 
     //===============================================================================
     //=======================jet done================================================
     //===============================================================================
 
 
-    if(foundHiggsCandidate){
+    if(isCode4l && foundHiggsCandidate){
       for(unsigned int i = 0; i<4;i++){
         int index = lep_Hindex[i];
         if(fsrmap[index].Pt()!=0){
@@ -2087,7 +2112,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     // Comput Matrix Elelements After filling jets, Do Kinematic fit, add scale factors
     //if (foundHiggsCandidate || lep_pt.size()>=4) {
-    if(foundHiggsCandidate){
+    if(isCode4l &&foundHiggsCandidate){
       if(foundHiggsCandidate){
         dataMCWeight = lep_dataMC[lep_Hindex[0]]*lep_dataMC[lep_Hindex[1]]*lep_dataMC[lep_Hindex[2]]*lep_dataMC[lep_Hindex[3]];
       }else{
@@ -2102,7 +2127,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       kinZfitter->Setup(selectedLeptons, selectedFsrMap,year);
       mass4lErr = (float)kinZfitter->GetM4lErr();
 
-      if(doRefit){
+      if(isCode4l && doRefit){
         kinZfitter->KinRefitZ();
         mass4lREFIT = (float)kinZfitter->GetRefitM4l();
         mass4lErrREFIT = (float)kinZfitter->GetRefitM4lErrFullCov();
@@ -2111,7 +2136,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       }
       if (verbose) cout<<"mass4l "<<mass4l<<" mass4lREFIT "<<mass4lREFIT<<" massErr "<<mass4lErr<<" massErrREFIT "<<mass4lErrREFIT<<" massZ1REFIT "<<massZ1REFIT<<endl;
     }
-    if (doMela && foundHiggsCandidate){
+    if (isCode4l && doMela && foundHiggsCandidate){
       TLorentzVector Lep1, Lep2, Lep3, Lep4,  Jet1, Jet2;
       if(foundHiggsCandidate){
         Lep1.SetPtEtaPhiM(lepFSR_pt[lep_Hindex[0]],lepFSR_eta[lep_Hindex[0]],lepFSR_phi[lep_Hindex[0]],lepFSR_mass[lep_Hindex[0]]);
@@ -2966,7 +2991,7 @@ void UFHZZ4LAna::findHiggsCandidate(std::vector< pat::Muon > &selectedMuons, std
       SimpleParticleCollection_t associated;
 
       float D_bkg_kin_tmp;
-      if(doMela){
+      if(isCode4l && doMela){
         mela->setInputEvent(&daughters, &associated,0,0);
         mela->setCurrentCandidateFromIndex(0);
 
@@ -3531,6 +3556,9 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("mergedjet_btag",&mergedjet_btag);
   tree->Branch("mergedjet_ZvsQCD",&mergedjet_ZvsQCD);
   tree->Branch("mergedjet_ZbbvsQCD",&mergedjet_ZbbvsQCD);
+  tree->Branch("mergedjet_WvsQCD",&mergedjet_WvsQCD);
+  tree->Branch("mergedjet_ZHbbvsQCD",&mergedjet_ZHbbvsQCD);
+  tree->Branch("mergedjet_HbbvsQCD",&mergedjet_H4qvsQCD);
 
 
   tree->Branch("mergedjet_L1",&mergedjet_L1);
@@ -3542,6 +3570,7 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("mergedjet_subjet_eta",&mergedjet_subjet_eta);
   tree->Branch("mergedjet_subjet_phi",&mergedjet_subjet_phi);
   tree->Branch("mergedjet_subjet_mass",&mergedjet_subjet_mass);
+  tree->Branch("mergedjet_subjet_softDropMass",&mergedjet_subjet_softDropMass);
   tree->Branch("mergedjet_subjet_btag",&mergedjet_subjet_btag);
   tree->Branch("mergedjet_subjet_partonFlavour",&mergedjet_subjet_partonFlavour);
   tree->Branch("mergedjet_subjet_hadronFlavour",&mergedjet_subjet_hadronFlavour);
@@ -3693,7 +3722,7 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
   using namespace pat;
   using namespace std;
 
-  cout<<"[INFO] start setTreeVariables"<<endl;
+  //cout<<"[INFO] start setTreeVariables"<<endl;
 
   //========================================================================================
   //======================================Jet INFO==========================================
@@ -4049,18 +4078,24 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
       mergedjet_tau2.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau2") );
       mergedjet_btag.push_back((float)selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags") );
       mergedjet_ZvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD"));
-      std::cout<<"(float)selectedMergedJets[k].bDiscriminator(pfDeepBoostedDiscriminatorsJetTags:ZvsQCD) = " <<(float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD")<<std::endl;
+      //std::cout<<"(float)selectedMergedJets[k].bDiscriminator(pfDeepBoostedDiscriminatorsJetTags:ZvsQCD) = " <<(float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD")<<std::endl;
       mergedjet_ZbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZbbvsQCD"));
+      mergedjet_WvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:WvsQCD"));
+      mergedjet_ZHbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"));
+      mergedjet_HbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:HbbvsQCD"));
+      mergedjet_H4qvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:H4qvsQCD"));
 
 
       if (verbose) cout<<"double btag: "<<selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags")<<endl;
 
-      auto wSubjets = selectedMergedJets[k].subjets("SoftDrop");
+      auto wSubjets = selectedMergedJets[k].subjets("SoftDropPuppi");
       int nsub = 0;
+      math::XYZTLorentzVector fatJet;
       vector<float> subjets_pt, subjets_eta, subjets_phi, subjets_mass, subjets_btag;
       vector<int> subjets_hadronFlavour, subjets_partonFlavour;
       for ( auto const & iw : wSubjets ) {
           nsub = nsub + 1;
+          fatJet = fatJet + iw->p4();
           subjets_pt.push_back((float)iw->pt());
           subjets_eta.push_back((float)iw->eta());
           subjets_phi.push_back((float)iw->phi());
@@ -4077,11 +4112,15 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
       mergedjet_subjet_eta.push_back(subjets_eta);
       mergedjet_subjet_phi.push_back(subjets_phi);
       mergedjet_subjet_mass.push_back(subjets_mass);
+      mergedjet_subjet_softDropMass.push_back(fatJet.M());
+      //std::cout<<"[INFO] this tau1 = "<<(float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau1")<<endl;
+      //std::cout<<"[INFO] this soft drop mass = "<<fatJet.M()<<endl;
       mergedjet_subjet_btag.push_back(subjets_btag);
       mergedjet_subjet_partonFlavour.push_back(subjets_partonFlavour);
       mergedjet_subjet_hadronFlavour.push_back(subjets_hadronFlavour);
 
   }
+
 
   //==============================================================================================
   //=====================================jet done=================================================
