@@ -401,6 +401,14 @@ private:
   vector<float> mergedjet_HbbvsQCD;
   vector<float> mergedjet_H4qvsQCD;
 
+
+  vector<float> mergedjet_ZvsQCD_de; //de with decorrelated
+  vector<float> mergedjet_ZbbvsQCD_de;
+  vector<float> mergedjet_WvsQCD_de;
+  vector<float> mergedjet_ZHbbvsQCD_de;
+  vector<float> mergedjet_HbbvsQCD_de;
+  vector<float> mergedjet_H4qvsQCD_de;
+
   vector<float> mergedjet_L1;
   vector<float> mergedjet_prunedmass; vector<float> mergedjet_softdropmass;
 
@@ -1148,6 +1156,14 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   mergedjet_ZHbbvsQCD.clear();
   mergedjet_HbbvsQCD.clear();
   mergedjet_H4qvsQCD.clear();
+
+  mergedjet_ZvsQCD_de.clear();
+  mergedjet_ZbbvsQCD_de.clear();
+  mergedjet_ZHbbvsQCD_de.clear();
+  mergedjet_WvsQCD_de.clear();
+  mergedjet_ZHbbvsQCD_de.clear();
+  mergedjet_HbbvsQCD_de.clear();
+  mergedjet_H4qvsQCD_de.clear();
 
   mergedjet_nsubjet.clear();
   mergedjet_subjet_pt.clear(); mergedjet_subjet_eta.clear();
@@ -3559,6 +3575,11 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("mergedjet_WvsQCD",&mergedjet_WvsQCD);
   tree->Branch("mergedjet_ZHbbvsQCD",&mergedjet_ZHbbvsQCD);
   tree->Branch("mergedjet_HbbvsQCD",&mergedjet_H4qvsQCD);
+  tree->Branch("mergedjet_ZvsQCD_de",&mergedjet_ZvsQCD_de);
+  tree->Branch("mergedjet_ZbbvsQCD_de",&mergedjet_ZbbvsQCD_de);
+  tree->Branch("mergedjet_WvsQCD_de",&mergedjet_WvsQCD_de);
+  tree->Branch("mergedjet_ZHbbvsQCD_de",&mergedjet_ZHbbvsQCD_de);
+  tree->Branch("mergedjet_HbbvsQCD_de",&mergedjet_H4qvsQCD_de);
 
 
   tree->Branch("mergedjet_L1",&mergedjet_L1);
@@ -3574,6 +3595,8 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("mergedjet_subjet_btag",&mergedjet_subjet_btag);
   tree->Branch("mergedjet_subjet_partonFlavour",&mergedjet_subjet_partonFlavour);
   tree->Branch("mergedjet_subjet_hadronFlavour",&mergedjet_subjet_hadronFlavour);
+
+
 
   // FSR Photons
   tree->Branch("nFSRPhotons",&nFSRPhotons,"nFSRPhotons/I");
@@ -4065,59 +4088,67 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
           }
      }
 
-      if (isclean_H4l) mergedjet_iscleanH4l.push_back((int)mergedjet_pt.size());
-      mergedjet_pt.push_back((float)selectedMergedJets[k].pt());
-      mergedjet_eta.push_back((float)selectedMergedJets[k].eta());
-      mergedjet_phi.push_back((float)selectedMergedJets[k].phi());
-      mergedjet_mass.push_back((float)selectedMergedJets[k].mass());
-      mergedjet_L1.push_back((float)selectedMergedJets[k].jecFactor("L1FastJet")); // current JEC to L1
+      if (isclean_H4l){
+        mergedjet_iscleanH4l.push_back((int)mergedjet_pt.size());
+        mergedjet_pt.push_back((float)selectedMergedJets[k].pt());
+        mergedjet_eta.push_back((float)selectedMergedJets[k].eta());
+        mergedjet_phi.push_back((float)selectedMergedJets[k].phi());
+        mergedjet_mass.push_back((float)selectedMergedJets[k].mass());
+        mergedjet_L1.push_back((float)selectedMergedJets[k].jecFactor("L1FastJet")); // current JEC to L1
 
-      mergedjet_softdropmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSSoftDropMass"));
-      mergedjet_prunedmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSCorrPrunedMass"));
-      mergedjet_tau1.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau1") );
-      mergedjet_tau2.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau2") );
-      mergedjet_btag.push_back((float)selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags") );
-      mergedjet_ZvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD"));
-      //std::cout<<"(float)selectedMergedJets[k].bDiscriminator(pfDeepBoostedDiscriminatorsJetTags:ZvsQCD) = " <<(float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD")<<std::endl;
-      mergedjet_ZbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZbbvsQCD"));
-      mergedjet_WvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:WvsQCD"));
-      mergedjet_ZHbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"));
-      mergedjet_HbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:HbbvsQCD"));
-      mergedjet_H4qvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:H4qvsQCD"));
+        mergedjet_softdropmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSSoftDropMass"));
+        mergedjet_prunedmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSCorrPrunedMass"));
+        mergedjet_tau1.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau1") );
+        mergedjet_tau2.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau2") );
+        mergedjet_btag.push_back((float)selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags") );
+        mergedjet_ZvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD"));
+        //std::cout<<"(float)selectedMergedJets[k].bDiscriminator(pfDeepBoostedDiscriminatorsJetTags:ZvsQCD) = " <<(float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZvsQCD")<<std::endl;
+        mergedjet_ZbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZbbvsQCD"));
+        mergedjet_WvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:WvsQCD"));
+        mergedjet_ZHbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"));
+        mergedjet_HbbvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:HbbvsQCD"));
+        mergedjet_H4qvsQCD.push_back((float)selectedMergedJets[k].bDiscriminator("pfDeepBoostedDiscriminatorsJetTags:H4qvsQCD"));
+        mergedjet_ZvsQCD_de.push_back((float)selectedMergedJets[k].bDiscriminator("pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZvsQCD"));
+        mergedjet_ZbbvsQCD_de.push_back((float)selectedMergedJets[k].bDiscriminator("pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZbbvsQCD"));
+        mergedjet_WvsQCD_de.push_back((float)selectedMergedJets[k].bDiscriminator("pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:WvsQCD"));
+        mergedjet_ZHbbvsQCD_de.push_back((float)selectedMergedJets[k].bDiscriminator("pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:ZHbbvsQCD"));
+        mergedjet_HbbvsQCD_de.push_back((float)selectedMergedJets[k].bDiscriminator("pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:HbbvsQCD"));
+        mergedjet_H4qvsQCD_de.push_back((float)selectedMergedJets[k].bDiscriminator("pfMassDecorrelatedDeepBoostedDiscriminatorsJetTags:H4qvsQCD"));
 
 
-      if (verbose) cout<<"double btag: "<<selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags")<<endl;
+        if (verbose) cout<<"double btag: "<<selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags")<<endl;
 
-      auto wSubjets = selectedMergedJets[k].subjets("SoftDropPuppi");
-      int nsub = 0;
-      math::XYZTLorentzVector fatJet;
-      vector<float> subjets_pt, subjets_eta, subjets_phi, subjets_mass, subjets_btag;
-      vector<int> subjets_hadronFlavour, subjets_partonFlavour;
-      for ( auto const & iw : wSubjets ) {
-          nsub = nsub + 1;
-          fatJet = fatJet + iw->p4();
-          subjets_pt.push_back((float)iw->pt());
-          subjets_eta.push_back((float)iw->eta());
-          subjets_phi.push_back((float)iw->phi());
-          subjets_mass.push_back((float)iw->mass());
-          subjets_btag.push_back((float)iw->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-          subjets_hadronFlavour.push_back(iw->hadronFlavour());
-          subjets_partonFlavour.push_back(iw->partonFlavour());
-          if (verbose) cout<<"subjet parton "<<iw->partonFlavour()<<" hadron "<<iw->hadronFlavour()<<endl;
+        auto wSubjets = selectedMergedJets[k].subjets("SoftDropPuppi");
+        int nsub = 0;
+        math::XYZTLorentzVector fatJet;
+        vector<float> subjets_pt, subjets_eta, subjets_phi, subjets_mass, subjets_btag;
+        vector<int> subjets_hadronFlavour, subjets_partonFlavour;
+        for ( auto const & iw : wSubjets ) {
+            nsub = nsub + 1;
+            fatJet = fatJet + iw->p4();
+            subjets_pt.push_back((float)iw->pt());
+            subjets_eta.push_back((float)iw->eta());
+            subjets_phi.push_back((float)iw->phi());
+            subjets_mass.push_back((float)iw->mass());
+            subjets_btag.push_back((float)iw->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+            subjets_hadronFlavour.push_back(iw->hadronFlavour());
+            subjets_partonFlavour.push_back(iw->partonFlavour());
+            if (verbose) cout<<"subjet parton "<<iw->partonFlavour()<<" hadron "<<iw->hadronFlavour()<<endl;
 
+        }
+
+        mergedjet_nsubjet.push_back(nsub);
+        mergedjet_subjet_pt.push_back(subjets_pt);
+        mergedjet_subjet_eta.push_back(subjets_eta);
+        mergedjet_subjet_phi.push_back(subjets_phi);
+        mergedjet_subjet_mass.push_back(subjets_mass);
+        mergedjet_subjet_softDropMass.push_back(fatJet.M());
+        //std::cout<<"[INFO] this tau1 = "<<(float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau1")<<endl;
+        //std::cout<<"[INFO] this soft drop mass = "<<fatJet.M()<<endl;
+        mergedjet_subjet_btag.push_back(subjets_btag);
+        mergedjet_subjet_partonFlavour.push_back(subjets_partonFlavour);
+        mergedjet_subjet_hadronFlavour.push_back(subjets_hadronFlavour);
       }
-
-      mergedjet_nsubjet.push_back(nsub);
-      mergedjet_subjet_pt.push_back(subjets_pt);
-      mergedjet_subjet_eta.push_back(subjets_eta);
-      mergedjet_subjet_phi.push_back(subjets_phi);
-      mergedjet_subjet_mass.push_back(subjets_mass);
-      mergedjet_subjet_softDropMass.push_back(fatJet.M());
-      //std::cout<<"[INFO] this tau1 = "<<(float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau1")<<endl;
-      //std::cout<<"[INFO] this soft drop mass = "<<fatJet.M()<<endl;
-      mergedjet_subjet_btag.push_back(subjets_btag);
-      mergedjet_subjet_partonFlavour.push_back(subjets_partonFlavour);
-      mergedjet_subjet_hadronFlavour.push_back(subjets_hadronFlavour);
 
   }
 
