@@ -27,7 +27,8 @@ process.Timing = cms.Service("Timing",
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 myfilelist = cms.untracked.vstring(
-       '/store/mc/RunIISummer19UL17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v1/260000/01E437E0-B757-5B45-950F-CF648C57CE32.root'
+       #'/store/mc/RunIISummer19UL17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v1/260000/01E437E0-B757-5B45-950F-CF648C57CE32.root',
+       '/store/mc/RunIISummer19UL17MiniAOD/QCD_Pt-15to7000_TuneCP5_Flat2018_13TeV_pythia8/MINIAODSIM/106X_mc2017_realistic_v6-v2/100000/00F14449-0E85-FB42-87FA-AD7956E4714B.root'
 
         )
 
@@ -372,7 +373,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               ),
                               verbose = cms.untracked.bool(False),
                               skimLooseLeptons = cms.untracked.int32(2),
-                              skimTightLeptons = cms.untracked.int32(2),
+                              skimTightLeptons = cms.untracked.int32(0),
                               #bestCandMela = cms.untracked.bool(False),
                               year = cms.untracked.int32(2017),
                               isCode4l = cms.untracked.bool(False),

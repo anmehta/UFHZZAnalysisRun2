@@ -27,7 +27,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 myfilelist = cms.untracked.vstring(
     #'/store/mc/RunIIAutumn18MiniAOD/JpsiToMuMu_JpsiPt8_TuneCP5_13TeV-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/270000/FE663B04-41AE-7F42-892C-22891454BB2C.root'
-     '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext2-v1/00000/0EFEE6C9-3B71-D94C-AF6F-D75EFE5D0C31.root',
+     '/store/mc/RunIISummer20UL18MiniAOD/GluGluHToZZTo2L2Q_M1000_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v1/10000/EB8E858B-766E-E647-8DF2-C2051DAD5CEA.root',
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/00000/1420AC0A-AB2F-8F4B-A5FC-8E040B670492.root/',
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root'
         )
@@ -391,7 +391,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               #bestCandMela = cms.untracked.bool(False),
 #                              verbose = cms.untracked.bool(True),
                               year = cms.untracked.int32(2018),####for year put 2016,2017, or 2018 to select correct setting
-                              #isCode4l = cms.untracked.bool(False),
+                              isCode4l = cms.untracked.bool(False),
                              )
 
 

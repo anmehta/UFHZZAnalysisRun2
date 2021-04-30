@@ -35,7 +35,7 @@ process.source = cms.Source("PoolSource",fileNames = myfilelist,
                             )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("DUMMYFILENAME.root")
+                                   fileName = cms.string("2017dataTesting.root")
 )
 
 # clean muons by segments 
@@ -90,14 +90,14 @@ process.calibratedPatElectrons.src = cms.InputTag("slimmedElectrons")
 ##  # add them to the VID producer
 ##  for idmod in my_id_modules:
 ##      setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-##  
+##
 ##  #process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('calibratedPatElectrons')
 ##  #process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('calibratedPatElectrons')
 ##  #process.electronMVAValueMapProducer.srcMiniAOD= cms.InputTag('calibratedPatElectrons')
 ##  process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('selectedElectrons')
 ##  process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('selectedElectrons')
 ##  process.electronMVAValueMapProducer.srcMiniAOD= cms.InputTag('selectedElectrons')
-##  
+##
 ##  process.electronsMVA = cms.EDProducer("SlimmedElectronMvaIDProducer",
 ##                                        mvaValuesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17IsoV2Values"),
 ##                                        #electronsCollection = cms.InputTag("calibratedPatElectrons"),
@@ -132,7 +132,7 @@ process.jec = cms.ESSource("PoolDBESSource",
             label= cms.untracked.string("AK4PFchs")
             ),
 
-        cms.PSet( 
+        cms.PSet(
             record = cms.string("JetCorrectionsRecord"),
             tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK8PFchs"),
             label= cms.untracked.string("AK8PFchs")
@@ -146,12 +146,12 @@ process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
 
 process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJets"),
-    levels = ['L1FastJet', 
-              'L2Relative', 
+    levels = ['L1FastJet',
+              'L2Relative',
               'L3Absolute',
               'L2L3Residual'
               ],
-    payload = 'AK4PFchs' ) 
+    payload = 'AK4PFchs' )
 
 process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJetsAK8"),
@@ -243,7 +243,7 @@ process.QGTagger.srcVertexCollection=cms.InputTag("offlinePrimaryVertices")
 # compute corrected pruned jet mass
 process.corrJets = cms.EDProducer ( "CorrJetsProducer",
                                     jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
-                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ), 
+                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
                                     rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
                                     payload = cms.string  ( "AK8PFchs" ),
                                     isData  = cms.bool    (  True ),
@@ -337,9 +337,9 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_Ele40_WPTight_Gsf_v',
                                   'HLT_IsoMu27_v',
                               ),
-                              verbose = cms.untracked.bool(False),              
-                              skimLooseLeptons = cms.untracked.int32(3),              
-                              skimTightLeptons = cms.untracked.int32(2),              
+                              verbose = cms.untracked.bool(False),
+                              skimLooseLeptons = cms.untracked.int32(3),
+                              skimTightLeptons = cms.untracked.int32(2),
                               #bestCandMela = cms.untracked.bool(False),
                               year = cms.untracked.int32(2017),
                              )
@@ -367,4 +367,3 @@ process.p = cms.Path(process.fsrPhotonSequence*
 #                     process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
                      process.Ana
                      )
-
