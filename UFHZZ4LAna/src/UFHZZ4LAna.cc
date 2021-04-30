@@ -4046,10 +4046,10 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
 
   // merged jet
   int nselectedMergedJets = selectedMergedJets.size();
-  if(nselectedMergedJets>0){
-    cout<<"[INFO] Found selectedMergedJets  ";
-    cout<<"nselectedMergedJets = "<<nselectedMergedJets<<endl;
-  }
+  //if(nselectedMergedJets>0){
+    //cout<<"[INFO] Found selectedMergedJets  ";
+    //cout<<"nselectedMergedJets = "<<nselectedMergedJets<<endl;
+  //}
   for( unsigned int k = 0; k < selectedMergedJets.size(); k++) {
 
       double tempDeltaR = 999.0;
@@ -4070,7 +4070,7 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
           }
       }
 
-      // check overlap with fsr photons
+      /* check overlap with fsr photons
       unsigned int N = fsrPhotons_pt.size();
       for(unsigned int i=0; i<N; i++) {
 
@@ -4086,7 +4086,9 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
           if (tempDeltaR<0.8) {
               isclean_H4l = false;
           }
+
      }
+     */
 
       if (isclean_H4l){
         mergedjet_iscleanH4l.push_back((int)mergedjet_pt.size());
