@@ -468,6 +468,9 @@ private:
 
   // Jets
   vector<double> GENjet_pt; vector<double> GENjet_eta; vector<double> GENjet_phi; vector<double> GENjet_mass;
+  vector<double> GENZjet_pt; vector<double> GENZjet_eta; vector<double> GENZjet_phi; vector<double> GENZjet_mass;
+  vector<int> GENZjet_momID; vector<int> GENZjet_mommomID;
+  vector<int> GENZjet_status;
   int GENnjets_pt30_eta4p7; float GENpt_leadingjet_pt30_eta4p7;
   int GENnjets_pt30_eta2p5; float GENpt_leadingjet_pt30_eta2p5;
   float GENabsrapidity_leadingjet_pt30_eta4p7; float GENabsdeltarapidity_hleadingjet_pt30_eta4p7;
@@ -3711,6 +3714,13 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("lheNj",&lheNj,"lheNj/I");
   tree->Branch("lheNb",&lheNb,"lheNb/I");
   tree->Branch("nGenStatus2bHad",&nGenStatus2bHad,"nGenStatus2bHad/I");
+  tree->Branch("GENZjet_pt",&GENZjet_pt);
+  tree->Branch("GENZjet_eta",&GENZjet_eta);
+  tree->Branch("GENZjet_phi",&GENZjet_phi);
+  tree->Branch("GENZjet_mass",&GENZjet_mass);
+  tree->Branch("GENZjet_momID",&GENZjet_momID);
+  tree->Branch("GENZjet_mommomID",&GENZjet_mommomID);
+  tree->Branch("GENZjet_status",&GENZjet_status);
 
   //ME
   tree->Branch("me_0plus_JHU", &me_0plus_JHU, "me_0plus_JHU/F");
@@ -4304,6 +4314,17 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
           // END GEN iso calculation
 
       } // leptons
+
+      //jet decay from HZZ
+      if(genPart->pdgId()<=8 && genAna.MotherID(&prunedgenParticles->at(j))==23 && genAna.MotherMotherID(&prunedgenParticles->at(j))==25 && genPart->isHardProcess()){
+        GENZjet_pt.push_back(genPart->pt());
+        GENZjet_eta.push_back(genPart->eta());
+        GENZjet_phi.push_back(genPart->phi());
+        GENZjet_mass.push_back(genPart->mass());
+        GENZjet_momID.push_back(genAna.MotherMotherID(&prunedgenParticles->at(j)));
+        GENZjet_mommomID.push_back(genAna.MotherMotherID(&prunedgenParticles->at(j)));
+        GENZjet_status.push_back(genPart->status());
+      }
 
       if (genPart->pdgId()==25) {
           GENMH=genPart->mass();
