@@ -410,7 +410,8 @@ private:
   vector<float> mergedjet_H4qvsQCD_de;
 
   vector<float> mergedjet_L1;
-  vector<float> mergedjet_prunedmass; vector<float> mergedjet_softdropmass;
+  //vector<float> mergedjet_prunedmass;
+  vector<float> mergedjet_softdropmass;
 
   vector<int> mergedjet_nsubjet;
   vector<float> mergedjet_subjet_softDropMass;
@@ -601,7 +602,7 @@ private:
   edm::EDGetTokenT<edm::ValueMap<float> > axis2Src_;
   edm::EDGetTokenT<edm::ValueMap<int> > multSrc_;
   edm::EDGetTokenT<edm::ValueMap<float> > ptDSrc_;
-  edm::EDGetTokenT<edm::View<pat::Jet> > mergedjetSrc_;
+  edm::EDGetTokenT<edm::View<pat::JetCollection> > mergedjetSrc_;
   //==========================deep jet===========================================
   //edm::EDGetTokenT<edm::View<pat::Jet> > Deepjets_;
   edm::EDGetTokenT<edm::View<pat::MET> > metSrc_;
@@ -691,7 +692,7 @@ qgTagSrc_(consumes<edm::ValueMap<float>>(edm::InputTag("QGTagger", "qgLikelihood
 axis2Src_(consumes<edm::ValueMap<float>>(edm::InputTag("QGTagger", "axis2"))),
 multSrc_(consumes<edm::ValueMap<int>>(edm::InputTag("QGTagger", "mult"))),
 ptDSrc_(consumes<edm::ValueMap<float>>(edm::InputTag("QGTagger", "ptD"))),
-mergedjetSrc_(consumes<edm::View<pat::Jet> >(iConfig.getUntrackedParameter<edm::InputTag>("mergedjetSrc"))),
+mergedjetSrc_(consumes<edm::View<pat::JetCollection> >(iConfig.getUntrackedParameter<edm::InputTag>("mergedjetSrc"))),
 //===================================deep jet===================================================
 //Deepjets_(consumes<edm::View<pat::Jet> >(iConfig.getUntrackedParameter<edm::InputTag>("deepjet"))),
 metSrc_(consumes<edm::View<pat::MET> >(iConfig.getUntrackedParameter<edm::InputTag>("metSrc"))),
@@ -989,7 +990,8 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<edm::ValueMap<float> > ptDHandle;
   iEvent.getByToken(ptDSrc_, ptDHandle);
 
-  edm::Handle<edm::View<pat::Jet> > mergedjets;
+  //edm::Handle<edm::View<pat::JetCollection> > mergedjets;
+  edm::Handle<pat::JetCollection> mergedjets;
   iEvent.getByToken(mergedjetSrc_,mergedjets);
 
   //=======================deep jet=============================================
@@ -1149,7 +1151,8 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   mergedjet_iscleanH4l.clear();
   mergedjet_pt.clear(); mergedjet_eta.clear(); mergedjet_phi.clear(); mergedjet_mass.clear();
   mergedjet_L1.clear();
-  mergedjet_softdropmass.clear(); mergedjet_prunedmass.clear();
+  mergedjet_softdropmass.clear();
+  //mergedjet_prunedmass.clear();
   mergedjet_tau1.clear(); mergedjet_tau2.clear();
   mergedjet_btag.clear();
   mergedjet_ZvsQCD.clear();
@@ -3587,7 +3590,7 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
 
   tree->Branch("mergedjet_L1",&mergedjet_L1);
   tree->Branch("mergedjet_softdropmass",&mergedjet_softdropmass);
-  tree->Branch("mergedjet_prunedmass",&mergedjet_prunedmass);
+  //tree->Branch("mergedjet_prunedmass",&mergedjet_prunedmass);
 
   tree->Branch("mergedjet_nsubjet",&mergedjet_nsubjet);
   tree->Branch("mergedjet_subjet_pt",&mergedjet_subjet_pt);
@@ -4109,7 +4112,7 @@ void UFHZZ4LAna::setTreeVariables(const edm::Event& iEvent, const edm::EventSetu
         mergedjet_L1.push_back((float)selectedMergedJets[k].jecFactor("L1FastJet")); // current JEC to L1
 
         mergedjet_softdropmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSSoftDropMass"));
-        mergedjet_prunedmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSCorrPrunedMass"));
+        //mergedjet_prunedmass.push_back((float)selectedMergedJets[k].userFloat("ak8PFJetsCHSCorrPrunedMass"));
         mergedjet_tau1.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau1") );
         mergedjet_tau2.push_back((float)selectedMergedJets[k].userFloat("NjettinessAK8Puppi:tau2") );
         mergedjet_btag.push_back((float)selectedMergedJets[k].bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags") );
