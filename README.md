@@ -20,10 +20,6 @@ cp UFHZZAnalysisRun2/install*.sh .
 
 ./install_2.sh
 
-cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/Sync_102X_2018_Legacy_cfg.py
-cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/Sync_102X_2017_Legacy_cfg.py
-cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/Sync_102X_2016_Legacy_cfg.py
-
 cp UFHZZAnalysisRun2/Utilities/crab/* .
 
 voms-proxy-init --valid=168:00
@@ -31,19 +27,26 @@ voms-proxy-init --valid=168:00
 
 source /cvmfs/cms.cern.ch/crab3/crab.sh
 
-python SubmitCrabJobs.py -t "myTask_Data" -d datasets_2016ReReco.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_80X_M1703Feb_2l_cfg.py
+test for cmsRun
+note: change path of JER and QGTag database files to fit interactively run in cfg.py
+i.e: vim UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
+     comment out QGdBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db" and dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
+cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
+
+for crab job 
+Data:
+python SubmitCrabJobs.py -t "myTask_Data" -d 2018Data.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
 
 or similary for MC:
-
-python SubmitCrabJobs.py -t "myTask_MC" -d datasets_Summer16_25ns_MiniAOD.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_80X_M17_4l_cfg.py
+python SubmitCrabJobs.py -t "myTask_MC" -d 2018MC.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_106X_Legacy18_2l_cfg.py
 
 You can use manageCrabTask.py to check the status, resubmit, or kill your task. E.g. after submitting:
 
-nohup python -u manageCrabTask.py -t resultsAna_Data_M17_Feb19 -r -l >& managedata.log &
+nohup python -u manageCrabTask.py -t resultsAna_myTask_Data -r -l >& managedata.log &
 
 This will start an infinite loop of running crab resubmit on all of your tasks, then sleep for 30min. You should kill the process once all of your tasks are done. Once all of your tasks are done, you should run the following command to purge your crab cache so that it doesn't fill up:
 
-python manageCrabTask.py -t resultsAna_Data_M17_Feb19 -p
+python manageCrabTask.py -t resultsAna_myTask_Data -p
 
 UFHZZ4LAna/python/templateMC_102X_Legacy16_4l_cfg.py
 UFHZZ4LAna/python/templateMC_102X_Legacy17_4l_cfg.py
