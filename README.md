@@ -6,9 +6,9 @@ To install:
 
 export SCRAM_ARCH=slc7_amd64_gcc700
 
-cmsrel CMSSW_10_6_12
+cmsrel CMSSW_10_6_25
 
-cd CMSSW_10_6_12/src
+cd CMSSW_10_6_25/src
 
 cmsenv
 
