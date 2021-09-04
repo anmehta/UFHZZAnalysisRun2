@@ -27,12 +27,12 @@ process.Timing = cms.Service("Timing",
 #)
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 myfilelist = cms.untracked.vstring(
     #'/store/mc/RunIIAutumn18MiniAOD/JpsiToMuMu_JpsiPt8_TuneCP5_13TeV-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/270000/FE663B04-41AE-7F42-892C-22891454BB2C.root'
     #'/store/mc/RunIIAutumn18MiniAOD/DYBJetsToLL_M-50_Zpt-200toInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/110000/16D28926-6855-EF42-A50F-C77B27C9EF09.root',
-    '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/0038605E-C94B-574F-AF1F-000435E9A26E.root',
+    '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/120000/B3F93EA2-04C6-E04E-96AF-CB8FAF67E6BA.root ',
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root'
         )
 
@@ -186,7 +186,7 @@ era = "Autumn18_V19_MC"
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
 #=====================AK8Jet recluster===========================================
-cleanedCandidates = cms.InputTag("cleanedCandidates")
+#cleanedCandidates = cms.InputTag("cleanedCandidates")
 print 'cleanedCandidates.value() = '+str(cleanedCandidates.value())
 from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
 listBTagInfos = ['pfInclusiveSecondaryVertexFinderTagInfos','pfImpactParameterTagInfos']
@@ -199,8 +199,8 @@ jetToolbox(process,'ak8','dummySeqAK8','noOutput',
            Cut='pt > 170.0 && abs(rapidity()) < 2.4',
            dataTier='miniAOD', runOnMC=True,
            postFix=reclusterAK8JetPostFix,
-           newPFCollection = False,
-           nameNewPFCollection = cleanedCandidates.value(),
+           #newPFCollection = False,
+           #nameNewPFCollection = cleanedCandidates.value(),
            addSoftDrop=True, addSoftDropSubjets=True,
            addNsub=True, maxTau=3,
            bTagInfos = listBTagInfos, bTagDiscriminators = listBtagDiscriminatorsAK8,
@@ -226,6 +226,9 @@ updateJetCollection(
      printWarning = False
 )
 process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
+newAK8Puppijet = "selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"
+
+#recluster done
 
 process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     #src = cms.InputTag("slimmedJets"),
@@ -236,13 +239,13 @@ process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     #payload = 'AK4PFchs'
     payload = 'AK4PFPuppi' )
 
-process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
+#process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
     #src = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
-    src = cms.InputTag("selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"),
-    levels = ['L1FastJet',
-              'L2Relative',
-              'L3Absolute'],
-    payload = 'AK8PFPuppi' )
+#    src = cms.InputTag("selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"),
+#    levels = ['L1FastJet',
+#              'L2Relative',
+#              'L3Absolute'],
+#    payload = 'AK8PFPuppi' )
 
 process.slimmedJetsJEC = process.updatedPatJets.clone(
     #jetSource = cms.InputTag("slimmedJets"),
@@ -250,11 +253,11 @@ process.slimmedJetsJEC = process.updatedPatJets.clone(
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("jetCorrFactors"))
     )
 
-process.slimmedJetsAK8JEC = process.updatedPatJets.clone(
+#process.slimmedJetsAK8JEC = process.updatedPatJets.clone(
     #jetSource = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
-    jetSource = cms.InputTag("selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"),
-    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("AK8PFJetCorrFactors"))
-    )
+#    jetSource = cms.InputTag("selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"),
+#    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("AK8PFJetCorrFactors"))
+#    )
 
 ### add pileup id and discriminant to patJetsReapplyJEC
 process.load("RecoJets.JetProducers.PileupJetID_cfi")
@@ -340,14 +343,14 @@ process.QGTagger.srcJets = cms.InputTag( 'slimmedJetsJEC' )
 process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 process.QGTagger.srcVertexCollection=cms.InputTag("offlinePrimaryVertices")
 
-# compute corrected pruned jet mass
-process.corrJets = cms.EDProducer ( "CorrJetsProducer",
-                                   jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
-                                   vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
-                                    rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
-                                    payload = cms.string  ( "AK8PFPuppi" ),
-                                    isData  = cms.bool    (  False ),
-                                    year = cms.untracked.int32(2018))
+# compute corrected pruned jet mass (no need for high mass analyze any more)
+#process.corrJets = cms.EDProducer ( "CorrJetsProducer",
+#                                   jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
+#                                   vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
+#                                    rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
+#                                    payload = cms.string  ( "AK8PFPuppi" ),
+#                                    isData  = cms.bool    (  False ),
+#                                    year = cms.untracked.int32(2018))
 
 
 # Recompute MET
@@ -393,7 +396,8 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               jetSrc       = cms.untracked.InputTag("slimmedJetsJEC"),
                               #jetSrc       = cms.untracked.InputTag("slimmedJetsPuppi"),
 #                              jetSrc       = cms.untracked.InputTag("slimmedJets"),
-                              mergedjetSrc = cms.untracked.InputTag("corrJets"),
+                              #mergedjetSrc = cms.untracked.InputTag("corrJets"),
+                              mergedjetSrc = cms.untracked.InputTag(newAK8Puppijet),
                               metSrc       = cms.untracked.InputTag("slimmedMETs","","UFHZZ4LAnalysis"),
                               #metSrc       = cms.untracked.InputTag("slimmedMETs"),
                               vertexSrc    = cms.untracked.InputTag("offlineSlimmedPrimaryVertices"),
@@ -481,10 +485,10 @@ process.p = cms.Path(process.fsrPhotonSequence*
                      process.pileupJetIdUpdated*
                      process.slimmedJetsJEC*
                      process.QGTagger*
-                     process.AK8PFJetCorrFactors*
-                     process.slimmedJetsAK8JEC*
+                     #process.AK8PFJetCorrFactors*
+                     #process.slimmedJetsAK8JEC*
                      process.fullPatMetSequence*
-                     process.corrJets*
+                     #process.corrJets*
                      process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
                      process.Ana
                      )
