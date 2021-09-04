@@ -22,13 +22,17 @@ process.Timing = cms.Service("Timing",
                              summaryOnly = cms.untracked.bool(True)
                              )
 
+#process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
+#    ignoreTotal = cms.untracked.int32(1)
+#)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 myfilelist = cms.untracked.vstring(
     #'/store/mc/RunIIAutumn18MiniAOD/JpsiToMuMu_JpsiPt8_TuneCP5_13TeV-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/270000/FE663B04-41AE-7F42-892C-22891454BB2C.root'
     #'/store/mc/RunIIAutumn18MiniAOD/DYBJetsToLL_M-50_Zpt-200toInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/110000/16D28926-6855-EF42-A50F-C77B27C9EF09.root',
-    '/store/mc/RunIIAutumn18MiniAOD/GluGluHToZZTo2L2Q_M600_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/50000/8AAD6194-1CE6-B046-98D4-5CA1F596AF4C.root',
+    '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/0038605E-C94B-574F-AF1F-000435E9A26E.root',
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root'
         )
 
@@ -181,19 +185,44 @@ era = "Autumn18_V19_MC"
 # Add an ESPrefer to override JEC that might be available from the global tag
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
+#=====================AK8Jet recluster===========================================
+cleanedCandidates = cms.InputTag("cleanedCandidates")
+print 'cleanedCandidates.value() = '+str(cleanedCandidates.value())
+from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
+listBTagInfos = ['pfInclusiveSecondaryVertexFinderTagInfos','pfImpactParameterTagInfos']
+listBtagDiscriminatorsAK8 = ['pfBoostedDoubleSecondaryVertexAK8BJetTags','pfMassIndependentDeepDoubleBvLJetTags:probHbb']
+JETCorrLevels = ['L2Relative', 'L3Absolute', 'L2L3Residual']
+#JETCorrLevels = ['L2Relative', 'L2L3Residual']
+reclusterAK8JetPostFix='CleanedWithZ'
+jetToolbox(process,'ak8','dummySeqAK8','noOutput',
+           PUMethod='Puppi', JETCorrPayload='AK8PFPuppi', JETCorrLevels=JETCorrLevels,
+           Cut='pt > 170.0 && abs(rapidity()) < 2.4',
+           dataTier='miniAOD', runOnMC=True,
+           postFix=reclusterAK8JetPostFix,
+           newPFCollection = False,
+           nameNewPFCollection = cleanedCandidates.value(),
+           addSoftDrop=True, addSoftDropSubjets=True,
+           addNsub=True, maxTau=3,
+           bTagInfos = listBTagInfos, bTagDiscriminators = listBtagDiscriminatorsAK8,
+           subJETCorrPayload='AK4PFPuppi', subJETCorrLevels=JETCorrLevels,
+           verbosity = 0 #if self.verbose else 0
+        )
+
 
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 from RecoBTag.ONNXRuntime.pfDeepBoostedJet_cff import _pfDeepBoostedJetTagsAll
 from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetJetTagsAll
 updateJetCollection(
      process,
-     jetSource = cms.InputTag('slimmedJetsAK8'),
+     #jetSource = cms.InputTag('slimmedJetsAK8'),
+     jetSource = cms.InputTag('packedPatJetsAK8PFPuppi'+reclusterAK8JetPostFix+'SoftDrop'), #recluster
      pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
      svSource = cms.InputTag('slimmedSecondaryVertices'),
      rParam = 0.8,
      jetCorrections = ('AK8PFPuppi', cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual']), 'None'),
      btagDiscriminators = _pfDeepBoostedJetTagsAll+_pfParticleNetJetTagsAll,
-     postfix='AK8WithDeepTags',
+     #postfix='AK8WithDeepTags',
+     postfix='AK8CleanedWithZWithPuppiDaughters', #recluster
      printWarning = False
 )
 process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
@@ -208,7 +237,8 @@ process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     payload = 'AK4PFPuppi' )
 
 process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
-    src = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
+    #src = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
+    src = cms.InputTag("selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"),
     levels = ['L1FastJet',
               'L2Relative',
               'L3Absolute'],
@@ -221,7 +251,8 @@ process.slimmedJetsJEC = process.updatedPatJets.clone(
     )
 
 process.slimmedJetsAK8JEC = process.updatedPatJets.clone(
-    jetSource = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
+    #jetSource = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
+    jetSource = cms.InputTag("selectedUpdatedPatJetsAK8"+reclusterAK8JetPostFix+"WithPuppiDaughters"),
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("AK8PFJetCorrFactors"))
     )
 
@@ -242,7 +273,7 @@ process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 # for hpc
 dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7b_MC.db"
 # for crab
-#dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
+#dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7b_MC.db"
 process.jer = cms.ESSource("PoolDBESSource",
         CondDBSetup,
         connect = cms.string("sqlite_file:"+dBJERFile),
