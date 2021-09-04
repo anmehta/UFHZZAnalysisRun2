@@ -187,7 +187,7 @@ era = "Autumn18_V19_MC"
 
 #=====================AK8Jet recluster===========================================
 #cleanedCandidates = cms.InputTag("cleanedCandidates")
-print 'cleanedCandidates.value() = '+str(cleanedCandidates.value())
+#print 'cleanedCandidates.value() = '+str(cleanedCandidates.value())
 from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
 listBTagInfos = ['pfInclusiveSecondaryVertexFinderTagInfos','pfImpactParameterTagInfos']
 listBtagDiscriminatorsAK8 = ['pfBoostedDoubleSecondaryVertexAK8BJetTags','pfMassIndependentDeepDoubleBvLJetTags:probHbb']
