@@ -21,7 +21,7 @@
 <use   name="PhysicsTools/Utilities"/>
 <use   name="SimDataFormats/PileupSummaryInfo"/>
 <use   name="SimDataFormats/GeneratorProducts">
-<use   name="EgammaAnalysis/ElectronTools"/> 
+<use   name="EgammaAnalysis/ElectronTools"/>
 <use   name="RecoEgamma/EgammaTools"/>
 <use   name="RecoParticleFlow/PFClusterTools"/>
 <use   name="DataFormats/METReco"/>
@@ -38,9 +38,9 @@
 <use   name="RecoEcal/EgammaCoreTools"/>
 <use   name="PhysicsTools/SelectorUtils"/>
 <use   name="MagneticField/Records"/>
-<use   name="ZZMatrixElement/MELA"/>
-<use   name="ZZMatrixElement/MEKD"/>
-<use   name="ZZMatrixElement/MEMCalculators"/>
+<use   name="JHUGenMELA/MELA"/>
+<use   name="JHUGenMELA/MEKD"/>
+<use   name="JHUGenMELA/MEMCalculators"/>
 <use   name="KinZfitter/KinZfitter"/>
 <use   name="CondFormats/JetMETObjects"/>
 <use   name="JetMETCorrections/Objects"/>
