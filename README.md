@@ -18,6 +18,8 @@ git clone -b 106X_2l2q https://github.com/jialin-guo1/UFHZZAnalysisRun2.git
 
 cp UFHZZAnalysisRun2/install*.sh .
 
+chmod 777 install_2.sh
+
 ./install_2.sh
 
 cp UFHZZAnalysisRun2/Utilities/crab/* .
@@ -33,7 +35,7 @@ i.e: vim UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.p
      comment out QGdBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db" and dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
 cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
 
-for crab job 
+for crab job
 Data:
 python SubmitCrabJobs.py -t "myTask_Data" -d 2018Data.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
 

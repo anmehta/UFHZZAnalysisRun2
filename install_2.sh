@@ -15,14 +15,16 @@ git cms-addpkg PhysicsTools/PatAlgos/
 git clone -b v2.3.5 https://github.com/JHUGen/JHUGenMELA
 sh JHUGenMELA/MELA/setup.sh -j 8
 git clone -b RunII_v2 https://github.com/VBF-HZZ/UFHZZAnalysisRun2-Accessary.git
-mv UFHZZAnalysisRun2-Accessary/* ./
+#mv UFHZZAnalysisRun2-Accessary/* ./
 #rm -rf UFHZZAnalysisRun2-Accessary
 mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/Identification/mvaElectronID_Autumn18_ID_ISO_cff.py ./RecoEgamma/ElectronIdentification/python/Identification/
 mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/Identification/mvaElectronID_Summer16_ID_ISO_cff.py  ./RecoEgamma/ElectronIdentification/python/Identification/
 mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/ElectronMVAValueMapProducer_cfi.py  RecoEgamma/ElectronIdentification/python/
 mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/ElectronIDValueMapProducer_cfi.py RecoEgamma/ElectronIdentification/python/
 mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/data/MVAWeightFiles RecoEgamma/ElectronIdentification/data/
-mv UFHZZAnalysisRun2-Accessary ../
+mv UFHZZAnalysisRun2-Accessary/* ./
+rm -rf UFHZZAnalysisRun2-Accessary
+#mv UFHZZAnalysisRun2-Accessary ../
 git clone -b tmp_Ferrico https://github.com/ferrico/KinZfitter.git
 git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_102X_v3
 scram b -j 8
