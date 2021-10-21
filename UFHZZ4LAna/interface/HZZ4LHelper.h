@@ -88,7 +88,6 @@ public:
     HZZ4LHelper();
     ~HZZ4LHelper();
   
-//    std::vector<pat::Electron> goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, double elPtCut,bool Corr);  //TJ
     std::vector<pat::Electron> goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, double elPtCut);
     std::vector<pat::Electron> goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, edm::Handle<edm::View<pat::Electron> > ElectronsUnS, double elPtCut);
     std::vector<pat::Muon> goodLooseMuons2012(edm::Handle<edm::View<pat::Muon> > Muons, double muPtCut);
@@ -155,6 +154,11 @@ public:
 
     float getDbkgkinConstant(int ZZflav, float ZZMass);
     float getDbkgConstant(int ZZflav, float ZZMass);
+
+    float getDg4Constant(float ZZMass);
+    float getDg2Constant(float ZZMass);
+    float getDL1Constant(float ZZMass);
+    float getDL1ZgsConstant(float ZZMass);
 
     enum MuonEffectiveAreaType {
         kMuTrkIso03, 
@@ -239,6 +243,10 @@ public:
     TSpline3 *DjjZHSpline;
     TSpline3 *DjjWHSpline;
 
+    TSpline *spline_g4;
+    TSpline *spline_g2;
+    TSpline *spline_L1;
+    TSpline *spline_L1Zgs;
 
 };
 
@@ -322,6 +330,29 @@ HZZ4LHelper::HZZ4LHelper()
     fDjjWHSpline->Close();
     delete fDjjWHSpline;
 
+    edm::FileInPath Dg4SplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_g4.root");
+    TFile *gConstant_g4 = TFile::Open(Dg4SplinefileInPath.fullPath().c_str());
+    spline_g4 = (TSpline*) gConstant_g4->Get("sp_tgfinal_HZZ2e2mu_SM_over_tgfinal_HZZ2e2mu_g4");
+    gConstant_g4->Close();
+    delete gConstant_g4;
+
+    edm::FileInPath Dg2SplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_g2.root");
+    TFile *gConstant_g2 = TFile::Open(Dg2SplinefileInPath.fullPath().c_str());
+    spline_g2 = (TSpline*) gConstant_g2->Get("sp_tgfinal_HZZ2e2mu_SM_over_tgfinal_HZZ2e2mu_g2");
+    gConstant_g2->Close();
+    delete gConstant_g2;
+
+    edm::FileInPath DL1SplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_L1.root");
+    TFile *gConstant_L1 = TFile::Open(DL1SplinefileInPath.fullPath().c_str());
+    spline_L1 = (TSpline*) gConstant_L1->Get("sp_tgfinal_HZZ2e2mu_SM_over_tgfinal_HZZ2e2mu_L1");
+    gConstant_L1->Close();
+    delete gConstant_L1;
+
+    edm::FileInPath DL1ZgsSplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_L1Zgs.root");
+    TFile *gConstant_L1Zgs = TFile::Open(DL1ZgsSplinefileInPath.fullPath().c_str());
+    spline_L1Zgs = (TSpline*) gConstant_L1Zgs->Get("sp_tgfinal_HZZ2e2mu_SM_photoncut_over_tgfinal_HZZ2e2mu_L1Zgs");
+    gConstant_L1Zgs->Close();
+    delete gConstant_L1Zgs;
 
 }
 
@@ -330,32 +361,6 @@ HZZ4LHelper::~HZZ4LHelper()
 {
     //destructor ---do nothing
 }
-
-/*
-//std::vector<pat::Electron> HZZ4LHelper::goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, double elPtCut) {
-std::vector<pat::Electron> HZZ4LHelper::goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, double elPtCut, bool Corr) {
-    using namespace pat;
-    using namespace std;    
-    vector<pat::Electron> bestElectrons;
-    vector <bool> Ele_passLoose;    
-//
-//    edm::Handle<pat::ElectronRefVector> electronHandle;  //TJ
-  
-    for(edm::View<pat::Electron>::const_iterator elec=Electrons->begin(); elec!=Electrons->end(); ++elec) {        
-	float corr_factor = elec->userFloat("ecalTrkEnergyPostCorr") / elec->energy();
-//	TLorentzVector elect;
-//        elect.SetPtEtaPhiM(elec->pt()*corr_factor,elec->eta(),elec->phi(),elec->mass()*corr_factor);
-//	if (Corr) {elec->setP4(pat::Electron::PolarLorentzVector(elec->pt()*corr_factor, elec->eta(), elec->phi(), elec->mass()*corr_factor));}  // FIXME
-	if (Corr) {cout<<"testing"<<endl;}  
-        if( abs(elec->eta()) < 2.5 && elec->pt() > elPtCut) {
-            bestElectrons.push_back(*elec);
-	    Ele_passLoose.push_back(true);
-        }
-	else Ele_passLoose.push_back(false);
-    }
-    return bestElectrons;    
-}
-*/
 
 std::vector<pat::Electron> HZZ4LHelper::goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, double elPtCut) {
     using namespace pat;
@@ -726,65 +731,44 @@ bool HZZ4LHelper::passTight_BDT_Id(pat::Electron electron, int year) {
     if(year==2018)
     {
         if(electron.pt()<=10){
-            //if(fSCeta < 0.8) cutVal = 0.8955937602;
-            if(fSCeta < 0.8) cutVal = 0.9044286167;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.91106464032;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9094166886;
-            //if(fSCeta >= 1.479) cutVal = 0.94067753025;
-            if(fSCeta >= 1.479) cutVal = 0.9443653660;
+            if(fSCeta < 0.8) cutVal = 0.8955937602;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.91106464032;
+            if(fSCeta >= 1.479) cutVal = 0.94067753025;
         }
         else {
-            //if(fSCeta < 0.8) cutVal = 0.04240620843;
-            if(fSCeta < 0.8) cutVal = 0.1968600840;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0047338429;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0759172100;
-            //if(fSCeta >= 1.479) cutVal = -0.60423293572;
-            if(fSCeta >= 1.479) cutVal = -0.5169136775;
+            if(fSCeta < 0.8) cutVal = 0.04240620843;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0047338429;
+            if(fSCeta >= 1.479) cutVal = -0.60423293572;
         }
-        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues");
-        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer18ULIdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues");
     }
     if(year==2017)
     {
         if(electron.pt()<=10){
-            //if(fSCeta < 0.8) cutVal = 0.85216885148;
-            if(fSCeta < 0.8) cutVal = 0.9128577458;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.82684550976;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9056792368;
-            //if(fSCeta >= 1.479) cutVal = 0.86937630022;
-            if(fSCeta >= 1.479) cutVal = 0.9439440575;
+            if(fSCeta < 0.8) cutVal = 0.85216885148;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.82684550976;
+            if(fSCeta >= 1.479) cutVal = 0.86937630022;
         }
         else {
-            //if(fSCeta < 0.8) cutVal = 0.98248928759;
-            if(fSCeta < 0.8) cutVal = 0.1559788054;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.96919224579;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0273863727;
-            //if(fSCeta >= 1.479) cutVal = 0.79349796445;
-            if(fSCeta >= 1.479) cutVal = -0.5532483665;
+            if(fSCeta < 0.8) cutVal = 0.98248928759;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.96919224579;
+            if(fSCeta >= 1.479) cutVal = 0.79349796445;
         }
-        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
-        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer17ULIdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
     }
     if(year==2016)
     {
         if(electron.pt()<=10){
-            //if(fSCeta < 0.8) cutVal = 0.95034841889;
-            if(fSCeta < 0.8) cutVal = 0.9557993256;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.94606270058;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9475406570;
-            //if(fSCeta >= 1.479) cutVal = 0.93872558098;
-            if(fSCeta >= 1.479) cutVal = 0.9285158721;
+            if(fSCeta < 0.8) cutVal = 0.95034841889;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.94606270058;
+            if(fSCeta >= 1.479) cutVal = 0.93872558098;
         }
         else {
-            //if(fSCeta < 0.8) cutVal = 0.3782357877;
-            if(fSCeta < 0.8) cutVal = 0.3272075608;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.35871320305;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.2468345995;
-            //if(fSCeta >= 1.479) cutVal = -0.57451499543;
-            if(fSCeta >= 1.479) cutVal = -0.5955762814;
+            if(fSCeta < 0.8) cutVal = 0.3782357877;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.35871320305;
+            if(fSCeta >= 1.479) cutVal = -0.57451499543;
         }
-        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16IdIsoValues");
-        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16ULIdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16IdIsoValues");
     }
     if( mvaVal > cutVal ) { return true;}
     //if (mvavalue > cutVal ) { return true;}
@@ -836,47 +820,17 @@ bool HZZ4LHelper::passTight_Id_SUS(pat::Electron electron, std::string elecID, c
     if(year==2018)
     {
         if(electron.pt()<=10){
-      //      if(fSCeta < 0.8) cutVal = 0.8955937602;
-	    if(fSCeta < 0.8) cutVal = 0.9044286167;
-//            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.91106464032;
-	    if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9094166886;
-//            if(fSCeta >= 1.479) cutVal = 0.94067753025;
-	    if(fSCeta >= 1.479) cutVal = 0.9443653660; 
+            if(fSCeta < 0.8) cutVal = 0.8955937602;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.91106464032;
+            if(fSCeta >= 1.479) cutVal = 0.94067753025;
         }
         else {
-        //    if(fSCeta < 0.8) cutVal = 0.04240620843;
-	    if(fSCeta < 0.8) cutVal = 0.1968600840;
-//            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0047338429;
-	    if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0759172100;
-//            if(fSCeta >= 1.479) cutVal = -0.60423293572;
-	    if(fSCeta >= 1.479) cutVal = -0.5169136775;
+            if(fSCeta < 0.8) cutVal = 0.04240620843;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0047338429;
+            if(fSCeta >= 1.479) cutVal = -0.60423293572;
         }
-//        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues");
-	mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer18ULIdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues");
     }
-    if(year==2017)
-    {    
-        if(electron.pt()<=10){
-            //if(fSCeta < 0.8) cutVal = 0.85216885148;
-            if(fSCeta < 0.8) cutVal = 0.9128577458;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.82684550976;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9056792368;
-            //if(fSCeta >= 1.479) cutVal = 0.86937630022;
-            if(fSCeta >= 1.479) cutVal = 0.9439440575;
-        }
-        else {
-            //if(fSCeta < 0.8) cutVal = 0.98248928759;
-            if(fSCeta < 0.8) cutVal = 0.1559788054;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.96919224579;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0273863727;
-            //if(fSCeta >= 1.479) cutVal = 0.79349796445;
-            if(fSCeta >= 1.479) cutVal = -0.5532483665;
-        }
-        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
-        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer17ULIdIsoValues");
-    }
-
-/*
     if(year==2017)
     {
         if(electron.pt()<=10){
@@ -891,31 +845,6 @@ bool HZZ4LHelper::passTight_Id_SUS(pat::Electron electron, std::string elecID, c
         }
         mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
     }
-*/
-
-    if(year==2016)
-    {
-        if(electron.pt()<=10){
-            //if(fSCeta < 0.8) cutVal = 0.95034841889;
-            if(fSCeta < 0.8) cutVal = 0.9557993256;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.94606270058;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9475406570;
-            //if(fSCeta >= 1.479) cutVal = 0.93872558098;
-            if(fSCeta >= 1.479) cutVal = 0.9285158721;
-        }
-        else {
-            //if(fSCeta < 0.8) cutVal = 0.3782357877;
-            if(fSCeta < 0.8) cutVal = 0.3272075608;
-            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.35871320305;
-            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.2468345995;
-            //if(fSCeta >= 1.479) cutVal = -0.57451499543;
-            if(fSCeta >= 1.479) cutVal = -0.5955762814;
-        }
-        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16IdIsoValues");
-        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16ULIdIsoValues");
-    }
-
-/*
     if(year==2016)
     {
         if(electron.pt()<=10){
@@ -930,7 +859,7 @@ bool HZZ4LHelper::passTight_Id_SUS(pat::Electron electron, std::string elecID, c
         }
         mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16IdIsoValues");
     }
-*/
+
     //if (electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues") <= cutVal ) return false;
     if( mvaVal <= cutVal ) return false;
 
@@ -2021,6 +1950,23 @@ float HZZ4LHelper::getDbkgVHdecConstant(int ZZflav, float ZZMass) { // ZZflav==i
     if (abs(ZZflav)==13*13*13*13 || abs(ZZflav)==2*13*13*13*13 || abs(ZZflav)==2*13*13*2*13*13) return DbkgVHdecSpline4l->Eval(ZZMass);
     return 0.0;
 }
+
+float HZZ4LHelper::getDg4Constant(float ZZMass){
+    return spline_g4->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDg2Constant(float ZZMass){
+    return spline_g2->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDL1Constant(float ZZMass){
+    return spline_L1->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDL1ZgsConstant(float ZZMass){
+    return spline_L1Zgs->Eval(ZZMass);
+}
+
 
 double HZZ4LHelper::photonPfIso03(pat::PFParticle pho, edm::Handle<pat::PackedCandidateCollection> pfcands) {
 

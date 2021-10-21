@@ -47,6 +47,7 @@ myfilelist = cms.untracked.vstring(
 print myfilelist
 
 process.source = cms.Source("PoolSource",fileNames = myfilelist,
+        eventsToProcess = cms.untracked.VEventRange('1:630795-1:630795'),
                             )
 
 process.TFileService = cms.Service("TFileService",
@@ -88,8 +89,8 @@ process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService
 
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-                       runEnergyCorrections=True,
-                       #runEnergyCorrections=False,
+                       #runEnergyCorrections=True,
+                       runEnergyCorrections=False,
                        runVID=True,
 		       eleIDModules=['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Summer17UL_ID_ISO_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff'],   
                        phoIDModules=['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff'],
@@ -100,6 +101,10 @@ process.load("RecoEgamma.EgammaTools.calibratedEgammas_cff")
 process.calibratedPatElectrons.correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2017_24Feb2020_runEtaR9Gain_v2"  # 
 process.calibratedPatElectrons.src = cms.InputTag("slimmedElectrons")
 '''
+process.load("RecoEgamma.EgammaTools.calibratedEgammas_cff")
+#process.calibratedPatElectrons.correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2017_17Nov2017_v1_ele_unc"  # 
+process.calibratedPatElectrons.correctionFile = "EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2017_24Feb2020_runEtaR9Gain_v2"  # 
+process.calibratedPatElectrons.src = cms.InputTag("slimmedElectrons")
 # FSR Photons
 process.load('UFHZZAnalysisRun2.FSRPhotons.fsrPhotons_cff')
 
@@ -290,7 +295,7 @@ process.rivetProducerHZZFid = cms.EDProducer('HZZRivetProducer',
 process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               photonSrc    = cms.untracked.InputTag("slimmedPhotons"),
                               electronUnSSrc  = cms.untracked.InputTag("slimmedElectrons"),
-#                              electronSrc  = cms.untracked.InputTag("calibratedPatElectrons"),
+                              electronSrc  = cms.untracked.InputTag("calibratedPatElectrons"),
                               muonSrc      = cms.untracked.InputTag("calibratedMuons"),
                               tauSrc      = cms.untracked.InputTag("slimmedTaus"),
                               jetSrc       = cms.untracked.InputTag("slimmedJetsJEC"),
@@ -346,7 +351,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_TripleMu_10_5_5_DZ_v',
                                   'HLT_TripleMu_12_10_5_v',
                               ),
-                              verbose = cms.untracked.bool(False),              
+                              verbose = cms.untracked.bool(True),              
                               skimLooseLeptons = cms.untracked.int32(4),              
                               skimTightLeptons = cms.untracked.int32(4),              
 			      bestCandMela = cms.untracked.bool(False),   # for differential measurements
@@ -361,7 +366,7 @@ process.p = cms.Path(process.fsrPhotonSequence*
                      process.egmGsfElectronIDSequence*
                      process.egmPhotonIDSequence*
                      process.egammaPostRecoSeq*
-#                     process.calibratedPatElectrons*  
+                     process.calibratedPatElectrons*  
                      process.jetCorrFactors*
                      process.pileupJetIdUpdated*
                      process.slimmedJetsJEC*
