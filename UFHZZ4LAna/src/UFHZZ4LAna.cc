@@ -6776,7 +6776,51 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
         } else {
             passPU_ = bool(goodJets[k].userInt("pileupJetId:fullId") & (1 << 0));
         }
-        if(!(passPU_ || !doPUJetID || jet_jer->Pt()>50)) continue;
+        //if(!(passPU_ || !doPUJetID || jet_jer->Pt()>50)) continue;
+        if(verbose)  cout<<"$$$$$$$$$$$$goodJet: "<<k<<"; pt: "<<goodJets[k].pt()<<"; jec pt: "<<jet_jer->Pt()<<"; PUjetID: "<<passPU_<<endl;
+        if(!(passPU_ || !doPUJetID || goodJets[k].pt()>50)) continue;
+
+//        bool PUjetID = false;
+//        float PUjetID_score = 0;
+//        if ( doJEC && ( year == 2017 || year == 2018 || (year == 2016 && (!(isMC)) )))
+//        {
+//            PUjetID_score = goodJets[k].userFloat("pileupJetIdUpdated:fullDiscriminant");
+//        }
+//        else
+//        {
+//            PUjetID_score = goodJets[k].userFloat("pileupJetId:fullDiscriminant");
+//        }
+//    float jpt, jabseta;
+//    //jpt=jet_jer->Pt();
+//    jpt=goodJets[k].pt();
+//    //jabseta=abs(jet_jer->Eta());
+//    jabseta=abs(goodJets[k].eta());
+//    PUjetID = ( 
+//         ((jpt > 10 && jpt <= 20 && jabseta > 0 && jabseta<=2.5) && PUjetID_score > 0.77) ||
+//         ((jpt > 20 && jpt <= 30 && jabseta > 0 && jabseta<=2.5) && PUjetID_score > 0.90) ||
+//         ((jpt > 30 && jpt <= 40 && jabseta > 0 && jabseta<=2.5) && PUjetID_score > 0.96) ||
+//         ((jpt > 40 && jpt <= 50 && jabseta > 0 && jabseta<=2.5) && PUjetID_score > 0.98) ||
+//
+//         ((jpt > 10 && jpt <= 20 && jabseta > 2.5 && jabseta<=2.75) && PUjetID_score > 0.38) ||
+//         ((jpt > 20 && jpt <= 30 && jabseta > 2.5 && jabseta<=2.75) && PUjetID_score > 0.60) ||
+//         ((jpt > 30 && jpt <= 40 && jabseta > 2.5 && jabseta<=2.75) && PUjetID_score > 0.82) ||
+//         ((jpt > 40 && jpt <= 50 && jabseta > 2.5 && jabseta<=2.75) && PUjetID_score > 0.92) ||
+//
+//         ((jpt > 10 && jpt <= 20 && jabseta > 2.75 && jabseta<=3.0) && PUjetID_score > -0.31) ||
+//         ((jpt > 20 && jpt <= 30 && jabseta > 2.75 && jabseta<=3.0) && PUjetID_score > -0.12) ||
+//         ((jpt > 30 && jpt <= 40 && jabseta > 2.75 && jabseta<=3.0) && PUjetID_score > 0.20)  ||
+//         ((jpt > 40 && jpt <= 50 && jabseta > 2.75 && jabseta<=3.0) && PUjetID_score > 0.47)  ||
+//
+//         ((jpt > 10 && jpt <= 20 && jabseta > 3.0 && jabseta<=5.0) && PUjetID_score > -0.21) ||
+//         ((jpt > 20 && jpt <= 30 && jabseta > 3.0 && jabseta<=5.0) && PUjetID_score > -0.13) ||
+//         ((jpt > 30 && jpt <= 40 && jabseta > 3.0 && jabseta<=5.0) && PUjetID_score > 0.09)  ||
+//         ((jpt > 40 && jpt <= 50 && jabseta > 3.0 && jabseta<=5.0) && PUjetID_score > 0.29) 
+//      );
+//
+//if(!(PUjetID || !doPUJetID || jet_jer->Pt()>50)) continue;
+
+
+
         if(jet_jer->Pt()<10) continue;
         if (verbose) cout<<"Jet nominal: "<<goodJets[k].pt()<<" JER corrected: "<<jet_jer->Pt()<<" JER up: "<<jet_jerup->Pt()<<" JER dn: "<<jet_jerdn->Pt()<<" check Delta between jet and lep / pho: "<<isclean_H4l<<std::endl;
         if (verbose) cout<<"Jet nominal: "<<goodJets[k].pt()<<" JER corrected: "<<jet_jer->Pt()<<" JER up: "<<jet_jerup->Pt()<<" JER dn: "<<jet_jerdn->Pt()<<"\t"<<isclean_H4l<<std::endl;
@@ -6788,47 +6832,38 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
         jecunc->setJetEta(goodJets[k].eta());
         double jecunc_dn = 1.0-jecunc->getUncertainty(false);
         
-        // Tahir-1
         if (jet_jer->Pt() > 30.0 && fabs(goodJets[k].eta())<4.7) {
             if (isclean_H4l) {
                 njets_pt30_eta4p7++;
                 jet_iscleanH4l.push_back((int)jet_pt.size());
-		if (jet_jer->Pt() > pt_leadingjet_pt30_eta4p7) {
+		        if (jet_jer->Pt() > pt_leadingjet_pt30_eta4p7) {
                     pt_leadingjet_pt30_eta4p7 = jet_jer->Pt();
-                    // std::cout << "L5767: pt_leadingjet_pt30_eta4p7 = " << pt_leadingjet_pt30_eta4p7  << std::endl;
-        	//    cout<<"in loop:   Run: "<<Run<<" LumiSect: "<<LumiSect<<" Event: "<<Event<<" pt_leadingjet_pt30_eta4p7 : "<<pt_leadingjet_pt30_eta4p7<<endl;
                     absrapidity_leadingjet_pt30_eta4p7 = jet_jer->Rapidity(); //take abs later
-		    }
+		        }
                 if (jet_jer->Pt() > jet1pt )  {
-		    jet2pt=jet1pt; jet2index2=jet1index2;
-	            //jet1pt=jet_jer->Pt();jet1index2=k;
-	            jet1pt=jet_jer->Pt();jet1index2=(int)jet_pt.size();;
-//        	    cout<<"in loop:   Run: "<<Run<<" LumiSect: "<<LumiSect<<" Event: "<<Event<<" pTj1: "<<pTj1<<endl;
+		            jet2pt=jet1pt; jet2index2=jet1index2;
+	                jet1pt=jet_jer->Pt();jet1index2=(int)jet_pt.size();;
+                    jet2index=jet1index; jet1index=(int)jet_pt.size();
                 }
                else if (jet_jer->Pt()>jet2pt) {
-                    //jet2pt=jet_jer->Pt(); jet2index2= k; //(int)jet_pt.size();
                     jet2pt=jet_jer->Pt(); jet2index2= (int)jet_pt.size(); //(int)jet_pt.size();
+                    jet2index=(int)jet_pt.size();
                 }
                 if (fabs(goodJets[k].eta())<2.5) {
                     njets_pt30_eta2p5++;
-		    if (jet_jer->Pt() > pt_leadingjet_pt30_eta2p5) {
+		            if (jet_jer->Pt() > pt_leadingjet_pt30_eta2p5) {
                         pt_leadingjet_pt30_eta2p5 = jet_jer->Pt();
                     }
                     if (jet_jer->Pt() >jet1pt2p5) {
-			//jet2pt2p5=jet1pt2p5; jet2index_2p5=jet1index_2p5; jet1index_2p5=k;
-			jet2pt2p5=jet1pt2p5; jet2index_2p5=jet1index_2p5; jet1index_2p5=(int)jet_pt.size();;
+			            jet2pt2p5=jet1pt2p5; jet2index_2p5=jet1index_2p5; jet1index_2p5=(int)jet_pt.size();;
                         jet1pt2p5 = jet_jer->Pt();
                     }
-		    else if (jet_jer->Pt()>jet2pt2p5) {
-			//jet2pt2p5=jet_jer->Pt(); jet2index_2p5=k; //(int)jet_pt.size();
-			jet2pt2p5=jet_jer->Pt(); jet2index_2p5=(int)jet_pt.size(); // k; 
-		   } 
-                    
+		            else if (jet_jer->Pt()>jet2pt2p5) {
+			            jet2pt2p5=jet_jer->Pt(); jet2index_2p5=(int)jet_pt.size(); // k; 
+		            } 
                 }
-                
             }  // isclean_H4l
             jet_pt.push_back(jet_jer->Pt());
-            // std::cout << "Line#5791:   Run: "<<Run<<" LumiSect: "<<LumiSect<<" Event: "<<Event << "\tpT " << jet_jer->Pt() << "\t"<< jet1index  << "\t" << jet2index << std::endl;
             jet_pt_raw.push_back(goodJets[k].correctedJet("Uncorrected").pt());///jet Pt without JEC applied
             jet_eta.push_back(jet_jer->Eta());
             jet_phi.push_back(jet_jer->Phi());
@@ -8368,49 +8403,42 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
         if (verbose) cout<<"passedFiducialSelection after other cuts? "<<passedFiducialSelection<<endl;
         
         if (passedFiducialSelection) {
-//            GENmela = new Mela(13.0, 125.0, TVar::SILENT); 
-//            GENmela->setCandidateDecayMode(TVar::CandidateDecay_ZZ);
             // DO GEN JETS
             if (verbose) cout<<"begin filling gen jets"<<endl;
             edm::View<reco::GenJet>::const_iterator genjet;
             //TJ
             int GENjet1index=0; int GENjet2index=0; int GENjet1index_2p5=0; int GENjet2index_2p5=0;
-            //int GENjet1index=0; int GENjet1index_2p5=0;// int GENjet2index_2p5=0;
+
             TLorentzVector Lep1, Lep2, Lep3, Lep4,  Jet1, Jet2, GENJet1, GENJet2, GENJet1_2p5, GENJet2_2p5;
             
             vector<reco::GenJet> GEN_goodJets;
 
-            for(unsigned int i = 0; i < genJets->size(); ++i) 
-            {
-                const reco::GenJet & genjet = genJets->at(i);
-                // GEN_goodJets.push_back(genjet);
+            //for(unsigned int i = 0; i < genJets->size(); ++i) 
+            //{
+            //    const reco::GenJet & genjet = genJets->at(i);
+            //    double pt = genjet.pt();  double eta = genjet.eta();
 
-                double pt = genjet.pt();  double eta = genjet.eta();
-                // double phi = genjet.phi();  double mass = genjet.mass();   // TJ
+            //    if (pt<30.0 || abs(eta)>4.7) continue;
+            //    unsigned int N=GENlep_pt.size();
+            //    for(unsigned int i = 0; i<N; i++)
+            //    {
+            //        if (!(abs(GENlep_id[i])==11 || abs(GENlep_id[i])==13)) continue;
+            //        TLorentzVector genlep;
+            //        genlep.SetPtEtaPhiM(GENlep_pt[i],GENlep_eta[i],GENlep_phi[i],GENlep_mass[i]);
+            //        double dR = deltaR(genlep.Eta(), genlep.Phi(), genjet.eta(),genjet.phi());
+            //        if(dR>0.4) {
+            //            GEN_goodJets.push_back(genjet);
+            //        }
+            //    }
 
-                if (pt<30.0 || abs(eta)>4.7) continue;
-                unsigned int N=GENlep_pt.size();
-                for(unsigned int i = 0; i<N; i++)
-                {
-                    if (!(abs(GENlep_id[i])==11 || abs(GENlep_id[i])==13)) continue;
-                    TLorentzVector genlep;
-                    genlep.SetPtEtaPhiM(GENlep_pt[i],GENlep_eta[i],GENlep_phi[i],GENlep_mass[i]);
-                    double dR = deltaR(genlep.Eta(), genlep.Phi(), genjet.eta(),genjet.phi());
-                    if(dR>0.4) {
-                        GEN_goodJets.push_back(genjet);
-                    }
-                }
+            //}
 
-            }
-
+            unsigned int index_tmp(-1);
             for(genjet = genJets->begin(); genjet != genJets->end(); genjet++) {
+
+                index_tmp++;
                 double pt = genjet->pt();  double eta = genjet->eta();
-                // double phi = genjet->phi();  double mass = genjet->mass();   // TJ
-                //	int jetid = 999;
                 genjet_id = genjet->pdgId();  // needed for bjets
-                //		TLorentzVector thisGENJet;
-                //thisGENJet.SetPtEtaPhiM((*GENjet_pt)[k],(*GENjet_eta)[k],(*GENjet_phi)[k],(*GENjet_mass)[k]);
-                //                thisGENJet.SetPtEtaPhiM(pt,eta,phi,mass);
                 if (pt<30.0 || abs(eta)>4.7) continue;
                 
                 bool inDR_pt30_eta4p7 = false;
@@ -8423,13 +8451,13 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                     double dR = deltaR(genlep.Eta(), genlep.Phi(), genjet->eta(),genjet->phi());
                     if(dR<0.4) {
                         inDR_pt30_eta4p7=true;
-                        // GEN_goodJets.push_back(genjet);
                     }
                 }
                 
                 if (verbose) cout<<"check overlap of gen jet with gen leptons"<<endl;
                 // count number of gen jets which no gen leptons are inside its cone
                 if (!inDR_pt30_eta4p7) {
+                    GEN_goodJets.push_back(genJets->at(index_tmp));
                     GENnjets_pt30_eta4p7++;
                     GENjet_pt.push_back(genjet->pt());
                     if (verbose) cout<<"original gen jet"<<genjet->pt()<<endl;
@@ -9069,6 +9097,8 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
             );
 
 //***************************************
+        if (verbose)
+            std::cout<<"N_GEN_goodJet: "<<GEN_goodJets.size()<<"; N_GENnjets_pt30_eta4p7: "<<GENnjets_pt30_eta4p7<<std::endl;
 
         CalculateNJettinessVar.New_GetRapidityWeightedValues_pTWeighted_UsingEnergy(
              0,  // NJettiness, // this depends on the jettiness that we would like to use
@@ -9307,6 +9337,10 @@ bool UFHZZ4LAna::mZ1_mZ2(unsigned int& L1, unsigned int& L2, unsigned int& L3, u
             
         } // lj
     } // li
+
+    unsigned int tmp_;
+    if(GENlep_pt[L1]<GENlep_pt[L2])    {tmp_=L1;    L1=L2;    L2=tmp_;}
+    if(GENlep_pt[L3]<GENlep_pt[L4])    {tmp_=L3;    L3=L4;    L4=tmp_;}
     
     if(passZ1 && findZ2) return true;
     else return false;
