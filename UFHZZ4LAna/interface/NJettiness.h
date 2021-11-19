@@ -746,7 +746,9 @@ void NJettiness::New_GetRapidityWeightedValues_pTWeighted(
         }
 
         // Inclusive tauB With Higgs Rapidity
-        float fy_TauB = TMath::Abs(goodJets[JetCounter].pt())*TMath::Exp(-TMath::Abs(goodJets[JetCounter].rapidity() - HiggsRapidity));
+        //float TauC_Inc_0j_num = sqrt(goodJets[JetCounter].energy()*goodJets[JetCounter].energy() - goodJets[JetCounter].pz()*goodJets[JetCounter].pz());
+        float fy_TauB = sqrt(goodJets[JetCounter].energy()*goodJets[JetCounter].energy() - goodJets[JetCounter].pz()*goodJets[JetCounter].pz())*TMath::Exp(-TMath::Abs(goodJets[JetCounter].rapidity() - HiggsRapidity));
+        //float fy_TauB = TMath::Abs(goodJets[JetCounter].pt())*TMath::Exp(-TMath::Abs(goodJets[JetCounter].rapidity() - HiggsRapidity));
         if (fy_TauB > TauB_Inc_0j_temp)
         {
             TauB_Inc_0j_temp = fy_TauB;
@@ -854,7 +856,8 @@ void NJettiness::New_GetRapidityWeightedValues_pTWeighted(
         }
 
         // Inclusive tauB With Higgs Rapidity
-        float fy_TauB = TMath::Abs(goodJets[JetCounter].pt())*TMath::Exp(-TMath::Abs(goodJets[JetCounter].rapidity() - HiggsRapidity));
+        //float fy_TauB = TMath::Abs(goodJets[JetCounter].pt())*TMath::Exp(-TMath::Abs(goodJets[JetCounter].rapidity() - HiggsRapidity));
+        float fy_TauB = sqrt(goodJets[JetCounter].energy()*goodJets[JetCounter].energy() - goodJets[JetCounter].pz()*goodJets[JetCounter].pz())*TMath::Exp(-TMath::Abs(goodJets[JetCounter].rapidity() - HiggsRapidity));
         if (fy_TauB > TauB_Inc_0j_temp)
         {
             TauB_Inc_0j_temp = fy_TauB;
@@ -1409,7 +1412,7 @@ void NJettiness::New_GetRapidityWeightedValues_pTWeighted_UsingEnergy(
     for (unsigned int JetCounter = NJettiness; JetCounter < nJettinessSize; ++JetCounter)
     {
         // Inclusive tauC
-	if (TMath::Abs(goodJets[JetCounter].eta()) > 2.5 || goodJets[JetCounter].pt() <30 )  continue;
+        //if (TMath::Abs(goodJets[JetCounter].eta()) > 2.5 || goodJets[JetCounter].pt() <30 )  continue;
         float TauC_Inc_0j_num = sqrt(goodJets[JetCounter].energy()*goodJets[JetCounter].energy() - goodJets[JetCounter].pz()*goodJets[JetCounter].pz());
         float TauC_Inc_0j_den = 2*cosh(goodJets[JetCounter].rapidity() - HiggsRapidity);
         if (TauC_Inc_0j_num/TauC_Inc_0j_den > TauC_Inc_0j_temp)
