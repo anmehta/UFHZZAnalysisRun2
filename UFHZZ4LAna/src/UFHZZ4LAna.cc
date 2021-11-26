@@ -1238,7 +1238,8 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     hMuScaleFacUnc = (TH2F*)fMuScalFac->Get("ERROR");
     
     //string pileup_name_161718[3] = {"puWeightsMoriond17_v2.root", "puWeightsMoriond18.root", "pu_weights_2018.root"};///was previous
-    string pileup_name_161718[3] = {"pu_weights_2016.root", "pu_weights_2017.root", "pu_weights_2018.root"};
+    //string pileup_name_161718[3] = {"pu_weights_2016.root", "pu_weights_2017.root", "pu_weights_2018.root"};
+    string pileup_name_161718[3] = {"pileup_UL_2016.root", "pileup_UL_2017.root", "pileup_UL_2018.root"};
     edm::FileInPath pileup_FileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+pileup_name_161718[year-2016]).c_str());
     TFile *f_pileup = TFile::Open(pileup_FileInPath.fullPath().c_str());
     h_pileup = (TH1D*)f_pileup->Get("weights");
