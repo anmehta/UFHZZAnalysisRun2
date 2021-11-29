@@ -14,7 +14,7 @@ cmsenv
 
 git cms-init
 
-git clone -b 10_6_20_UL https://github.com/tjavaid/UFHZZAnalysisRun2.git
+git clone -b UL https://github.com/qyguo/UFHZZAnalysisRun2.git
 
 git cms-merge-topic asculac:Electron_XGBoost_MVA_16UL_17UL
 
@@ -47,6 +47,10 @@ git cms-addpkg PhysicsTools/PatAlgos/
 git clone -b v2.3.5 https://github.com/JHUGen/JHUGenMELA
 
 sh JHUGenMELA/MELA/setup.sh -j 8
+
+git clone https://github.com/bachtis/Analysis.git -b KaMuCa_V4 KaMuCa
+
+git clone -b tmp_Ferrico https://github.com/ferrico/KinZfitter.git
 
 scramv1 b -j 8
 
