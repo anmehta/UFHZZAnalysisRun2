@@ -7,15 +7,15 @@ now = datetime.now() # current date and time
 #date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
 date = now.strftime("%d%m%Y")
 
-#run_events=-1
-run_events=1500
+run_events=-1
+#run_events=1500
 #mela=''
 #mela='bestCandMelaTrue'
 mela='bestCandMelaFalse'
 process = cms.Process("UFHZZ4LAnalysis")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 process.MessageLogger.categories.append('UFHZZ4LAna')
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
@@ -26,44 +26,49 @@ process.load('Configuration.StandardSequences.Services_cff')
 #process.GlobalTag.globaltag='94X_mc2017_realistic_v17'
 #process.GlobalTag.globaltag='106X_upgrade2018_realistic_v16'
 #process.GlobalTag.globaltag='106X_upgrade2018_realistic_v16_L1v1'
-#process.GlobalTag.globaltag='106X_mc2017_realistic_v9' # MiniAODv2
-process.GlobalTag.globaltag='106X_mc2017_realistic_v6'  ## nanoAOD, miniAOD
+process.GlobalTag.globaltag='106X_mc2017_realistic_v9' # MiniAODv2
+#process.GlobalTag.globaltag='106X_mc2017_realistic_v6'  ## nanoAOD, miniAOD
 
 process.Timing = cms.Service("Timing",
                              summaryOnly = cms.untracked.bool(True)
                              )
 
 
-#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(run_events) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(run_events) )
 #process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 myfilelist = cms.untracked.vstring(
-#'/store/mc/RunIIFall17MiniAODv2/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/60000/3450B123-E8BF-E811-B895-FA163E9604CF.root',
-'/store/mc/RunIISummer20UL17MiniAOD/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v6-v2/270000/794448BF-6D5B-7149-90C7-2F7D0F3E1DA6.root',
-#'794448BF-6D5B-7149-90C7-2F7D0F3E1DA6.root',
+#'/store/mc/RunIISummer20UL17MiniAOD/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v6-v2/270000/794448BF-6D5B-7149-90C7-2F7D0F3E1DA6.root',
+'/store/mc/RunIISummer20UL17MiniAODv2/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v2/130000/638CB4D1-A901-FE45-8AFE-21298AACAD4D.root',
+'/store/mc/RunIISummer20UL17MiniAODv2/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v2/2500000/2B2874CE-8DC5-8A41-B4FB-B0B68AA02C7B.root',
+'/store/mc/RunIISummer20UL17MiniAODv2/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v2/40000/8FF12A6D-44D8-9145-90FC-12F8364F3324.root',
+'/store/mc/RunIISummer20UL17MiniAODv2/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v2/250000/EE928E68-C8F9-D045-BFC3-91AA32BEB8F4.root',
+'/store/mc/RunIISummer20UL17MiniAODv2/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v9-v2/260000/29EA6E9B-C0F2-E140-B3B0-C2E5E0FC36DA.root',
+#'/store/mc/RunIISummer20UL17MiniAOD/ttH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/MINIAODSIM/106X_mc2017_realistic_v6-v1/250000/D2AD3E36-0F5F-ED4B-9024-5CF627896C57.root',
 )
 
 print myfilelist
 
 process.source = cms.Source("PoolSource",fileNames = myfilelist,
-        eventsToProcess = cms.untracked.VEventRange('1:630795-1:630795'),
+        #eventsToProcess = cms.untracked.VEventRange('1:634409-1:634409'),
+        #eventsToProcess = cms.untracked.VEventRange('1:630035-1:630035'),
                             )
 
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string("Sync_102X_2017_v2.root")
                                    #fileName = cms.string("Sync_106X_2017UL.root")
-				   #fileName = cms.string("Sync_106X_2017UL_"+date+"_"+str(run_events)+".root")##
-				   fileName = cms.string("Sync_106X_2017UL_"+date+"_"+str(run_events)+mela+".root")##
+                   #fileName = cms.string("Sync_106X_2017UL_"+date+"_"+str(run_events)+".root")##
+                   fileName = cms.string("Sync_106X_2017UL_"+date+"_"+str(run_events)+mela+"_v2.root")##
 )
 
 # clean muons by segments 
 process.boostedMuons = cms.EDProducer("PATMuonCleanerBySegments",
-				     src = cms.InputTag("slimmedMuons"),
-				     preselection = cms.string("track.isNonnull"),
-				     passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
-				     fractionOfSharedSegments = cms.double(0.499),
-				     )
+                     src = cms.InputTag("slimmedMuons"),
+                     preselection = cms.string("track.isNonnull"),
+                     passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
+                     fractionOfSharedSegments = cms.double(0.499),
+                     )
 
 
 # Kalman Muon Calibrations
@@ -92,7 +97,7 @@ setupEgammaPostRecoSeq(process,
                        #runEnergyCorrections=True,
                        runEnergyCorrections=False,
                        runVID=True,
-		       eleIDModules=['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Summer17UL_ID_ISO_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff'],   
+               eleIDModules=['RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Summer17UL_ID_ISO_cff','RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff'],   
                        phoIDModules=['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Fall17_94X_V2_cff'],
                        era='2017-UL')
 '''
@@ -268,6 +273,24 @@ runMetCorAndUncFromMiniAOD(process,
             isData=False,
             )
 
+#from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+#process.prefiringweight = l1ECALPrefiringWeightProducer.clone(
+#            DataEra = cms.string("2017BtoF"), #Use 2016BtoH for 2016                                     
+#            UseJetEMPt = cms.bool(False),
+#            PrefiringRateSystematicUncty = cms.double(0.2),
+#            SkipWarnings = False)
+
+from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
+process.prefiringweight= l1ECALPrefiringWeightProducer.clone(
+    #TheJets = cms.InputTag("updatedPatJetsUpdatedJEC"), #this should be the slimmedJets collection with up to date JECs !
+    TheJets = cms.InputTag("slimmedJetsJEC"), #this should be the slimmedJets collection with up to date JECs !
+    L1Maps = cms.string("L1PrefiringMaps.root"),
+    DataEra = cms.string('UL2017BtoF'), #or UL2016preVFP for runs <278801 in 2016, or UL2016postVFP for runs>=278801 in 2016
+    UseJetEMPt = cms.bool(False),
+    PrefiringRateSystematicUncty = cms.double(0.2),
+    SkipWarnings = False
+    )
+
 # STXS
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.mergedGenParticles = cms.EDProducer("MergedGenParticleProducer",
@@ -351,12 +374,11 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_TripleMu_10_5_5_DZ_v',
                                   'HLT_TripleMu_12_10_5_v',
                               ),
-                              verbose = cms.untracked.bool(True),              
+                              #verbose = cms.untracked.bool(True),              
                               skimLooseLeptons = cms.untracked.int32(4),              
                               skimTightLeptons = cms.untracked.int32(4),              
-			      bestCandMela = cms.untracked.bool(False),   # for differential measurements
-			      #bestCandMela = cms.untracked.bool(True),   # for mass and width measurements
-#                              verbose = cms.untracked.bool(True),              
+                              bestCandMela = cms.untracked.bool(False),   # for differential measurements
+                              #bestCandMela = cms.untracked.bool(True),   # for mass and width measurements
                               year = cms.untracked.int32(2017)
                              )
 
@@ -376,5 +398,6 @@ process.p = cms.Path(process.fsrPhotonSequence*
                      process.fullPatMetSequence*
                      process.corrJets*
                      process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
+                     process.prefiringweight*
                      process.Ana
                      )

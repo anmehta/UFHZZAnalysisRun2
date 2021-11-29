@@ -7,7 +7,7 @@ now = datetime.now() # current date and time
 #date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
 date = now.strftime("%d%m%Y")
 
-run_events=2
+run_events=-1
 #run_events=1500
 #mela=''
 #mela='bestCandMelaTrue'
@@ -52,7 +52,7 @@ print myfilelist
 
 process.source = cms.Source("PoolSource",fileNames = myfilelist,
         #eventsToProcess = cms.untracked.VEventRange('1:634409-1:634409'),
-        eventsToProcess = cms.untracked.VEventRange('1:291044-1:291044','1:141524-1:141524'),
+        #eventsToProcess = cms.untracked.VEventRange('1:291044-1:291044','1:141524-1:141524'),
                             )
 
 process.TFileService = cms.Service("TFileService",
@@ -296,8 +296,8 @@ runMetCorAndUncFromMiniAOD(process,
 from PhysicsTools.PatUtils.l1ECALPrefiringWeightProducer_cfi import l1ECALPrefiringWeightProducer
 process.prefiringweight= l1ECALPrefiringWeightProducer.clone(
     #TheJets = cms.InputTag("updatedPatJetsUpdatedJEC"), #this should be the slimmedJets collection with up to date JECs !
-    #TheJets = cms.InputTag("slimmedJetsJEC"), #this should be the slimmedJets collection with up to date JECs !
-    TheJets = cms.InputTag("slimmedJets"),
+    TheJets = cms.InputTag("slimmedJetsJEC"), #this should be the slimmedJets collection with up to date JECs !
+    #TheJets = cms.InputTag("slimmedJets"),
     L1Maps = cms.string("L1PrefiringMaps.root"),
     DataEra = cms.string('UL2017BtoF'), #or UL2016preVFP for runs <278801 in 2016, or UL2016postVFP for runs>=278801 in 2016
     UseJetEMPt = cms.bool(False),
@@ -388,7 +388,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_TripleMu_10_5_5_DZ_v',
                                   'HLT_TripleMu_12_10_5_v',
                               ),
-                              verbose = cms.untracked.bool(True),              
+                              #verbose = cms.untracked.bool(True),              
                               skimLooseLeptons = cms.untracked.int32(4),              
                               skimTightLeptons = cms.untracked.int32(4),              
                               bestCandMela = cms.untracked.bool(False),   # for differential measurements

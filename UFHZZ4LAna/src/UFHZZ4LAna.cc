@@ -7930,7 +7930,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
     int j = -1;
     int nGENLeptons=0;
     TLorentzVector GENmom1, GENmom2;
-    TLorentzVector LS3_Z1_1, LS3_Z1_2, LS3_Z2_1, LS3_Z2_2;
+    TLorentzVector LS3_Z1_1, LS3_Z1_2, LS3_Z2_1, LS3_Z2_2, GEN_HVec;
     int GENmom1_id=-999, GENmom2_id=-999;
     int counter_initParticle=0;
     if (verbose) cout<<"begin looping on gen particles"<<endl;
@@ -8127,6 +8127,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
             LS3_Z1_2.SetPtEtaPhiM(GENlep_pt[L2],GENlep_eta[L2],GENlep_phi[L2],GENlep_mass[L2]);
             LS3_Z2_1.SetPtEtaPhiM(GENlep_pt[L3],GENlep_eta[L3],GENlep_phi[L3],GENlep_mass[L3]);
             LS3_Z2_2.SetPtEtaPhiM(GENlep_pt[L4],GENlep_eta[L4],GENlep_phi[L4],GENlep_mass[L4]);
+            GEN_HVec = LS3_Z1_1 + LS3_Z1_2 + LS3_Z2_1 + LS3_Z2_2;
 
             GENmass4l = (LS3_Z1_1+LS3_Z1_2+LS3_Z2_1+LS3_Z2_2).M();
             
@@ -8195,9 +8196,10 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
             // DO GEN JETS
             if (verbose) cout<<"begin filling gen jets"<<endl;
             edm::View<reco::GenJet>::const_iterator genjet;
-            //TJ
+
             int GENjet1index=0; int GENjet2index=0; int GENjet1index_2p5=0; int GENjet2index_2p5=0;
-            TLorentzVector Lep1, Lep2, Lep3, Lep4,  Jet1, Jet2, GENJet1, GENJet2, GENJet1_2p5, GENJet2_2p5;
+            //TLorentzVector Lep1, Lep2, Lep3, Lep4,  Jet1, Jet2, GENJet1, GENJet2, GENJet1_2p5, GENJet2_2p5;
+            TLorentzVector GENJet1, GENJet2, GENJet1_2p5, GENJet2_2p5;
             vector<reco::GenJet> GEN_goodJets;
 
             unsigned int index_tmp(-1);
@@ -8235,13 +8237,9 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                     if (verbose) cout <<"gen jet PDG id is .... "<<genjet_id<<endl;
                     GENjet_id.push_back(genjet_id);
                     if (genjet_id==5){GENnbjets_pt30_eta4p7++;}  //FIXME
-                    //TJ
-                    //thisGENJet.SetPtEtaPhiM(GENjet_pt[k],GENjet_eta[k],GENjet_phi[k],GENjet_mass[k]);
                     if (pt>GENpt_leadingjet_pt30_eta4p7) {
                         GENpt_leadingjet_pt30_eta4p7=pt;
                         GENabsrapidity_leadingjet_pt30_eta4p7=genjet->rapidity(); //take abs later
-                        GENpT4lj = GENpT4l + GENpt_leadingjet_pt30_eta4p7;   //FIXME
-                        GENmass4lj = GENmass4l + genjet->mass();
                     }
                     if (abs(genjet->eta())<2.5) {
                         GENnjets_pt30_eta2p5++;
@@ -8250,7 +8248,6 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                         }
                     }
                 }
-                
             }// loop over gen jets
             
             if (GENnjets_pt30_eta4p7>0) GENabsdeltarapidity_hleadingjet_pt30_eta4p7 = fabs(GENrapidity4l-GENabsrapidity_leadingjet_pt30_eta4p7);
@@ -8281,9 +8278,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                     } else if (thisGENJet.Pt()>GENpTj2_2p5) {
                         GENpTj2_2p5=thisGENJet.Pt(); GENjet2index_2p5=k;
                     }
-                    
                 }
-                
             }
             
             //GENmothers
@@ -8316,7 +8311,8 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                 GENyj1=GENJet1.Rapidity();
                 GENetaj1=GENJet1.Eta();
                 GENphij1=GENJet1.Phi();
-		        GENmass4lj=GENmass4l+GENJet1.M();;
+		        GENmass4lj=(GEN_HVec+GENJet1).M();
+                GENpT4lj=(GEN_HVec+GENJet1).Pt();
                 GENdPhiHj1=deltaPhi(GENphi4l,GENJet1.Phi());
                 GENdyHj1=TMath::Abs(GENrapidity4l-GENyj1);
                 GENassociated.push_back(SimpleParticle_t(0, GENJet1));
@@ -8327,10 +8323,10 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                 GENmj2=GENJet2.M();
                 GENetaj2=GENJet2.Eta();
                 GENphij2=GENJet2.Phi();
-		        GENpT4ljj = GENpT4l + GENpTj1 + GENpTj2;
+		        GENpT4ljj=(GEN_HVec+GENJet1+GENJet2).Pt();
                 GENyj2=GENJet2.Rapidity();
                 GENmj1j2=(GENJet1+GENJet2).M();
-                GENmass4ljj=GENmass4l+GENmj1j2;
+                GENmass4ljj=(GEN_HVec+GENJet1+GENJet2).M();
                 GENdEtaj1j2=TMath::Abs(GENJet1.Eta()-GENJet2.Eta());
                 GENdPhij1j2=deltaPhi(GENJet1.Phi(),GENJet2.Phi());
                 GENdPhiHj1j2=deltaPhi(GENphi4l,(GENJet1+GENJet2).Phi());
@@ -8478,8 +8474,6 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
         NJettiness CalculateNJettinessVar;
         // double Taub = CalculateNJettinessVar.GeneralizedTaunN(pfCands, jets, 1.0, 1.0);
         // Tau0 = Taub; 
-
-        TLorentzVector GEN_HVec = LS3_Z1_1 + LS3_Z1_2 + LS3_Z2_1 + LS3_Z2_2;
 
         GEN_Tau0 = CalculateNJettinessVar.Tau0(prunedgenParticles,
                                            sqrt((GEN_HVec.M()*GEN_HVec.M()) + (GEN_HVec.Pt()*GEN_HVec.Pt())),
