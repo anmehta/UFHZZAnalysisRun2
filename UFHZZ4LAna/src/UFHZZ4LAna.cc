@@ -276,7 +276,7 @@ private:
     
     
     // Event Weights
-    float genWeight, pileupWeight, pileupWeightUp, pileupWeightDn, dataMCWeight, eventWeight, prefiringWeight;
+    float genWeight, pileupWeight, pileupWeightUp, pileupWeightDn, dataMCWeight, eventWeight, prefiringWeight, prefiringWeightECAL, prefiringWeightMuon;
     float k_ggZZ, k_qqZZ_qcd_dPhi, k_qqZZ_qcd_M, k_qqZZ_qcd_Pt, k_qqZZ_ewk;
     // pdf weights
     vector<float> qcdWeights;
@@ -1020,6 +1020,8 @@ _EnergyWgt
     edm::EDGetTokenT<HTXS::HiggsClassification> htxsSrc_;
     //edm::EDGetTokenT<HZZFid::FiducialSummary> fidRivetSrc_;
     edm::EDGetTokenT< double > prefweight_token_;
+    edm::EDGetTokenT< double > prefweightECAL_token_;
+    edm::EDGetTokenT< double > prefweightMuon_token_;
     
     // Configuration
     const float Zmass;
@@ -1106,6 +1108,8 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     lheRunInfoToken_(consumes<LHERunInfoProduct,edm::InRun>(edm::InputTag("externalLHEProducer",""))),
     htxsSrc_(consumes<HTXS::HiggsClassification>(edm::InputTag("rivetProducerHTXS","HiggsClassification"))),
     prefweight_token_(consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProb"))),
+    prefweightECAL_token_(consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbECAL"))),
+    prefweightMuon_token_(consumes< double >(edm::InputTag("prefiringweight:nonPrefiringProbMuon"))),
     //fidRivetSrc_(consumes<HZZFid::FiducialSummary>(edm::InputTag("rivetProducerHZZFid","FiducialSummary"))),
     Zmass(91.1876),
     mZ1Low(iConfig.getUntrackedParameter<double>("mZ1Low",40.0)),
@@ -1161,11 +1165,11 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
 {
     
     if(!isMC){reweightForPU = false;}
-    if(year_==2017||year_==2018)
+    if(year_==2017||year_==2018||year_==2016)
     {
         year=year_;
     }
-    if(year_==20160||year_==20165)//20160 -> pre VFP; 20165 -> post VFP 
+    if(year_==-2016)//-2016 -> pre VFP; 2016 -> post VFP 
     {
         year=2016;
     }
@@ -1213,23 +1217,27 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     edm::FileInPath elec_scalefacFileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+elec_scalefac_name_161718[year-2016]).c_str());
     TFile *fElecScalFac = TFile::Open(elec_scalefacFileInPath.fullPath().c_str());
     hElecScaleFac = (TH2F*)fElecScalFac->Get("EGamma_SF2D");
+
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaUL2016To2018#A_note_about_IDs_in_UL
     
-    //string elec_Gsfscalefac_name_161718[3] = {"egammaEffi.txt_EGM2D_GSF.root", "egammaEffi.txt_EGM2D_Moriond2018v1_runBCDEF_passingRECO.root", "Ele_Reco_2018.root"};//was previous;
-    string elec_Gsfscalefac_name_161718[3] = {"Ele_Reco_2016.root", "Ele_Reco_2017.root", "Ele_Reco_2018.root"};
     //string elec_Gsfscalefac_name_161718[3] = {"Ele_Reco_2016.root", "egammaEffi_ptAbove20.txt_EGM2D_UL2017.root", "egammaEffi_ptAbove20.txt_EGM2D_UL2018.root"};     //FIXME 2016UL to be updated
+    //string elec_Gsfscalefac_name_161718[3] = {"Ele_Reco_2016.root", "Ele_Reco_2017.root", "Ele_Reco_2018.root"};
+    string elec_Gsfscalefac_name_161718[3] = {"egammaEffi_ptAbove20.txt_EGM2D_UL2016postVFP.root", "egammaEffi_ptAbove20.txt_EGM2D_UL2017.root", "egammaEffi_ptAbove20.txt_EGM2D_UL2018.root"};
+    if (year_ == -2016)
+        elec_Gsfscalefac_name_161718[0]="egammaEffi_ptAbove20.txt_EGM2D_UL2016preVFP.root";
     edm::FileInPath elec_GsfscalefacFileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+elec_Gsfscalefac_name_161718[year-2016]).c_str());
     TFile *fElecScalFacGsf = TFile::Open(elec_GsfscalefacFileInPath.fullPath().c_str());
     hElecScaleFacGsf = (TH2F*)fElecScalFacGsf->Get("EGamma_SF2D");
     
-    //string elec_GsfLowETscalefac_name_161718[3]= {"", "egammaEffi.txt_EGM2D_Moriond2018v1_runBCDEF_passingRECO_lowEt.root", "Ele_Reco_LowEt_2018.root"};//was previous
-    string elec_GsfLowETscalefac_name_161718[3]= {"Ele_Reco_LowEt_2016.root", "Ele_Reco_LowEt_2017.root", "Ele_Reco_LowEt_2018.root"};
     //string elec_GsfLowETscalefac_name_161718[3]= {"Ele_Reco_LowEt_2016.root", "egammaEffi_ptBelow20.txt_EGM2D_UL2017.root", "egammaEffi_ptBelow20.txt_EGM2D_UL2018.root"};   //FIXME 2016UL to be updated
+    //string elec_GsfLowETscalefac_name_161718[3]= {"Ele_Reco_LowEt_2016.root", "Ele_Reco_LowEt_2017.root", "Ele_Reco_LowEt_2018.root"};
+    string elec_GsfLowETscalefac_name_161718[3]= {"egammaEffi_ptBelow20.txt_EGM2D_UL2016postVFP.root", "egammaEffi_ptBelow20.txt_EGM2D_UL2017.root", "egammaEffi_ptBelow20.txt_EGM2D_UL2018.root"};
+    if (year_ == -2016)
+        elec_GsfLowETscalefac_name_161718[0]="egammaEffi_ptBelow20.txt_EGM2D_UL2016preVFP.root";
     edm::FileInPath elec_GsfLowETscalefacFileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+elec_GsfLowETscalefac_name_161718[year-2016]).c_str());
     TFile *fElecScalFacGsfLowET = TFile::Open(elec_GsfLowETscalefacFileInPath.fullPath().c_str());
     hElecScaleFacGsfLowET = (TH2F*)fElecScalFacGsfLowET->Get("EGamma_SF2D");
     
-    //string mu_scalefac_name_161718[3] = {"final_HZZ_Moriond17Preliminary_v4.root", "ScaleFactors_mu_Moriond2018_final.root", "final_HZZ_muon_SF_2018RunA2D_ER_2702.root"};//was previous;
-    //         string mu_scalefac_name_161718[3] = {"final_HZZ_SF_2016_legacy_mupogsysts.root", "final_HZZ_SF_2017_rereco_mupogsysts_3010.root", "final_HZZ_SF_2018_rereco_mupogsysts_3010.root"};
     string mu_scalefac_name_161718[3] = {"final_HZZ_muon_SF_2016RunB2H_legacy_newLoose_newIso_paper.root", "final_HZZ_muon_SF_2017_newLooseIso_mupogSysts_paper.root", "final_HZZ_muon_SF_2018RunA2D_ER_newLoose_newIso_paper.root"};
     //string mu_scalefac_name_161718[3] = {"final_HZZ_SF_2016UL_mupogsysts_newLoose_pairdR0pt1_06072021.root", "final_HZZ_2017UL_SF_noTracking_Loose_syst_mupogSysts_pairdR0pt1_06072021.root", "final_HZZ_muon_SF_2018UL_POG_newLoose_JG_b4_JDG_b3_newIso_Syst_06072021.root"};
     edm::FileInPath mu_scalefacFileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+mu_scalefac_name_161718[year-2016]).c_str());
@@ -1237,7 +1245,6 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     hMuScaleFac = (TH2F*)fMuScalFac->Get("FINAL");
     hMuScaleFacUnc = (TH2F*)fMuScalFac->Get("ERROR");
     
-    //string pileup_name_161718[3] = {"puWeightsMoriond17_v2.root", "puWeightsMoriond18.root", "pu_weights_2018.root"};///was previous
     //string pileup_name_161718[3] = {"pu_weights_2016.root", "pu_weights_2017.root", "pu_weights_2018.root"};
     string pileup_name_161718[3] = {"pileup_UL_2016.root", "pileup_UL_2017.root", "pileup_UL_2018.root"};
     edm::FileInPath pileup_FileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+pileup_name_161718[year-2016]).c_str());
@@ -1255,15 +1262,22 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     
     
     //BTag calibration
-    //string csv_name_161718[3] = {"DeepCSV_2016LegacySF_V1.csv", "DeepCSV_94XSF_V4_B_F.csv", "DeepCSV_102XSF_V1.csv"};
-    string csv_name_161718[3] = {"DeepCSV_2016LegacySF_V1.csv", "DeepCSV_106XUL17SF_V2p1.csv", "DeepCSV_106XUL18SF.csv"};
-		 
+    //string csv_name_161718[3] = {"DeepCSV_2016LegacySF_V1.csv", "DeepCSV_106XUL17SF_V2p1.csv", "DeepCSV_106XUL18SF.csv"};
+    //string csv_name_161718[3] = {"DeepCSV_106XUL16postVFPSF_v2_v2.csv", "DeepCSV_106XUL17SF_V2p1.csv", "DeepCSV_106XUL18SF_V1p1.csv"};
+    string csv_name_161718[3] = {"DeepCSV_106XUL16postVFPSF_v2_hzz.csv", "wp_deepCSV_106XUL17_v3_hzz.csv", "wp_deepCSV_106XUL18_v2_hzz.csv"};
+    if (year_ == -2016)
+        //csv_name_161718[0]="DeepCSV_106XUL16preVFPSF_v1_v1.csv";
+        csv_name_161718[0]="DeepCSV_106XUL16preVFPSF_v1_hzz.csv";
+    if (year==2016 && verbose)     std::cout<<"BTag calibration csv: "<<csv_name_161718[year-2016]<<std::endl;
+
     edm::FileInPath btagfileInPath(("UFHZZAnalysisRun2/UFHZZ4LAna/data/"+csv_name_161718[year-2016]).c_str());
     
     BTagCalibration calib("DeepCSV", btagfileInPath.fullPath().c_str());
     reader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
                                        "central",             // central sys type
                                        {"up", "down"});      // other sys types
+    // Btag information
+    // https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation
     
     
     reader->load(calib,                // calibration instance
@@ -1275,7 +1289,9 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     //if(year==2017)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Fall17IsoV2Values"; BTagCut=0.4941; heepID_name_161718 = "heepElectronID-HEEPV70";}
     if(year==2017)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer17ULIdIsoValues"; BTagCut=0.4506; heepID_name_161718 = "heepElectronID-HEEPV70";}
     //if(year==2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16IdIsoValues"; BTagCut=0.6321; heepID_name_161718 = "heepElectronID-HEEPV70";}
-    if(year==2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16ULIdIsoValues"; BTagCut=0.6321; heepID_name_161718 = "heepElectronID-HEEPV70";}
+    if(year_==2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16ULIdIsoValues"; BTagCut=0.5847; heepID_name_161718 = "heepElectronID-HEEPV70";}
+    if(year_==-2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16ULIdIsoValues"; BTagCut=0.6001; heepID_name_161718 = "heepElectronID-HEEPV70";}
+    //preVFP (2016APV) BTagCut 0.6001; 2016postVFP (2016) 0.5847
     
     std::string DATAPATH = std::getenv( "CMSSW_BASE" );
     //if(year == 2018)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v3/RoccoR2018.txt";
@@ -1283,8 +1299,8 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig) :
     //if(year == 2017)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v3/RoccoR2017.txt";
     if(year == 2017)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2017UL.txt";
     //if(year == 2016)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v3/RoccoR2016.txt";
-    if(year_ == 20165)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2016bUL.txt"; // for post VFP
-    if(year_ == 20160)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2016aUL.txt"; // for pre VFP 
+    if(year_ == 2016)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2016bUL.txt"; // for post VFP
+    if(year_ == -2016)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2016aUL.txt"; // for pre VFP 
     calibrator = new RoccoR(DATAPATH);
     
 }
@@ -1521,13 +1537,23 @@ UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if (isMC) {
         edm::Handle< double > theprefweight;
         iEvent.getByToken(prefweight_token_, theprefweight ) ;
-        if (year == 2016 || year == 2017)
-            prefiringWeight =(*theprefweight);
-        else if (year == 2018)
-            prefiringWeight =1.0;
+
+        edm::Handle< double > theprefweightECAL;
+        iEvent.getByToken(prefweightECAL_token_, theprefweightECAL ) ;
+
+        edm::Handle< double > theprefweightMuon;
+        iEvent.getByToken(prefweightMuon_token_, theprefweightMuon ) ;
+
+        prefiringWeight = (*theprefweight);
+        prefiringWeightECAL = (*theprefweightECAL);
+        prefiringWeightMuon = (*theprefweightMuon);
+
     }
-    else
-        prefiringWeight =1.0;
+    else {
+        prefiringWeight = 1.0;
+        prefiringWeightECAL = 1.0;
+        prefiringWeightMuon = 1.0;
+    }
     
     // ============ Initialize Variables ============= //
     
@@ -3247,8 +3273,11 @@ UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     if (verbose) cout<<"checking jetid..."<<endl;
                     float jpumva=0.;
                     bool passPU;
-                    if (doJEC && (year==2017 || year==2018)) {
+                    if (doJEC && (year==2017 || year==2018 )) {
                         passPU = bool(jet.userInt("pileupJetIdUpdated:fullId") & (1 << 0));
+                        jpumva=jet.userFloat("pileupJetIdUpdated:fullDiscriminant");
+                    } else if (doJEC && year==2016) {
+                        passPU = bool(jet.userInt("pileupJetIdUpdated:fullId") & (1 << 2));
                         jpumva=jet.userFloat("pileupJetIdUpdated:fullDiscriminant");
                     } else {
                         passPU = bool(jet.userInt("pileupJetId:fullId") & (1 << 0));
@@ -5429,6 +5458,8 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree)
     tree->Branch("dataMCWeight",&dataMCWeight,"dataMCWeight/F");
     tree->Branch("eventWeight",&eventWeight,"eventWeight/F");
     tree->Branch("prefiringWeight",&prefiringWeight,"prefiringWeight/F");
+    tree->Branch("prefiringWeightECAL",&prefiringWeightECAL,"prefiringWeightECAL/F");
+    tree->Branch("prefiringWeightMuon",&prefiringWeightMuon,"prefiringWeightMuon/F");
     tree->Branch("crossSection",&crossSection,"crossSection/F");
     
     // Lepton variables
@@ -6659,8 +6690,10 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
         TLorentzVector *jet_jerdn = new TLorentzVector(jercorrdn*goodJets[k].px(),jercorrdn*goodJets[k].py(),jercorrdn*goodJets[k].pz(),jercorrdn*goodJets[k].energy());
         
         bool passPU_;
-        if (doJEC && (year==2017 || year==2018)) {
+        if (doJEC && (year==2017 || year==2018 )) {
             passPU_ = bool(goodJets[k].userInt("pileupJetIdUpdated:fullId") & (1 << 0));
+        } else if (doJEC && year==2016) {
+            passPU_ = bool(goodJets[k].userInt("pileupJetIdUpdated:fullId") & (1 << 2));
         } else {
             passPU_ = bool(goodJets[k].userInt("pileupJetId:fullId") & (1 << 0));
         }
