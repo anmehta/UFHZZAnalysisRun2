@@ -36,6 +36,8 @@ myfilelist = cms.untracked.vstring(
 )
 
 process.source = cms.Source("PoolSource",fileNames = myfilelist,
+        #eventsToProcess = cms.untracked.VEventRange('1:590706-1:590706','1:1487346-1:1487346','1:870453-1:870453','1:848227-1:848227','1:1932721-1:1932721'),
+        #eventsToProcess = cms.untracked.VEventRange('1:848227-1:848227'),
                             )
 
 process.TFileService = cms.Service("TFileService",
@@ -321,43 +323,22 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               doTriggerMatching = cms.untracked.bool(False),
                               #doTriggerMatching = cms.untracked.bool(True),
                               triggerList = cms.untracked.vstring(     
-                                  # Single Lepton:
-                                  'HLT_Ele35_WPTight_Gsf_v',
-                                  'HLT_Ele38_WPTight_Gsf_v',
-                                  'HLT_Ele40_WPTight_Gsf_v',
-                                  'HLT_IsoMu27_v',
-                                  # Dilepton
+                                  # Toni
+                                  'HLT_Ele32_WPTight_Gsf_v', 
+                                  'HLT_IsoMu24_v',
                                   'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-                                  'HLT_DoubleEle33_CaloIdL_MW_v',
+                                  'HLT_DoubleEle25_CaloIdL_MW_v',
                                   'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v',
-                                  'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v',
                                   'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
                                   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
                                   'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
                                   'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
                                   'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_DZ_v',
-                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',
-                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v',
-                                  # TriLepton
-                                  'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v',
                                   'HLT_TripleMu_10_5_5_DZ_v',
                                   'HLT_TripleMu_12_10_5_v',
-                                  # Toni
-                                  #'HLT_Ele32_WPTight_Gsf_v', 
-                                  #'HLT_IsoMu24_v',
-                                  #'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-                                  #'HLT_DoubleEle25_CaloIdL_MW_v',
-                                  #'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v',
-                                  #'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-                                  #'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
-                                  #'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
-                                  #'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
-                                  #'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_DZ_v',
-                                  #'HLT_TripleMu_10_5_5_DZ_v',
-                                  #'HLT_TripleMu_12_10_5_v',
-                                  ## I'm adding these
-                                  #'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v', 
-                                  #'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v', 
+                                  # I'm adding these
+                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v', 
+                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v', 
                               ),
                               verbose = cms.untracked.bool(False),              
                               skimLooseLeptons = cms.untracked.int32(4),              
