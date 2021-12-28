@@ -6,17 +6,17 @@ To install:
 
 SCRAM_ARCH=slc7_amd64_gcc700; export SCRAM_ARCH
 
-cmsrel CMSSW_10_6_20
+cmsrel CMSSW_10_6_26
 
-cd CMSSW_10_6_20/src/
+cd CMSSW_10_6_26/src/
 
 cmsenv
 
 git cms-init
 
-git clone -b UL https://github.com/qyguo/UFHZZAnalysisRun2.git
+git clone -b UL_10_6_26 https://github.com/qyguo/UFHZZAnalysisRun2.git
 
-git cms-merge-topic asculac:Electron_XGBoost_MVA_16UL_17UL
+##git cms-merge-topic asculac:Electron_XGBoost_MVA_16UL_17UL
 
 git cms-addpkg GeneratorInterface/RivetInterface
 
