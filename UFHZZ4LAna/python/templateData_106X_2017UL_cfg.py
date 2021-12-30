@@ -363,6 +363,6 @@ process.p = cms.Path(process.fsrPhotonSequence*
                      process.fullPatMetSequence*
                      process.corrJets*
                      #process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
-                     process.prefiringweight*
+                     #process.prefiringweight*
                      process.Ana
                      )
