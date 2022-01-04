@@ -172,7 +172,7 @@ process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 # for hpc
 dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Summer20UL16APV_JRV3_DATA.db"
 ## for crab
-dBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Summer20UL16APV_JRV3_DATA.db"
+dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Summer20UL16APV_JRV3_DATA.db"
 process.jer = cms.ESSource("PoolDBESSource",
         CondDBSetup,
         connect = cms.string("sqlite_file:"+dBJERFile),
