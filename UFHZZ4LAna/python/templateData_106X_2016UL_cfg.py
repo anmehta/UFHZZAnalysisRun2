@@ -91,11 +91,11 @@ process.jec = cms.ESSource("PoolDBESSource",
                           CondDBSetup,
                           connect = cms.string("sqlite_file:"+dBFile),
                           toGet =  cms.VPSet(
-        cms.PSet(
-            record = cms.string("JetCorrectionsRecord"),
-            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
-            label= cms.untracked.string("AK4PF")
-            ),
+        #cms.PSet(
+        #    record = cms.string("JetCorrectionsRecord"),
+        #    tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
+        #    label= cms.untracked.string("AK4PF")
+        #    ),
         cms.PSet(
             record = cms.string("JetCorrectionsRecord"),
             tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
