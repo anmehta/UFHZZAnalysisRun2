@@ -64,6 +64,7 @@ def submitAnalyzer():
     nfiles = {}
     nevents = {}
     datasetfiles = {}
+    fileNameDict = {}
 
     with open(opt.DATASETS, "r") as datasetfile:
         for line in datasetfile:
@@ -79,7 +80,8 @@ def submitAnalyzer():
 
             datasets.append(dataset)
             cross_section[dataset] = float(line.split()[1])
-            
+            fileNameDict[dataset] = line.split()[2]            
+
             #cmd = './das_client.py --query="file dataset='+dataset+'" --limit=10 | grep ".root"'
             #output = processCmd(cmd)
             #while ('error' in output):
@@ -128,14 +130,12 @@ def submitAnalyzer():
         cmd = "sed -i 's~DUMMYFILELIST~ ~g' "+outDir+'/cfg/'+cfgfile
         output = processCmd(cmd)
 
-        filename = dataset.split('/')[1]+'_'+dataset.split('/')[2]
+        #filename = dataset.split('/')[1]+'_'+dataset.split('/')[2]
+        filename = fileNameDict[dataset]
+
         if (len(filename)>99):
-          
-	#newfilename = filename.split('-PU')[0]
-		#newfilename = filename.split('-PUMoriond17_80X')[0]
-        	#newfilename = filename.split('-PU2017_12Apr2018_94X')[0]
-		newfilename = filename.split('_upgrade2018_')[0]
-		filename = newfilename
+          newfilename = filename.split('-PU')[0]
+          filename = newfilename
 
         cmd  = "sed -i 's~DUMMYFILENAME~"+filename+"~g' "+outDir+'/cfg/'+cfgfile
         output = processCmd(cmd)

@@ -23,7 +23,9 @@ config.JobType.psetName = 'CFGFILE'
 config.JobType.pluginName = 'Analysis'
 config.JobType.disableAutomaticOutputCollection = True
 config.JobType.outputFiles = ['OUTFILENAME.root']
-config.JobType.maxMemoryMB = 2500
+#config.JobType.maxMemoryMB = 2500
+config.JobType.numCores = 2
+config.JobType.maxMemoryMB = 5000
 
 config.section_('Data')
 config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader/'
@@ -58,7 +60,7 @@ else:
 
 config.Data.publication = False
 #config.Data.outLFNDirBase = '/store/user/%s/2018data/UFHZZAnalysisRun2/JOBTAG/' % (getUsernameFromSiteDB())
-config.Data.outLFNDirBase = '/store/user/qguo/newNTuple_UL/UL2018/UFHZZAnalysisRun2/JOBTAG/'
+config.Data.outLFNDirBase = '/store/user/qguo/newNTuple_UL/UL2018_V2/UFHZZAnalysisRun2/JOBTAG/'
 config.Data.ignoreLocality = True
 config.Data.allowNonValidInputDataset = True
 

@@ -3,6 +3,9 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
 process = cms.Process("UFHZZ4LAnalysis")
+process.options = cms.untracked.PSet(
+        numberOfThreads = cms.untracked.uint32(2)
+)
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 10000

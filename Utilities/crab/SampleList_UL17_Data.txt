@@ -1,0 +1,33 @@
+/DoubleEG/Run2017B-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleEG_Run17B
+/DoubleEG/Run2017C-UL2017_MiniAODv2-v2/MINIAOD 1.0 DoubleEG_Run17C
+/DoubleEG/Run2017D-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleEG_Run17D
+/DoubleEG/Run2017E-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleEG_Run17E
+/DoubleEG/Run2017F-UL2017_MiniAODv2-v2/MINIAOD 1.0 DoubleEG_Run17F
+#
+/DoubleMuon/Run2017B-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleMuon_Run17B
+/DoubleMuon/Run2017C-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleMuon_Run17C
+/DoubleMuon/Run2017D-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleMuon_Run17D
+/DoubleMuon/Run2017E-UL2017_MiniAODv2-v2/MINIAOD 1.0 DoubleMuon_Run17E
+/DoubleMuon/Run2017F-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleMuon_Run17F
+/DoubleMuon/Run2017G-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleMuon_Run17G
+/DoubleMuon/Run2017H-UL2017_MiniAODv2-v1/MINIAOD 1.0 DoubleMuon_Run17H
+#
+/MuonEG/Run2017B-UL2017_MiniAODv2-v1/MINIAOD 1.0 MuonEG_Run17B
+/MuonEG/Run2017C-UL2017_MiniAODv2-v1/MINIAOD 1.0 MuonEG_Run17C
+/MuonEG/Run2017D-UL2017_MiniAODv2-v1/MINIAOD 1.0 MuonEG_Run17D
+/MuonEG/Run2017E-UL2017_MiniAODv2-v1/MINIAOD 1.0 MuonEG_Run17E
+/MuonEG/Run2017F-UL2017_MiniAODv2-v1/MINIAOD 1.0 MuonEG_Run17F
+#
+/SingleElectron/Run2017B-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleElectron_Run17B
+/SingleElectron/Run2017C-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleElectron_Run17C
+/SingleElectron/Run2017D-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleElectron_Run17D
+/SingleElectron/Run2017E-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleElectron_Run17E
+/SingleElectron/Run2017F-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleElectron_Run17F
+#
+/SingleMuon/Run2017B-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17B
+/SingleMuon/Run2017C-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17C
+/SingleMuon/Run2017D-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17D
+/SingleMuon/Run2017E-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17E
+/SingleMuon/Run2017F-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17F
+/SingleMuon/Run2017G-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17G
+/SingleMuon/Run2017H-UL2017_MiniAODv2-v1/MINIAOD 1.0 SingleMuon_Run17H
