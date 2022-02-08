@@ -1,10 +1,10 @@
+source /cvmfs/cms.cern.ch/cmsset_default.sh
 export SCRAM_ARCH=slc7_amd64_gcc700
 
-cmsrel CMSSW_10_6_26
-
+scramv1 project CMSSW CMSSW_10_6_26
 cd CMSSW_10_6_26/src/
-
-cmsenv
+#cmsenv
+eval `scramv1 runtime -sh`
 
 git cms-init
 
