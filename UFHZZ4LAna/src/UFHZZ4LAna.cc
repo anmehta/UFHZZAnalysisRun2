@@ -678,7 +678,7 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig):
   triggerList(iConfig.getUntrackedParameter<std::vector<std::string>>("triggerList")),
   skimLooseLeptons(iConfig.getUntrackedParameter<int>("skimLooseLeptons",2)),
   skimTightLeptons(iConfig.getUntrackedParameter<int>("skimTightLeptons",2)),
-  verbose(iConfig.getUntrackedParameter<bool>("verbose",false)),
+  verbose(iConfig.getUntrackedParameter<bool>("verbose",true)),
   year_(iConfig.getUntrackedParameter<int>("year",2018)),////for year put 2016,2017, or 2018 to select correct training
   isCode4l(iConfig.getUntrackedParameter<bool>("isCode4l",false))
 {
@@ -915,8 +915,8 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
       //AK8 uncertainty
       iSetup.get<JetCorrectionsRecord>().get("AK8PFPuppi", jetCorrParameterSet);
-      const JetCorrectorParameters& jetCorrParameters = (*jetCorrParameterSet)["Uncertainty"];
-      jecmergedunc.reset(new JetCorrectionUncertainty(jetCorrParameters));
+      const JetCorrectorParameters& AK8jetCorrParameters = (*jetCorrParameterSet)["Uncertainty"];
+      jecmergedunc.reset(new JetCorrectionUncertainty(AK8jetCorrParameters));
   }
 
   resolution_pt = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
@@ -2534,7 +2534,7 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
         TLorentzVector pho;
         pho.SetPtEtaPhiM(fsrPhotons_pt[i],fsrPhotons_eta[i],fsrPhotons_phi[i],0.0);
         tempDeltaR=999.0;
-        tempDeltaR=deltaR(goodJets[k].eta(),goodJets[k].phi(),pho.Eta(),pho.Phi());
+        tempDeltaR=deltaR(selectedMergedJets[k].eta(),selectedMergedJets[k].phi(),pho.Eta(),pho.Phi());
         if (verbose) cout<<" jet DeltaR between pho"<<i<<" : "<<tempDeltaR;
         if (tempDeltaR<0.8) {
             isclean_H4l = false;
