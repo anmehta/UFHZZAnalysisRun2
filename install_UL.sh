@@ -1,14 +1,14 @@
-source /cvmfs/cms.cern.ch/cmsset_default.sh
-export SCRAM_ARCH=slc7_amd64_gcc700
-
-scramv1 project CMSSW CMSSW_10_6_26
-cd CMSSW_10_6_26/src/
-#cmsenv
-eval `scramv1 runtime -sh`
-
-git cms-init
-
-git clone -b UL_10_6_26 https://github.com/qyguo/UFHZZAnalysisRun2.git
+##amsource /cvmfs/cms.cern.ch/cmsset_default.sh
+##amexport SCRAM_ARCH=slc7_amd64_gcc700
+##am
+##amscramv1 project CMSSW CMSSW_10_6_26
+##amcd CMSSW_10_6_26/src/
+##am#cmsenv
+##ameval `scramv1 runtime -sh`
+##am
+##amgit cms-init
+##am
+##amgit clone -b UL_10_6_26 https://github.com/qyguo/UFHZZAnalysisRun2.git
 
 ##git cms-merge-topic asculac:Electron_XGBoost_MVA_16UL_17UL
 
@@ -59,7 +59,7 @@ scramv1 b -j 8
 cp UFHZZAnalysisRun2/Utilities/crab/* .
 
 source /cvmfs/cms.cern.ch/crab3/crab.sh
-voms-proxy-init --rfc --voms cms
+#voms-proxy-init --rfc --voms cms
 
 #python SubmitCrabJobs.py -t "DataUL18" -d SampleList_UL18_Data.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_2018UL_cfg.py
 
