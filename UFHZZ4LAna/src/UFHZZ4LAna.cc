@@ -178,15 +178,15 @@
 #include "RecoVertex/KalmanVertexFit/interface/SingleTrackVertexConstraint.h"
 
 //Auto MELA
-#include "IvyBase.h"
-#include <IvyFramework/IvyAutoMELA/interface/IvyMELAHelpers.h>
-#include <IvyFramework/IvyAutoMELA/interface/IvyMELAOutputStreamerExt.h>
-#include <IvyFramework/IvyDataTools/interface/HostHelpersCore.h>
+//#include "IvyBase.h"
+//#include <IvyFramework/IvyAutoMELA/interface/IvyMELAHelpers.h>
+//#include <IvyFramework/IvyAutoMELA/interface/IvyMELAOutputStreamerExt.h>
+//#include <IvyFramework/IvyDataTools/interface/HostHelpersCore.h>
 
 //
 // class declaration
 //
-using namespace IvyStreamHelpers;
+//using namespace IvyStreamHelpers;
 using namespace EwkCorrections;
 
 class UFHZZ4LAna : public edm::EDAnalyzer{
@@ -588,9 +588,9 @@ private:
   string heepID_name_161718;
 
   // ME lists
-  vector<string> lheMElist;
-  vector<string> recoMElist;
-  IvyMELAHelpers::GMECBlock MEblock;
+  //vector<string> lheMElist;
+  //vector<string> recoMElist;
+  //IvyMELAHelpers::GMECBlock MEblock;
 
 };
 
