@@ -25,10 +25,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #myfilelist = cms.untracked.vstring(DUMMYFILELIST)
 myfilelist = cms.untracked.vstring(
-#'/store/data/Run2018D/DoubleMuon/MINIAOD/PromptReco-v2/000/320/673/00000/FEC164FC-E897-E811-A713-FA163EE4DD06.root'
+'/store/data/Run2018D/DoubleMuon/MINIAOD/PromptReco-v2/000/320/673/00000/FEC164FC-E897-E811-A713-FA163EE4DD06.root'
 #'file:/afs/cern.ch/user/m/mschen/work/hzz4l-run2/102X/Run2018D-DoubleMuon-MINIAOD-PromptReco-v2-320673.root'
-#'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/500/00000/064A883F-F995-E811-B3E7-FA163E81C56B.root'
-'/store/data/Run2018D/MuonEG/MINIAOD/PromptReco-v2/000/320/712/00000/30F25513-3898-E811-B4E3-02163E019E9A.root'
 )
 
 process.source = cms.Source("PoolSource",fileNames = myfilelist,
@@ -39,7 +37,7 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("DUMMYFILENAME.root")
 )
 
-# clean muons by segments
+# clean muons by segments 
 process.boostedMuons = cms.EDProducer("PATMuonCleanerBySegments",
 				     src = cms.InputTag("slimmedMuons"),
 				     preselection = cms.string("track.isNonnull"),
@@ -154,11 +152,11 @@ process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
 
 process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJets"),
-    levels = ['L1FastJet',
-              'L2Relative',
+    levels = ['L1FastJet', 
+              'L2Relative', 
               'L3Absolute',
               'L2L3Residual'],
-    payload = 'AK4PFchs' )
+    payload = 'AK4PFchs' ) 
 
 process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJetsAK8"),
@@ -237,7 +235,7 @@ process.QGTagger.srcVertexCollection=cms.InputTag("offlinePrimaryVertices")
 # compute corrected pruned jet mass
 process.corrJets = cms.EDProducer ( "CorrJetsProducer",
                                     jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
-                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
+                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ), 
                                     rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
                                     payload = cms.string  ( "AK8PFchs" ),
                                     isData  = cms.bool    (  True ))
@@ -331,10 +329,10 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_TripleMu_10_5_5_DZ_v',
                                   'HLT_TripleMu_12_10_5_v',
                               ),
-                              skimLooseLeptons = cms.untracked.int32(4),
-                              skimTightLeptons = cms.untracked.int32(4),
+                              skimLooseLeptons = cms.untracked.int32(4),              
+                              skimTightLeptons = cms.untracked.int32(4),              
                               doMela = cms.untracked.bool(False),
-                              #verbose = cms.untracked.bool(True)
+                              #verbose = cms.untracked.bool(True)              
                              )
 
 process.p = cms.Path(process.fsrPhotonSequence*

@@ -19,10 +19,7 @@ echo "================= DONE =========================="
 echo "================= Copy Input Files ================"
 echo "${PWD}"
 
-rm -rf ${CMSSW_BASE}/src/JHUGenMELA/MEKD
-mv ${CMSSW_BASE}/MEKD ${CMSSW_BASE}/src/JHUGenMELA/
-
-#rm -rf ${CMSSW_BASE}/src/JHUGenMELA/MELA
+#rm -rf ${CMSSW_BASE}/src/JHUGenMELA/MELA/
 #mv ${CMSSW_BASE}/MELA ${CMSSW_BASE}/src/JHUGenMELA/
 
 rm -rf ${CMSSW_BASE}/src/KinZfitter/KinZfitter/ParamZ1/
@@ -31,10 +28,6 @@ mv ${CMSSW_BASE}/ParamZ1 ${CMSSW_BASE}/src/KinZfitter/KinZfitter/
 rm -rf ${CMSSW_BASE}/src/KinZfitter/HelperFunction/hists/
 mv ${CMSSW_BASE}/hists ${CMSSW_BASE}/src/KinZfitter/HelperFunction/
 
-echo "================= Dumping PSet =================="
-
-python -c "import PSet; print PSet.process.dumpPython()"
-
 echo "================= DONE =========================="
 
-cmsRun -j FrameworkJobReport.xml -p PSet.py
+cmsRun -j FrameworkJobReport.xml -p PSet.py 

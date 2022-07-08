@@ -3,9 +3,6 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
 process = cms.Process("UFHZZ4LAnalysis")
-process.options = cms.untracked.PSet(
-        numberOfThreads = cms.untracked.uint32(2)
-)
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -24,17 +21,12 @@ process.Timing = cms.Service("Timing",
                              )
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 myfilelist = cms.untracked.vstring(
 
-        #'/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/60000/FF5D961D-4587-494F-B2D0-D1FE3A025B83.root',
-        #'/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/90000/6FEE6A9B-E03C-A14F-AD01-914C76D0A721.root',
-        #'/store/data/Run2018D/MuonEG/MINIAOD/PromptReco-v2/000/320/712/00000/30F25513-3898-E811-B4E3-02163E019E9A.root'
-        #'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/500/00000/045F861F-F995-E811-8394-FA163EE8287C.root'
-        #'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/500/00000/04A18830-F995-E811-976F-FA163E8CA0FA.root'
-        #'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/500/00000/064A883F-F995-E811-B3E7-FA163E81C56B.root'
-        '/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/100000/0004A5E9-9F18-6B42-B31D-4206406CE423.root'
+        '/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/60000/FF5D961D-4587-494F-B2D0-D1FE3A025B83.root',
+'/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/90000/6FEE6A9B-E03C-A14F-AD01-914C76D0A721.root',
 #DUMMYFILELIST
 )
 
@@ -46,7 +38,7 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("DUMMYFILENAME.root")
 )
 
-# clean muons by segments
+# clean muons by segments 
 process.boostedMuons = cms.EDProducer("PATMuonCleanerBySegments",
 				     src = cms.InputTag("slimmedMuons"),
 				     preselection = cms.string("track.isNonnull"),
@@ -100,14 +92,14 @@ process.calibratedPatElectrons.src = cms.InputTag("slimmedElectrons")
 ##  # add them to the VID producer
 ##  for idmod in my_id_modules:
 ##      setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-##
+##  
 ##  #process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('calibratedPatElectrons')
 ##  #process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('calibratedPatElectrons')
 ##  #process.electronMVAValueMapProducer.srcMiniAOD= cms.InputTag('calibratedPatElectrons')
 ##  process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('selectedElectrons')
 ##  process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('selectedElectrons')
 ##  process.electronMVAValueMapProducer.srcMiniAOD= cms.InputTag('selectedElectrons')
-##
+##  
 ##  process.electronsMVA = cms.EDProducer("SlimmedElectronMvaIDProducer",
 ##                                        mvaValuesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Autumn18IdIsoValues"),
 ##                                        #electronsCollection = cms.InputTag("calibratedPatElectrons"),
@@ -143,7 +135,7 @@ process.jec = cms.ESSource("PoolDBESSource",
             label= cms.untracked.string("AK4PFchs")
             ),
 
-        cms.PSet(
+        cms.PSet( 
             record = cms.string("JetCorrectionsRecord"),
             tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK8PFchs"),
             label= cms.untracked.string("AK8PFchs")
@@ -157,12 +149,12 @@ process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
 
 process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJets"),
-    levels = ['L1FastJet',
-              'L2Relative',
+    levels = ['L1FastJet', 
+              'L2Relative', 
               'L3Absolute',
               'L2L3Residual'
               ],
-    payload = 'AK4PFchs' )
+    payload = 'AK4PFchs' ) 
 
 process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJetsAK8"),
@@ -254,7 +246,7 @@ process.QGTagger.srcVertexCollection=cms.InputTag("offlinePrimaryVertices")
 # compute corrected pruned jet mass
 process.corrJets = cms.EDProducer ( "CorrJetsProducer",
                                     jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
-                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
+                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ), 
                                     rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
                                     payload = cms.string  ( "AK8PFchs" ),
                                     isData  = cms.bool    (  True ),
@@ -330,7 +322,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               doTriggerMatching = cms.untracked.bool(False),
                               triggerList = cms.untracked.vstring(
                                   # Toni
-                                  'HLT_Ele32_WPTight_Gsf_v',
+                                  'HLT_Ele32_WPTight_Gsf_v', 
                                   'HLT_IsoMu24_v',
                                   'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v',
                                   'HLT_DoubleEle25_CaloIdL_MW_v',
@@ -342,12 +334,12 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_DZ_v',
                                   'HLT_TripleMu_10_5_5_DZ_v',
                                   'HLT_TripleMu_12_10_5_v',
-                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',
-                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v',
+                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v', 
+                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v', 
                               ),
-                              verbose = cms.untracked.bool(False),
-                              skimLooseLeptons = cms.untracked.int32(2),
-                              skimTightLeptons = cms.untracked.int32(2),
+                              verbose = cms.untracked.bool(False),              
+                              skimLooseLeptons = cms.untracked.int32(2),              
+                              skimTightLeptons = cms.untracked.int32(2),              
                               #bestCandMela = cms.untracked.bool(False),
                               year = cms.untracked.int32(2018),
                               isCode4l = cms.untracked.bool(False),
@@ -376,3 +368,4 @@ process.p = cms.Path(process.fsrPhotonSequence*
 #                     process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
                      process.Ana
                      )
+

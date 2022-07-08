@@ -3,9 +3,6 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
 process = cms.Process("UFHZZ4LAnalysis")
-process.options = cms.untracked.PSet(
-        numberOfThreads = cms.untracked.uint32(2)
-)
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -16,18 +13,21 @@ process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load('Configuration.StandardSequences.Services_cff')
 #process.GlobalTag.globaltag='102X_upgrade2018_realistic_v15'
-process.GlobalTag.globaltag='102X_upgrade2018_realistic_v15'
+process.GlobalTag.globaltag='102X_upgrade2018_realistic_v18'
 
 process.Timing = cms.Service("Timing",
                              summaryOnly = cms.untracked.bool(True)
                              )
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+
+process.options = cms.untracked.PSet(
+        numberOfThreads = cms.untracked.uint32(2) )
 
 myfilelist = cms.untracked.vstring(
     #'/store/mc/RunIIAutumn18MiniAOD/JpsiToMuMu_JpsiPt8_TuneCP5_13TeV-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/270000/FE663B04-41AE-7F42-892C-22891454BB2C.root'
-     '/store/mc/RunIIAutumn18MiniAOD/DYBJetsToLL_M-50_Zpt-200toInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/110000/16D28926-6855-EF42-A50F-C77B27C9EF09.root',
+     '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15_ext2-v1/00000/0EFEE6C9-3B71-D94C-AF6F-D75EFE5D0C31.root',
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/00000/1420AC0A-AB2F-8F4B-A5FC-8E040B670492.root/',
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root'
         )
@@ -41,7 +41,7 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("DUMMYFILENAME.root")
 )
 
-# clean muons by segments
+# clean muons by segments 
 process.boostedMuons = cms.EDProducer("PATMuonCleanerBySegments",
 				     src = cms.InputTag("slimmedMuons"),
 				     preselection = cms.string("track.isNonnull"),
@@ -134,7 +134,7 @@ process.calibratedPatElectrons.src = cms.InputTag("slimmedElectrons")
 ##  process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('selectedElectrons')
 ##  process.electronMVAVariableHelper.srcMiniAOD = cms.InputTag('selectedElectrons')
 ##  process.electronMVAValueMapProducer.srcMiniAOD = cms.InputTag('selectedElectrons')
-##
+##  
 ##  process.electronsMVA = cms.EDProducer("SlimmedElectronMvaIDProducer",
 ##                                        mvaValuesMap = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Autumn18IdIsoValues"),
 ##  #                                      electronsCollection = cms.InputTag("calibratedPatElectrons"),
@@ -149,72 +149,61 @@ process.load('UFHZZAnalysisRun2.FSRPhotons.fsrPhotons_cff')
 import os
 # Jet Energy Corrections
 from CondCore.DBCommon.CondDBSetup_cfi import *
-#era = "Autumn18_V19_MC"
+era = "Autumn18_V19_MC"
 # for HPC
-#dBFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/"+era+".db"
+dBFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/"+era+".db"
 # for crab
-#dBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/"+era+".db"
-#process.jec = cms.ESSource("PoolDBESSource",
-#                           CondDBSetup,
-#                           connect = cms.string("sqlite_file:"+dBFile),
-#                           toGet =  cms.VPSet(
-#        cms.PSet(
-#            record = cms.string("JetCorrectionsRecord"),
-#            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
-#            label= cms.untracked.string("AK4PF")
-#            ),
-#        cms.PSet(
-#            record = cms.string("JetCorrectionsRecord"),
-#            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
-#            label= cms.untracked.string("AK4PFchs")
-#            ),
-#
-#        cms.PSet(
-#            record = cms.string("JetCorrectionsRecord"),
-#            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK8PFchs"),
-#            label= cms.untracked.string("AK8PFchs")
-#            ),
-#        )
-#)
+dBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/"+era+".db"
+process.jec = cms.ESSource("PoolDBESSource",
+                           CondDBSetup,
+                           connect = cms.string("sqlite_file:"+dBFile),
+                           toGet =  cms.VPSet(
+        cms.PSet(
+            record = cms.string("JetCorrectionsRecord"),
+            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PF"),
+            label= cms.untracked.string("AK4PF")
+            ),
+        cms.PSet(
+            record = cms.string("JetCorrectionsRecord"),
+            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK4PFchs"),
+            label= cms.untracked.string("AK4PFchs")
+            ),
 
-from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-from RecoBTag.ONNXRuntime.pfDeepBoostedJet_cff import _pfDeepBoostedJetTagsAll
-updateJetCollection(
-     process,
-     jetSource = cms.InputTag('slimmedJetsAK8'),
-     pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-     svSource = cms.InputTag('slimmedSecondaryVertices'),
-     rParam = 0.8,
-     jetCorrections = ('AK8PFPuppi', cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual']), 'None'),
-     btagDiscriminators = _pfDeepBoostedJetTagsAll,
-     postfix='AK8WithDeepTags',
-     printWarning = True
+        cms.PSet(
+            record = cms.string("JetCorrectionsRecord"),
+            tag = cms.string("JetCorrectorParametersCollection_"+era+"_AK8PFchs"),
+            label= cms.untracked.string("AK8PFchs")
+            ),
+        )
 )
+process.es_prefer_jec = cms.ESPrefer("PoolDBESSource",'jec')
+
+
 process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
 
 process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
     src = cms.InputTag("slimmedJets"),
+    levels = ['L1FastJet', 
+              'L2Relative', 
+              'L3Absolute'],
+    payload = 'AK4PFchs' ) 
+
+process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
+    src = cms.InputTag("slimmedJetsAK8"),
     levels = ['L1FastJet',
               'L2Relative',
               'L3Absolute'],
-    payload = 'AK4PFchs' )
-
-#process.AK8PFJetCorrFactors = process.updatedPatJetCorrFactors.clone(
-#    src = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
-#    levels = ['L1FastJet',
-#              'L2Relative',
-#              'L3Absolute'],
-#    payload = 'AK8PFPuppi' )
+    payload = 'AK8PFchs' )
 
 process.slimmedJetsJEC = process.updatedPatJets.clone(
     jetSource = cms.InputTag("slimmedJets"),
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("jetCorrFactors"))
     )
 
-#process.slimmedJetsAK8JEC = process.updatedPatJets.clone(
-#    jetSource = cms.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
-#    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("AK8PFJetCorrFactors"))
-#    )
+process.slimmedJetsAK8JEC = process.updatedPatJets.clone(
+    jetSource = cms.InputTag("slimmedJetsAK8"),
+    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("AK8PFJetCorrFactors"))
+    )
 
 ### add pileup id and discriminant to patJetsReapplyJEC
 process.load("RecoJets.JetProducers.PileupJetID_cfi")
@@ -230,9 +219,9 @@ process.slimmedJetsJEC.userData.userInts.src += ['pileupJetIdUpdated:fullId']
 # JER
 process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 # for hpc
-dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
+dBJERFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"   
 # for crab
-#dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
+dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
 process.jer = cms.ESSource("PoolDBESSource",
         CondDBSetup,
         connect = cms.string("sqlite_file:"+dBJERFile),
@@ -262,8 +251,8 @@ process.load("CondCore.CondDB.CondDB_cfi")
 qgDatabaseVersion = 'cmssw8020_v2'
 # for hpc
 QGdBFile = os.environ.get('CMSSW_BASE')+"/src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db"
-# for crab
-#QGdBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db"
+# for crabu#QGdBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db"
+QGdBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db"
 process.QGPoolDBESSource = cms.ESSource("PoolDBESSource",
       DBParameters = cms.PSet(messageLevel = cms.untracked.int32(1)),
       timetype = cms.string('runnumber'),
@@ -284,13 +273,13 @@ process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 process.QGTagger.srcVertexCollection=cms.InputTag("offlinePrimaryVertices")
 
 # compute corrected pruned jet mass
-#process.corrJets = cms.EDProducer ( "CorrJetsProducer",
-#                                   jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
-#                                   vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ),
-#                                    rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
-#                                    payload = cms.string  ( "AK8PFPuppi" ),
-#                                    isData  = cms.bool    (  False ),
-#                                    year = cms.untracked.int32(2018))
+process.corrJets = cms.EDProducer ( "CorrJetsProducer",
+                                    jets    = cms.InputTag( "slimmedJetsAK8JEC" ),
+                                    vertex  = cms.InputTag( "offlineSlimmedPrimaryVertices" ), 
+                                    rho     = cms.InputTag( "fixedGridRhoFastjetAll"   ),
+                                    payload = cms.string  ( "AK8PFchs" ),
+                                    isData  = cms.bool    (  False ),
+                                    year = cms.untracked.int32(2018))
 
 
 # Recompute MET
@@ -335,7 +324,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               tauSrc      = cms.untracked.InputTag("slimmedTaus"),
                               jetSrc       = cms.untracked.InputTag("slimmedJetsJEC"),
 #                              jetSrc       = cms.untracked.InputTag("slimmedJets"),
-                              mergedjetSrc = cms.untracked.InputTag("selectedUpdatedPatJetsAK8WithDeepTags"),
+                              mergedjetSrc = cms.untracked.InputTag("corrJets"),
                               metSrc       = cms.untracked.InputTag("slimmedMETs","","UFHZZ4LAnalysis"),
                               #metSrc       = cms.untracked.InputTag("slimmedMETs"),
                               vertexSrc    = cms.untracked.InputTag("offlineSlimmedPrimaryVertices"),
@@ -366,7 +355,7 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               doTriggerMatching = cms.untracked.bool(False),
                               triggerList = cms.untracked.vstring(
                                   # Toni
-                                  'HLT_Ele32_WPTight_Gsf_v',
+                                  'HLT_Ele32_WPTight_Gsf_v', 
                                   'HLT_IsoMu24_v',
                                   'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v',
                                   'HLT_DoubleEle25_CaloIdL_MW_v',
@@ -376,9 +365,9 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                                   'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v',
                                   'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',
                                   'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_DZ_v',
-                                  'HLT_TripleMu_10_5_5_DZ_v',
-                                  'HLT_TripleMu_12_10_5_v',
-                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',
+                                  'HLT_TripleMu_10_5_5_DZ_v',             
+                                  'HLT_TripleMu_12_10_5_v',               
+                                  'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',   
                                   'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v',
                                   # OLD
 #                                  'HLT_Ele32_WPTight_Gsf_v',
@@ -396,15 +385,14 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
 #                                  'HLT_TripleMu_10_5_5_DZ_v',
 #                                  'HLT_TripleMu_12_10_5_v',
                               ),
-                              verbose = cms.untracked.bool(False),
-                              skimLooseLeptons = cms.untracked.int32(2),
-                              skimTightLeptons = cms.untracked.int32(2),
+                              verbose = cms.untracked.bool(False),              
+                              skimLooseLeptons = cms.untracked.int32(2),              
+                              skimTightLeptons = cms.untracked.int32(2),              
                               #bestCandMela = cms.untracked.bool(False),
-#                              verbose = cms.untracked.bool(True),
+#                              verbose = cms.untracked.bool(True),              
                               year = cms.untracked.int32(2018),####for year put 2016,2017, or 2018 to select correct setting
-                              isCode4l = cms.untracked.bool(False),
+                              isCode4l = cms.untracked.bool(False), 
                              )
-
 
 
 process.p = cms.Path(process.fsrPhotonSequence*
@@ -423,14 +411,11 @@ process.p = cms.Path(process.fsrPhotonSequence*
                      process.pileupJetIdUpdated*
                      process.slimmedJetsJEC*
                      process.QGTagger*
-                     #process.AK8PFJetCorrFactors*
-                     #process.slimmedJetsAK8JEC*
+                     process.AK8PFJetCorrFactors*
+                     process.slimmedJetsAK8JEC*
                      process.fullPatMetSequence*
-                     #process.corrJets*
+                     process.corrJets*
                      process.mergedGenParticles*process.myGenerator*process.rivetProducerHTXS*#process.rivetProducerHZZFid*
                      process.Ana
                      )
 
-from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask
-task = getPatAlgosToolsTask(process)
-process.p.associate(task)

@@ -1,30 +1,48 @@
+SCRAM_ARCH=slc7_amd64_gcc700; export SCRAM_ARCH
+cmsrel CMSSW_10_6_26
+cd CMSSW_10_6_26/src/
+cmsenv
 git cms-init
+
+git clone -b 106X_2l2q git@github.com:jialin-guo1/UFHZZAnalysisRun2.git
+
+##git cms-merge-topic asculac:Electron_XGBoost_MVA_16UL_17UL
+
 git cms-addpkg GeneratorInterface/RivetInterface
+
 git cms-addpkg SimDataFormats/HTXS
-git cms-addpkg RecoEgamma/EgammaTools
+
 git cms-addpkg RecoEgamma/PhotonIdentification
+
 git cms-addpkg RecoEgamma/ElectronIdentification
+
 git cms-merge-topic cms-egamma:EgammaPostRecoTools
+
+git cms-addpkg RecoEgamma/EgammaTools
+
+git clone https://github.com/cms-egamma/EgammaPostRecoTools.git
+
+mv EgammaPostRecoTools/python/EgammaPostRecoTools.py RecoEgamma/EgammaTools/python/.
+
+#git clone https://github.com/cms-data/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data/
+
+git clone -b ULSSfiles_correctScaleSysMC https://github.com/jainshilpi/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data/
+
+git cms-addpkg EgammaAnalysis/ElectronTools
+
+git cms-addpkg  RecoJets/JetProducers
+
 git cms-addpkg PhysicsTools/PatAlgos/
-#(vi .git/info/sparse-checkout & git read-tree -mu HEAD)
-#git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
-#cd ZZMatrixElement
-#git checkout -b from-v223 v2.2.3
-#. setup.sh -j 12
-#cd ../
+
 git clone -b v2.3.5 https://github.com/JHUGen/JHUGenMELA
+
 sh JHUGenMELA/MELA/setup.sh -j 8
-git clone -b RunII_v2 https://github.com/jialin-guo1/UFHZZAnalysisRun2-Accessary.git
-#mv UFHZZAnalysisRun2-Accessary/* ./
-#rm -rf UFHZZAnalysisRun2-Accessary
-mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/Identification/mvaElectronID_Autumn18_ID_ISO_cff.py ./RecoEgamma/ElectronIdentification/python/Identification/
-mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/Identification/mvaElectronID_Summer16_ID_ISO_cff.py  ./RecoEgamma/ElectronIdentification/python/Identification/
-mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/ElectronMVAValueMapProducer_cfi.py  RecoEgamma/ElectronIdentification/python/
-mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/python/ElectronIDValueMapProducer_cfi.py RecoEgamma/ElectronIdentification/python/
-mv UFHZZAnalysisRun2-Accessary/RecoEgamma/ElectronIdentification/data/MVAWeightFiles RecoEgamma/ElectronIdentification/data/
-mv UFHZZAnalysisRun2-Accessary/* ./
-rm -rf UFHZZAnalysisRun2-Accessary
-#mv UFHZZAnalysisRun2-Accessary ../
+
+git clone https://github.com/bachtis/Analysis.git -b KaMuCa_V4 KaMuCa
+
 git clone -b tmp_Ferrico https://github.com/ferrico/KinZfitter.git
-git clone git@github.com:cms-jet/JetToolbox.git JMEAnalysis/JetToolbox -b jetToolbox_102X_v3
-scram b -j 8
+
+scramv1 b -j 8
+
+voms-proxy-init --rfc --voms cms
+

@@ -1,6 +1,13 @@
 HZZ Analyzer for CMS Run2
 
 ------
+To install_new:
+
+'''bash
+wget https://raw.githubusercontent.com/qyguo/UFHZZAnalysisRun2/UL_10_6_26/install_UL.sh
+chmod +x install_UL.sh
+./install_UL.sh
+'''
 
 To install:
 

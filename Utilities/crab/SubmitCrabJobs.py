@@ -49,7 +49,7 @@ def submitAnalyzer():
     currentDir = os.getcwd()
 
     tag = opt.TAG
-    outDir='resultsAna_'+tag
+    outDir='resultsAna_'+tag 
 
     if (not os.path.isdir(outDir)):
         cmd = 'mkdir '+outDir
@@ -79,7 +79,7 @@ def submitAnalyzer():
 
             datasets.append(dataset)
             cross_section[dataset] = float(line.split()[1])
-
+            
             #cmd = './das_client.py --query="file dataset='+dataset+'" --limit=10 | grep ".root"'
             #output = processCmd(cmd)
             #while ('error' in output):
@@ -87,7 +87,7 @@ def submitAnalyzer():
             #    output = processCmd(cmd)
             #datasetfiles[dataset] =  output.split()
             #nfiles[dataset] = len(datasetfiles[dataset])
-
+ 
             #cmd = './das_client.py --query="dataset dataset='+dataset+' | grep dataset.nevents" --limit=0'
             #output = processCmd(cmd)
             #while ('error' in output):
@@ -104,14 +104,9 @@ def submitAnalyzer():
     jobCount=0
 
     for dataset in datasets:
-
+        
         #continue
         filename = dataset.split('/')[1]+'_'+dataset.split('/')[2]
-        print " length of filename = " + str(len(filename))
-        if(len(filename)>99):
-            print " reduce the length of filename"
-            filename = filename.split('_up')[0]
-            print " get new file name = " + filename
 
         cfgfile = dataset.lstrip('/')
         cfgfile = cfgfile.replace('/','_')+'.py'
@@ -130,13 +125,17 @@ def submitAnalyzer():
         #filelist = filelist.rstrip(',')
 
         #cmd = "sed -i 's~DUMMYFILELIST~"+filelist+"~g' "+outDir+'/cfg/'+cfgfile
-        #cmd = "sed -i 's~DUMMYFILELIST~ ~g' "+outDir+'/cfg/'+cfgfile
-        #output = processCmd(cmd)
+        cmd = "sed -i 's~DUMMYFILELIST~ ~g' "+outDir+'/cfg/'+cfgfile
+        output = processCmd(cmd)
 
-        #filename = dataset.split('/')[1]+'_'+dataset.split('/')[2]
-        #if (len(filename)>99):
-        #  newfilename = filename.split('-PU')[0]
-        #  filename = newfilename
+        filename = dataset.split('/')[1]+'_'+dataset.split('/')[2]
+        if (len(filename)>99):
+          
+	#newfilename = filename.split('-PU')[0]
+		#newfilename = filename.split('-PUMoriond17_80X')[0]
+        	#newfilename = filename.split('-PU2017_12Apr2018_94X')[0]
+		newfilename = filename.split('_upgrade2018_')[0]
+		filename = newfilename
 
         cmd  = "sed -i 's~DUMMYFILENAME~"+filename+"~g' "+outDir+'/cfg/'+cfgfile
         output = processCmd(cmd)
@@ -164,7 +163,7 @@ def submitAnalyzer():
             cmd = "sed -i 's~checkOnlySingle = cms.untracked.bool(False)~checkOnlySingle = cms.untracked.bool(True)~g' "+outDir+'/cfg/'+cfgfile
             output = processCmd(cmd)
 
-        crabcfgfile = 'crabConfig_'+filename+'.py'
+        crabcfgfile = 'crabConfig_'+filename+'.py'             
 
         cmd = 'cp crabConfig_TEMPLATE.py '+outDir+'/cfg/'+crabcfgfile
         output = processCmd(cmd)
@@ -175,17 +174,14 @@ def submitAnalyzer():
         cmd = "sed -i 's~CFGFILE~"+outDir+"/cfg/"+cfgfile+"~g' "+outDir+'/cfg/'+crabcfgfile
         output = processCmd(cmd)
 
-
         cmd = "sed -i 's~OUTFILENAME~"+filename+"~g' "+outDir+'/cfg/'+crabcfgfile
-        #cmd = "sed -i 's~OUTFILENAME~"+testname+"~g' "+outDir+'/cfg/'+crabcfgfile
-        print "OUTFILENAME = "+filename
         output = processCmd(cmd)
 
         cmd = "sed -i 's~DATASETNAME~"+dataset+"~g' "+outDir+'/cfg/'+crabcfgfile
         output = processCmd(cmd)
 
         cmd = 'crab submit -c '+outDir+'/cfg/'+crabcfgfile
-        print cmd
+        print cmd     
 
         output = processCmd(cmd)
         if ("ERROR!!!" in output):
@@ -203,6 +199,6 @@ def submitAnalyzer():
         else:
             print output
 
-# run the submitAnalyzer() as main()
-if __name__ == "__main__":
-    submitAnalyzer()
+# run the submitAnalyzer() as main() 
+if __name__ == "__main__": 
+    submitAnalyzer() 

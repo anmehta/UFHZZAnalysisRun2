@@ -39,8 +39,11 @@
 <use   name="PhysicsTools/SelectorUtils"/>
 <use   name="MagneticField/Records"/>
 <use   name="JHUGenMELA/MELA"/>
-<use   name="JHUGenMELA/MEKD"/>
-<use   name="JHUGenMELA/MEMCalculators"/>
+<use   name="MelaAnalytics/EventContainer"/>
+<use   name="MelaAnalytics/GenericMEComputer"/>
+<use   name="MelaAnalytics/CandidateLOCaster"/>
+<use   name="IvyFramework/IvyDataTools"/>
+<use   name="IvyFramework/IvyAutoMELA"/>
 <use   name="KinZfitter/KinZfitter"/>
 <use   name="CondFormats/JetMETObjects"/>
 <use   name="JetMETCorrections/Objects"/>
@@ -55,3 +58,4 @@
 <use   name="CondTools/BTau"/>
 <flags EDM_PLUGIN="1"/>
 <Flags CXXFLAGS="-g"/>
+<flags CXXFLAGS="-g -O3 -I$(CMSSW_BASE)/src/JHUGenMELA/MELA/interface/ -I$(CMSSW_BASE)/src/IvyFramework/IvyDataTools/interface/ -I$(CMSSW_BASE)/src/IvyFramework/IvyAutoMELA/interface/"/>
