@@ -3,15 +3,15 @@
 ------
 To install_new:
 
-'''bash
+```bash
 wget https://github.com/jialin-guo1/UFHZZAnalysisRun2/blob/106X_2l2q/install_2.sh
 chmod +x install_2.sh
 ./install_2.sh
-'''
+```
 ##test 
-'''bash
+```bash
 cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_106X_2016ULAPV_2l2q_cfg.py
-'''
+```
 
 To install (old):
 
