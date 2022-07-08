@@ -6,15 +6,15 @@ To install:
 
 export SCRAM_ARCH=slc7_amd64_gcc700
 
-cmsrel CMSSW_10_6_25
+cmsrel CMSSW_10_6_26
 
-cd CMSSW_10_6_25/src
+cd CMSSW_10_6_26/src
 
 cmsenv
 
 git cms-init
 
-git clone -b 106X_2l2q https://github.com/jialin-guo1/UFHZZAnalysisRun2.git
+git clone -b 106X_2l2q git@github.com:jialin-guo1/UFHZZAnalysisRun2.git
 
 cp UFHZZAnalysisRun2/install*.sh .
 
