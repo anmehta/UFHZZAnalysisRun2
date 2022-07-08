@@ -4,7 +4,7 @@
 To install_new:
 
 ```bash
-wget https://github.com/jialin-guo1/UFHZZAnalysisRun2/blob/106X_2l2q/install_2.sh
+wget https://raw.githubusercontent.com/jialin-guo1/UFHZZAnalysisRun2/106X_2l2q/install_2.sh
 chmod +x install_2.sh
 ./install_2.sh
 ```
