@@ -1,15 +1,19 @@
-HZZ Analyzer for CMS Run2
+#HZZ Analyzer for CMS Run2
 
 ------
 To install_new:
 
 '''bash
-wget https://raw.githubusercontent.com/qyguo/UFHZZAnalysisRun2/UL_10_6_26/install_UL.sh
-chmod +x install_UL.sh
-./install_UL.sh
+wget https://github.com/jialin-guo1/UFHZZAnalysisRun2/blob/106X_2l2q/install_2.sh
+chmod +x install_2.sh
+./install_2.sh
+'''
+##test 
+'''bash
+cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_106X_2016ULAPV_2l2q_cfg.py
 '''
 
-To install:
+To install (old):
 
 export SCRAM_ARCH=slc7_amd64_gcc700
 
