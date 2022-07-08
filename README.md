@@ -1,4 +1,4 @@
-#HZZ Analyzer for CMS Run2
+# HZZ Analyzer for CMS Run2
 
 ------
 To install_new:
@@ -8,7 +8,7 @@ wget https://github.com/jialin-guo1/UFHZZAnalysisRun2/blob/106X_2l2q/install_2.s
 chmod +x install_2.sh
 ./install_2.sh
 ```
-##test 
+## test 
 ```bash
 cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_106X_2016ULAPV_2l2q_cfg.py
 ```
