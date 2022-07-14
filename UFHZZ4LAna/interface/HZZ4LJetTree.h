@@ -79,7 +79,7 @@ class HZZ4LJetTree
   ~HZZ4LJetTree();
 
 
-  void fillJetDumpTree(edm::Handle<edm::View<pat::Jet> > jets,edm::Handle<edm::View<pat::Jet> > correctedJets, const edm::Event& iEvent);
+  void fillJetDumpTree(edm::Handle<edm::View<pat::Jet> > jets,edm::Handle<edm::View<pat::Jet> > correctedJets, const edm::Event& iEvent, int year);
 
  private:
   
@@ -126,7 +126,7 @@ HZZ4LJetTree::~HZZ4LJetTree()
 }
 
 
-void HZZ4LJetTree::fillJetDumpTree(edm::Handle<edm::View<pat::Jet> >  jets, edm::Handle<edm::View<pat::Jet> >  correctedJets, const edm::Event& iEvent)
+void HZZ4LJetTree::fillJetDumpTree(edm::Handle<edm::View<pat::Jet> >  jets, edm::Handle<edm::View<pat::Jet> >  correctedJets, const edm::Event& iEvent, int year)
 {
 
   edm::Handle<edm::ValueMap<float> > puJetIdMva;
@@ -152,7 +152,7 @@ void HZZ4LJetTree::fillJetDumpTree(edm::Handle<edm::View<pat::Jet> >  jets, edm:
       //puidflag = (*puJetIdFlag)[jets->refAt(i)]; // for miniAOD
       //puidpass =  PileupJetIdentifier::passJetId( puidflag, PileupJetIdentifier::kLoose ); // for miniAOD
       puidpass = patjet.userFloat("pileupJetId:fullDiscriminant"); // for miniAOD
-      pfid = JetHelper.patjetID(correctedjet);
+      pfid = JetHelper.patjetID(correctedjet, year);
       pT = correctedjet.pt();
       eta = patjet.eta();
       phi = patjet.phi();

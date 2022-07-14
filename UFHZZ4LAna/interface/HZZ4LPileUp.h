@@ -40,6 +40,7 @@ class HZZ4LPileUp
   ~HZZ4LPileUp();
 
   void fillPUWeights();
+  double getPUWeight(TH1D* h_pileup, int ntrue);
   double getPUWeight(double nInteraction, std::string version);
   double weightTruePileupV07toIchep52X(double input);
   double weightTruePileupV07toHcp53X(double input);
@@ -49,6 +50,8 @@ class HZZ4LPileUp
   double weightTruePileupLegacy53X(double input);
   double weightTruePileupFall15_74X(double input);
   double weightTruePileupFall15_76X(double input);
+  double weightTruePileupSpring16_80X(double input);
+  double weightTruePileupSummer16_80X(double input);
   double weightTrue2011(double input);
   double weightTrue2011to2012(double input);
 
@@ -78,6 +81,11 @@ HZZ4LPileUp::~HZZ4LPileUp()
 
 }
 
+double HZZ4LPileUp::getPUWeight(TH1D* h_pileup, int ntrue)
+{
+    return h_pileup->GetBinContent(ntrue+1);
+}
+
 double HZZ4LPileUp::getPUWeight(double nInteraction, std::string version)
 {
   
@@ -91,6 +99,8 @@ double HZZ4LPileUp::getPUWeight(double nInteraction, std::string version)
   else if(version == "Legacy53X") return weightTruePileupLegacy53X(nInteraction);
   else if(version == "Fall15_74X") return weightTruePileupFall15_74X(nInteraction);
   else if(version == "Fall15_76X") return weightTruePileupFall15_76X(nInteraction);
+  else if(version == "Spring16_80X") return weightTruePileupSpring16_80X(nInteraction);
+  else if(version == "Summer16_80X") return weightTruePileupSummer16_80X(nInteraction);
   else{
     std::string msg;
     msg = "HZZ4LPileUp::getPUWeight() unknown version\n";
@@ -671,57 +681,57 @@ double HZZ4LPileUp::weightTruePileupFall15_76X(double input){
 
   if(input > 50) return 1.0;
 
-  double w[50] = {      
-      0.541295,
-      0.681438,
-      1.05914,
-      1.36561,
-      1.6259,
-      1.94201,
-      1.45237,
-      1.28815,
-      1.38652,
-      1.36718,
-      1.26216,
-      1.16109,
-      1.0583,
-      0.904563,
-      0.70166,
-      0.495698,
-      0.334522,
-      0.244202,
-      0.213501,
-      0.185225,
-      0.120628,
-      0.0549179,
-      0.0187476,
-      0.00537602,
-      0.00152633,
-      0.000509498,
-      0.000207473,
-      9.64441e-05,
-      4.84226e-05,
-      2.53744e-05,
-      1.35337e-05,
-      7.22056e-06,
-      3.81235e-06,
-      1.97863e-06,
-      1.00433e-06,
-      4.96044e-07,
-      2.36999e-07,
-      1.08774e-07,
-      4.75968e-08,
-      1.9715e-08,
-      7.68935e-09,
-      2.81756e-09,
-      9.70956e-10,
-      3.15813e-10,
-      9.74324e-11,
-      2.86468e-11,
-      8.06565e-12,
-      2.1444e-12,
-      7.12649e-13,
-      0
+  double w[50] = {
+      0.55447356777,
+      0.678629598034,
+      1.06172336068,
+      1.35504411557,
+      1.59983895936,
+      1.90698165584,
+      1.420273616,
+      1.25566672497,
+      1.34991085968,
+      1.33075745197,
+      1.22905355766,
+      1.13215896181,
+      1.0349277284,
+      0.890281072958,
+      0.701864786848,
+      0.518259798658,
+      0.393672078109,
+      0.368262853288,
+      0.449322525513,
+      0.57271854774,
+      0.638421250388,
+      0.63088332883,
+      0.590233296608,
+      0.534579731223,
+      0.466027142791,
+      0.388605219184,
+      0.310142635272,
+      0.238072902477,
+      0.176861698551,
+      0.127936490811,
+      0.0907113339412,
+      0.0635561892026,
+      0.0444549098904,
+      0.031411245817,
+      0.0226831775955,
+      0.0168806354317,
+      0.0129690586193,
+      0.0102213258096,
+      0.00815808496134,
+      0.00649198825312,
+      0.00507909916204,
+      0.00386940642307,
+      0.00285795149439,
+      0.00204639138044,
+      0.00142410754415,
+      0.000966534632481,
+      0.000641886312873,
+      0.000418244638923,
+      0.000267909848803,
+     0.00016893227596
   };
 
  return w[(int)floor(input)];
@@ -729,6 +739,155 @@ double HZZ4LPileUp::weightTruePileupFall15_76X(double input){
 }
 
 
+double HZZ4LPileUp::weightTruePileupSpring16_80X(double input){
+
+  if(input > 50) return 1.0;
+
+  double w[50] = {
+      0.0006977897,
+      0.01355602,
+      0.02092033,
+      0.03753119,
+      0.05806716,
+      0.0470678,
+      0.09734445,
+      0.3871528,
+      0.6245049,
+      0.9889339,
+      1.274338,
+      1.498751,
+      1.735016,
+      1.9445,
+      2.084375,
+      1.928796,
+      1.671028,
+      1.614396,
+      1.419708,
+      1.370662,
+      1.078287,
+      0.8692069,
+      0.744226,
+      0.6291096,
+      0.4742221,
+      0.3862415,
+      0.2543844,
+      0.1851091,
+      0.1134851,
+      0.07546794,
+      0.04801787,
+      0.03072565,
+      0.02607218,
+      0.02043605,
+      0.02261487,
+      0.03027836,
+      0.05515847,
+      0.07193636,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+      0.,
+
+  };
+
+ return w[(int)floor(input)];
+
+}
+
+
+double HZZ4LPileUp::weightTruePileupSummer16_80X(double input){
+
+    if(input > 75) return 1.0;
+
+    Double_t w[75] = {
+        0.276456,
+        0.685961,
+        0.79023,
+        1.00711,
+        1.09105,
+        0.815616,
+        0.39808,
+        0.645477,
+        0.852773,
+        1.01032,
+        1.20354,
+        1.30785,
+        1.3894,
+        1.43699,
+        1.43695,
+        1.39856,
+        1.34786,
+        1.28165,
+        1.2196,
+        1.17907,
+        1.14314,
+        1.11342,
+        1.08447,
+        1.05764,
+        1.03718,
+        1.01988,
+        0.998359,
+        0.975233,
+        0.945835,
+        0.889817,
+        0.83305,
+        0.755456,
+        0.672334,
+        0.581728,
+        0.487709,
+        0.391876,
+        0.302432,
+        0.222328,
+        0.156586,
+        0.102833,
+        0.0641031,
+        0.0383416,
+        0.0217736,
+        0.0120626,
+        0.00637766,
+        0.00318226,
+        0.00159622,
+        0.00078772,
+        0.000407124,
+        0.000233919,
+        0.000171271,
+        0.000163426,
+        0.00018634,
+        0.000252858,
+        0.00036261,
+        0.000502654,
+        0.000717929,
+        0.00104137,
+        0.00142684,
+        0.00224348,
+        0.00286275,
+        0.00325997,
+        0.00335719,
+        0.00352319,
+        0.00319764,
+        0.00275661,
+        0.00230799,
+        0.00199088,
+        0.00166658,
+        0.00138022,
+        0.00113311,
+        0.000923941,
+        0.000753904,
+        0.000603124,
+        0.
+    };
+    
+    return w[(int)floor(input)];
+
+}
+    
 double HZZ4LPileUp::weightTrue2011(double input){
   if(input>50) 
     return 1;

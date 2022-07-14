@@ -69,7 +69,6 @@ class SlimmedElectronMvaIDProducer : public edm::EDProducer {
      edm::EDGetToken electronsToken_;
      edm::EDGetToken electronsCollection_;
 
-     bool Trig_;
      std::string idname; 
 
 };
@@ -86,21 +85,16 @@ class SlimmedElectronMvaIDProducer : public edm::EDProducer {
 //
 // constructors and destructor
 //
-SlimmedElectronMvaIDProducer::SlimmedElectronMvaIDProducer(const edm::ParameterSet& iConfig)
-//   mvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMap")))
+SlimmedElectronMvaIDProducer::SlimmedElectronMvaIDProducer(const edm::ParameterSet& iConfig):
+    mvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMap")))
 {
 
    electronsCollection_ = consumes<std::vector<pat::Electron> >(iConfig.getParameter<edm::InputTag>("electronsCollection"));
    electronsToken_ = mayConsume<edm::View<reco::GsfElectron> >(iConfig.getParameter<edm::InputTag>("electronsCollection"));
-   Trig_ = iConfig.getParameter<bool>("Trig");
-
-    if(Trig_){ idname = "Trig";}    
-    if(!Trig_){ idname = "NonTrig";    }
+   idname = iConfig.getParameter<std::string>("idname");
 
    //register your products
-
-   produces<edm::ValueMap<float> >();
-   produces<std::vector<pat::Electron> >(idname);      
+   produces<std::vector<pat::Electron> >();      
 
 }
 
@@ -131,57 +125,33 @@ SlimmedElectronMvaIDProducer::produce(edm::Event& iEvent, const edm::EventSetup&
    edm::Handle<edm::View<reco::GsfElectron> > gsfelectrons;
    iEvent.getByToken(electronsToken_,gsfelectrons);
         
-   // electron mva values            
-   //edm::Handle<edm::ValueMap<float> > mvaValues;
-   //iEvent.getByToken(mvaValuesMapToken_,mvaValues);
+   edm::Handle<edm::ValueMap<float> > mvaValues;
+   iEvent.getByToken(mvaValuesMapToken_,mvaValues);
    
    // output electrons
    std::vector<pat::Electron> * patElectrons = new std::vector<pat::Electron>();
    
-   // output valuemap
-   std::auto_ptr<edm::ValueMap<float> > ID(new edm::ValueMap<float>() );
-
-   std::vector<float> values;
-
    // input electrons
    const vector<pat::Electron> * theElectrons = electronsCollection.product();
    unsigned int nbElectron =  theElectrons->size();
-   values.reserve(theElectrons->size());    
 
    for(unsigned i = 0 ; i < nbElectron; i++){
 
         const auto gsf = gsfelectrons->ptrAt((size_t)i);
 
-        //float idvalue = (*mvaValues)[gsf]; 
+        float idvalue = (*mvaValues)[gsf]; 
 
         pat::Electron anElectron = theElectrons->at(i); 
 
-        float idvalue = anElectron.userFloat("ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"); 
-        
-        std::vector<pat::Electron::IdPair> ids;
-        pat::Electron::IdPair id;
-        //std::pair<std::string,float> id;
-        id.first  =  idname;    
-        id.second =  idvalue;
-        
-        ids.push_back(id);     
-        anElectron.setElectronIDs(ids);
+        anElectron.addUserFloat(idname,idvalue);
         
         patElectrons->push_back(anElectron);    
         
-        values.push_back( idvalue );
     }
     
-    // add the value map to the input electron collection
-    edm::ValueMap<float>::Filler filler(*ID);
-    filler.insert(electronsCollection, values.begin(), values.end() );
-    
-    filler.fill();
-    iEvent.put(ID);
-    
     // add the electrons to the event output
-    std::auto_ptr<std::vector<pat::Electron> > ptr(patElectrons);
-    iEvent.put(ptr,idname);
+    std::unique_ptr<std::vector<pat::Electron> > ptr(patElectrons);
+    iEvent.put(std::move(ptr));
     
 }
 

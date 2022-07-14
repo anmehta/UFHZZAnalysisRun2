@@ -1,87 +1,69 @@
-HZZ Analyzer for CMS Run2
+# HZZ Analyzer for CMS Run2
 
 ------
+To install_new:
 
+```bash
+wget https://raw.githubusercontent.com/jialin-guo1/UFHZZAnalysisRun2/106X_2l2q/install_2.sh
+chmod +x install_2.sh
+./install_2.sh
+```
+## test 
+```bash
+cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_106X_2016ULAPV_2l2q_cfg.py
+```
 
-To install:
+To install (old):
 
-setenv SCRAM_ARCH slc6_amd64_gcc493
+export SCRAM_ARCH=slc7_amd64_gcc700
 
-cmsrel CMSSW_7_6_3_patch2
+cmsrel CMSSW_10_6_26
 
-cd CMSSW_7_6_3_patch2/src
+cd CMSSW_10_6_26/src
 
 cmsenv
 
-git cms-merge-topic -u matteosan1:smearer_76X
+git cms-init
 
-git clone https://github.com/VBF-HZZ/UFHZZAnalysisRun2.git
+git clone -b 106X_2l2q git@github.com:jialin-guo1/UFHZZAnalysisRun2.git
 
-git clone -b 74x-root6 https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+cp UFHZZAnalysisRun2/install*.sh .
 
-git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
+chmod 777 install_2.sh
 
-cd ZZMatrixElement
+./install_2.sh
 
-git checkout -b from-V00-02-01-patch1 V00-02-01-patch1
+cp UFHZZAnalysisRun2/Utilities/crab/* .
 
-cd ..
+voms-proxy-init --valid=168:00
+#probably need "voms-proxy-init -voms cms -rfc"
 
-git clone https://github.com/tocheng/KinZfitter.git
+source /cvmfs/cms.cern.ch/crab3/crab.sh
 
-git clone https://github.com/bachtis/Analysis.git -b KaMuCa_V2 KaMuCa
+test for cmsRun
+note: change path of JER and QGTag database files to fit interactively run in cfg.py
+i.e: vim UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
+     comment out QGdBFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/QGL_"+qgDatabaseVersion+".db" and dBJERFile = "src/UFHZZAnalysisRun2/UFHZZ4LAna/data/Autumn18_V7_MC.db"
+cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
 
-scram b -j 8
+for crab job
+Data:
+python SubmitCrabJobs.py -t "myTask_Data" -d 2018Data.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateData_106X_Legacy18_2l_cfg.py
 
-cmsRun UFHZZAnalysisRun2/UFHZZ4LAna/python/Sync_76X_cfg.py
+or similary for MC:
+python SubmitCrabJobs.py -t "myTask_MC" -d 2018MC.txt -c UFHZZAnalysisRun2/UFHZZ4LAna/python/templateMC_106X_Legacy18_2l_cfg.py
 
+You can use manageCrabTask.py to check the status, resubmit, or kill your task. E.g. after submitting:
 
-Instructions on how to use git:
+nohup python -u manageCrabTask.py -t resultsAna_myTask_Data -r -l >& managedata.log &
 
-4.) Development of the codes and put your codes to git:
+This will start an infinite loop of running crab resubmit on all of your tasks, then sleep for 30min. You should kill the process once all of your tasks are done. Once all of your tasks are done, you should run the following command to purge your crab cache so that it doesn't fill up:
 
-4.1.) Inside directory:
+python manageCrabTask.py -t resultsAna_myTask_Data -p
 
-      CMSSW_xxxx/src/UFHZZAnalysisRun2
-
-4.2.) Make a new branch for yourself, choose the branch name as you want, but do not be the same as others’:
-
-4.2.1.) Create a branch of your own :
-
-    git branch your_own_branch_name 
-
-4.2.2.) Change the codes of the working area to be the new branch
-
-     git checkout your_own_branch_name 
-
-4.2.3.) Put your new branch to the to remote git repository https://github.com/
-
-       git push origin your_own_branch_name:your_own_branch_name
-
-4.3.) Update your changes to github after you made some modifications:
-
-4.3.1.) Commit change to your local repository:
-
-    git commit -m “note of the change” -a 
-
-4.3.2.) Update the remote repository:
-
-    git push origin
-
-4.4.) If you want to add some new files or delete some old files:
-
-      git add a_new_file
-
-      git rm an_old_file
-
-      git commit -m “note of the change add new files, and delete old files” -a
-
-      git push origin 
-
-New module for electron MVA ID:
-
-SlimmedElectronMvaIDProducer
-
-The instruction for the module can be found in 
-SlimmedElectronMvaIDProducer/doc/
-
+UFHZZ4LAna/python/templateMC_102X_Legacy16_4l_cfg.py
+UFHZZ4LAna/python/templateMC_102X_Legacy17_4l_cfg.py
+UFHZZ4LAna/python/templateMC_102X_Legacy18_4l_cfg.py
+UFHZZ4LAna/python/templateData_102X_Legacy16_3l_cfg.py
+UFHZZ4LAna/python/templateData_102X_Legacy17_3l_cfg.py
+UFHZZ4LAna/python/templateData_102X_Legacy18_3l_cfg.py

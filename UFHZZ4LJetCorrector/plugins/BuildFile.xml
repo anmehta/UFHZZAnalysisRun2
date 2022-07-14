@@ -16,11 +16,3 @@
 <use   name="Geometry/Records"/>
 <use   name="JetMETCorrections/Objects"/>
 <use   name="CondFormats/JetMETObjects"/>
-
-
-<library name="UFHZZAnalysisRun2UFHZZ4LJetCorrectorPlugins" file="*.cc">
-   <flags   EDM_PLUGIN="1"/>
-</library>
-
-<export>
-</export>

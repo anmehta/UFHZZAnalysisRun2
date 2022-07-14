@@ -1,0 +1,6 @@
+# Emacs backup files
+*~
+*.pyc
+*_cc.d
+*_cc.so
+*_ACLiC_dict_rdict.pcm

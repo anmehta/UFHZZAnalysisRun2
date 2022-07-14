@@ -77,8 +77,9 @@
 #include "CommonTools/CandUtils/interface/CenterOfMassBooster.h"
 #include "CommonTools/CandUtils/interface/Booster.h"
 
-
-
+//Muon MVA
+//#include "MuonMVAReader/Reader/interface/MuonGBRForestReader.hpp"
+//class MuonGBRForestReader;
 class HZZ4LHelper
 {
 
@@ -88,12 +89,15 @@ public:
     ~HZZ4LHelper();
   
     std::vector<pat::Electron> goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, double elPtCut);
+    std::vector<pat::Electron> goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, edm::Handle<edm::View<pat::Electron> > ElectronsUnS, double elPtCut);
     std::vector<pat::Muon> goodLooseMuons2012(edm::Handle<edm::View<pat::Muon> > Muons, double muPtCut);
     std::vector<pat::Tau> goodLooseTaus2015(edm::Handle<edm::View<pat::Tau> > Taus, double tauPtCut);
+    std::vector<pat::Photon> goodLoosePhotons2015(edm::Handle<edm::View<pat::Photon> > Photons, double phoPtCut);
 
     std::vector<pat::Electron> goodElectrons2015_noIso_noBdt(std::vector<pat::Electron> Electrons, double elecPtCut, std::string elecID, const reco::Vertex *&vertex,const edm::Event& iEvent, double sip3dCut); 
     std::vector<pat::Muon> goodMuons2015_noIso_noPf(std::vector<pat::Muon> Muons, double muPtCut, const reco::Vertex *&vertex, double sip3dCut);
     std::vector<pat::Tau> goodTaus2015(std::vector<pat::Tau> Taus, double tauPtCut);
+    std::vector<pat::Photon> goodPhotons2015(std::vector<pat::Photon> Photons, double phoPtCut, int year);
 
     void cleanOverlappingLeptons(std::vector<pat::Muon> &Muons, std::vector<pat::Electron> &Electrons,const reco::Vertex *&vertex);
     void cleanOverlappingTaus(std::vector<pat::Muon> &Muons, std::vector<pat::Electron> &Electrons, std::vector<pat::Tau> &Taus, double isoCutMu, double IsoCutEl, double muRho, double elRho);
@@ -113,20 +117,49 @@ public:
     double ptRatio(pat::Muon muon, edm::Handle<edm::View<pat::Jet> > jets,bool isMC);
     double ptRel(pat::Electron electron, edm::Handle<edm::View<pat::Jet> > jets,bool isMC);
     double ptRel(pat::Muon muon, edm::Handle<edm::View<pat::Jet> > jets,bool isMC);
+    double photonPfIso03(pat::PFParticle pho, edm::Handle<pat::PackedCandidateCollection> pfcands);
 
-    bool passTight_BDT_Id(pat::Electron electron, std::string elecID);
+    bool passTight_Id(pat::Muon muon, const reco::Vertex *&vertex);
     bool passTight_Id_SUS(pat::Muon muon, const reco::Vertex *&vertex);
-    bool passTight_Id_SUS(pat::Electron electron, std::string elecID, const reco::Vertex *&vertex, const reco::BeamSpot BS, edm::Handle< std::vector<reco::Conversion> > theConversions);
+    //bool passTight_BDT_Id(pat::Electron electron, float mvavalue, int year);
+    bool passTight_BDT_Id(pat::Electron electron, int year);
+    bool passTight_Id_SUS(pat::Electron electron, std::string elecID, const reco::Vertex *&vertex, const reco::BeamSpot BS, std::vector<reco::Conversion> theConversions, int year);
     
+    bool isTrackerHighPt(pat::Muon muon, const reco::Vertex *&vertex);
+    //float get_Muon_MVA_Value(pat::Muon muon, edm::Handle<reco::VertexCollection> vertices, double rho, int year, const reco::Vertex *&vertex);
+    //bool passTight_BDT_Id(pat::Muon muon, edm::Handle<reco::VertexCollection> vertices, double rho, int year, const reco::Vertex *&vertex);
+    //float get_Muon_MVA_Value(pat::Muon muon, const reco::Vertex *&vertices, double rho, int year);
+    //bool passTight_BDT_Id(pat::Muon muon, const reco::Vertex *&vertices, double rho, int year);
+
     float kfactor_qqZZ_qcd_dPhi(float GENdPhiZZ, int finalState);
     float kfactor_qqZZ_qcd_Pt(float GENpTZZ, int finalState);
     float kfactor_qqZZ_qcd_M(float GENmassZZ, int finalState);
 
-    float dataMC(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScalFac_Cracks);
-    float dataMCErr(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScalFac_Cracks);
+    float dataMC(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScalFac_Cracks, TH2F* hElecScaleFacGsf, TH2F* hElecScaleFacGsfLowET);
+    float dataMCErr(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScalFacUnc_Cracks);
     float dataMC(pat::Muon muon, TH2F* hMuScaleFac);
     float dataMCErr(pat::Muon muon, TH2F* hMuScaleFac);
+    float dataMC(double pt, float eta, TH2F* hMuScaleFac);
+	float dataMCErr(double pt, float eta, TH2F* hMuScaleFac);
     
+    float get_bTagEffi(float _pt_jet, float _eta_jet, TH2F* hbTagEffi);
+    
+    float getDVBF2jetsConstant(float ZZMass);
+    float getDVBF1jetConstant(float ZZMass);
+    float getDWHhConstant(float ZZMass);
+    float getDZHhConstant(float ZZMass);
+
+    float getDbkgVBFdecConstant(int ZZflav, float ZZMass);
+    float getDbkgVHdecConstant(int ZZflav, float ZZMass);
+
+    float getDbkgkinConstant(int ZZflav, float ZZMass);
+    float getDbkgConstant(int ZZflav, float ZZMass);
+
+    float getDg4Constant(float ZZMass);
+    float getDg2Constant(float ZZMass);
+    float getDL1Constant(float ZZMass);
+    float getDL1ZgsConstant(float ZZMass);
+
     enum MuonEffectiveAreaType {
         kMuTrkIso03, 
         kMuEcalIso03, 
@@ -196,6 +229,25 @@ public:
     ElecEffectiveAreaType elEAtype;
     ElecEffectiveAreaTarget elEAtarget;
 
+    TSpline3 *DbkgkinSpline2e2mu;
+    TSpline3 *DbkgkinSpline4e;
+    TSpline3 *DbkgkinSpline4mu;
+
+    TSpline3 *DbkgVBFdecSpline2l2l;
+    TSpline3 *DbkgVBFdecSpline4l;
+    TSpline3 *DbkgVHdecSpline2l2l;
+    TSpline3 *DbkgVHdecSpline4l;
+
+    TSpline3 *DjjVBFSpline;
+    TSpline3 *DjVBFSpline;
+    TSpline3 *DjjZHSpline;
+    TSpline3 *DjjWHSpline;
+
+    TSpline *spline_g4;
+    TSpline *spline_g2;
+    TSpline *spline_L1;
+    TSpline *spline_L1Zgs;
+
 };
 
 #endif
@@ -211,6 +263,97 @@ HZZ4LHelper::HZZ4LHelper()
     elEAtype = kEGammaNeutralHadIso04;
     elEAtarget = kElEAData2015;
     //declarations
+
+    edm::FileInPath DbkgkinSpline2e2mufileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_Dbkgkin_2e2mu13TeV.root");
+    TFile *fDbkgkinSpline2e2mu = TFile::Open(DbkgkinSpline2e2mufileInPath.fullPath().c_str());
+    DbkgkinSpline2e2mu = (TSpline3*) fDbkgkinSpline2e2mu->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgkinSpline2e2mu->Close();
+    delete fDbkgkinSpline2e2mu;
+
+    edm::FileInPath DbkgkinSpline4efileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_Dbkgkin_4e13TeV.root");
+    TFile *fDbkgkinSpline4e = TFile::Open(DbkgkinSpline4efileInPath.fullPath().c_str());
+    DbkgkinSpline4e = (TSpline3*) fDbkgkinSpline4e->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgkinSpline4e->Close();
+    delete fDbkgkinSpline4e;
+
+    edm::FileInPath DbkgkinSpline4mufileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_Dbkgkin_4mu13TeV.root");
+    TFile *fDbkgkinSpline4mu = TFile::Open(DbkgkinSpline4mufileInPath.fullPath().c_str());
+    DbkgkinSpline4mu = (TSpline3*) fDbkgkinSpline4mu->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgkinSpline4mu->Close();
+    delete fDbkgkinSpline4mu;
+
+    edm::FileInPath DbkgVBFdecSpline2l2lfileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DbkgjjEWQCD_2l2l_JJVBFTagged_13TeV.root");
+    TFile *fDbkgVBFdecSpline2l2l = TFile::Open(DbkgVBFdecSpline2l2lfileInPath.fullPath().c_str());
+    DbkgVBFdecSpline2l2l = (TSpline3*) fDbkgVBFdecSpline2l2l->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgVBFdecSpline2l2l->Close();
+    delete fDbkgVBFdecSpline2l2l;
+
+    edm::FileInPath DbkgVBFdecSpline4lfileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DbkgjjEWQCD_4l_JJVBFTagged_13TeV.root");
+    TFile *fDbkgVBFdecSpline4l = TFile::Open(DbkgVBFdecSpline4lfileInPath.fullPath().c_str());
+    DbkgVBFdecSpline4l = (TSpline3*) fDbkgVBFdecSpline4l->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgVBFdecSpline4l->Close();
+    delete fDbkgVBFdecSpline4l;
+
+    edm::FileInPath DbkgVHdecSpline2l2lfileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DbkgjjEWQCD_2l2l_HadVHTagged_13TeV.root");
+    TFile *fDbkgVHdecSpline2l2l = TFile::Open(DbkgVHdecSpline2l2lfileInPath.fullPath().c_str());
+    DbkgVHdecSpline2l2l = (TSpline3*) fDbkgVHdecSpline2l2l->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgVHdecSpline2l2l->Close();
+    delete fDbkgVHdecSpline2l2l;
+
+    edm::FileInPath DbkgVHdecSpline4lfileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DbkgjjEWQCD_4l_HadVHTagged_13TeV.root");
+    TFile *fDbkgVHdecSpline4l = TFile::Open(DbkgVHdecSpline4lfileInPath.fullPath().c_str());
+    DbkgVHdecSpline4l = (TSpline3*) fDbkgVHdecSpline4l->Get("sp_gr_varReco_Constant_Smooth");
+    fDbkgVHdecSpline4l->Close();
+    delete fDbkgVHdecSpline4l;
+
+    edm::FileInPath DjjVBFSplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DjjVBF13TeV.root");
+    TFile *fDjjVBFSpline = TFile::Open(DjjVBFSplinefileInPath.fullPath().c_str());
+    DjjVBFSpline = (TSpline3*) fDjjVBFSpline->Get("sp_gr_varReco_Constant_Smooth");
+    fDjjVBFSpline->Close();
+    delete fDjjVBFSpline;
+
+    edm::FileInPath DjVBFSplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DjVBF13TeV.root");
+    TFile *fDjVBFSpline = TFile::Open(DjVBFSplinefileInPath.fullPath().c_str());
+    DjVBFSpline = (TSpline3*) fDjVBFSpline->Get("sp_gr_varReco_Constant_Smooth");
+    fDjVBFSpline->Close();
+    delete fDjVBFSpline;
+
+    edm::FileInPath DjjZHSplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DjjZH13TeV.root");
+    TFile *fDjjZHSpline = TFile::Open(DjjZHSplinefileInPath.fullPath().c_str());
+    DjjZHSpline = (TSpline3*) fDjjZHSpline->Get("sp_gr_varReco_Constant_Smooth");
+    fDjjZHSpline->Close();
+    delete fDjjZHSpline;
+
+    edm::FileInPath DjjWHSplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/SmoothKDConstant_m4l_DjjWH13TeV.root");
+    TFile *fDjjWHSpline = TFile::Open(DjjWHSplinefileInPath.fullPath().c_str());
+    DjjWHSpline = (TSpline3*) fDjjWHSpline->Get("sp_gr_varReco_Constant_Smooth");
+    fDjjWHSpline->Close();
+    delete fDjjWHSpline;
+
+    edm::FileInPath Dg4SplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_g4.root");
+    TFile *gConstant_g4 = TFile::Open(Dg4SplinefileInPath.fullPath().c_str());
+    spline_g4 = (TSpline*) gConstant_g4->Get("sp_tgfinal_HZZ2e2mu_SM_over_tgfinal_HZZ2e2mu_g4");
+    gConstant_g4->Close();
+    delete gConstant_g4;
+
+    edm::FileInPath Dg2SplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_g2.root");
+    TFile *gConstant_g2 = TFile::Open(Dg2SplinefileInPath.fullPath().c_str());
+    spline_g2 = (TSpline*) gConstant_g2->Get("sp_tgfinal_HZZ2e2mu_SM_over_tgfinal_HZZ2e2mu_g2");
+    gConstant_g2->Close();
+    delete gConstant_g2;
+
+    edm::FileInPath DL1SplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_L1.root");
+    TFile *gConstant_L1 = TFile::Open(DL1SplinefileInPath.fullPath().c_str());
+    spline_L1 = (TSpline*) gConstant_L1->Get("sp_tgfinal_HZZ2e2mu_SM_over_tgfinal_HZZ2e2mu_L1");
+    gConstant_L1->Close();
+    delete gConstant_L1;
+
+    edm::FileInPath DL1ZgsSplinefileInPath("UFHZZAnalysisRun2/UFHZZ4LAna/data/CoupleConstantsForMELA/gConstant_HZZ2e2mu_L1Zgs.root");
+    TFile *gConstant_L1Zgs = TFile::Open(DL1ZgsSplinefileInPath.fullPath().c_str());
+    spline_L1Zgs = (TSpline*) gConstant_L1Zgs->Get("sp_tgfinal_HZZ2e2mu_SM_photoncut_over_tgfinal_HZZ2e2mu_L1Zgs");
+    gConstant_L1Zgs->Close();
+    delete gConstant_L1Zgs;
+
 }
 
 
@@ -231,11 +374,34 @@ std::vector<pat::Electron> HZZ4LHelper::goodLooseElectrons2012(edm::Handle<edm::
     return bestElectrons;    
 }
 
+std::vector<pat::Electron> HZZ4LHelper::goodLooseElectrons2012(edm::Handle<edm::View<pat::Electron> > Electrons, edm::Handle<edm::View<pat::Electron> > ElectronsUnS, double elPtCut) {
+    using namespace pat;
+    using namespace std;
+    vector<pat::Electron> bestElectrons;
+    vector <bool> Ele_passLoose;
+    for(edm::View<pat::Electron>::const_iterator elec=Electrons->begin(); elec!=Electrons->end(); ++elec) {
+        if( abs(elec->eta()) < 2.5 && elec->pt() > elPtCut) {
+            //bestElectrons.push_back(*elec);
+            Ele_passLoose.push_back(true);
+        }
+        else    Ele_passLoose.push_back(false);
+    }
+    int i = 0;
+    for(edm::View<pat::Electron>::const_iterator elec_=ElectronsUnS->begin(); elec_!=ElectronsUnS->end(); ++elec_) {
+        if(Ele_passLoose[i]) {
+            bestElectrons.push_back(*elec_);
+        }
+        i++;
+    }
+    return bestElectrons;
+}
+
 std::vector<pat::Muon> HZZ4LHelper::goodLooseMuons2012(edm::Handle<edm::View<pat::Muon> > Muons, double muPtCut) {
     using namespace pat;
     using namespace std;    
     vector<pat::Muon> bestMuons;    
     for(edm::View<pat::Muon>::const_iterator mu=Muons->begin(); mu != Muons->end(); ++mu) {
+        //std::cout<<"global? "<<mu->isGlobalMuon()<<" tracker? "<<mu->isTrackerMuon()<<" PF "<<mu->isPFMuon()<<" pt: "<< mu->pt()<<std::endl;
         if( (mu->isGlobalMuon() || mu->isTrackerMuon() || mu->isPFMuon()) && fabs(mu->eta()) < 2.4 && mu->pt() > muPtCut) {
             bestMuons.push_back(*mu);
         }
@@ -257,6 +423,19 @@ std::vector<pat::Tau> HZZ4LHelper::goodLooseTaus2015(edm::Handle<edm::View<pat::
 }
 
 
+std::vector<pat::Photon> HZZ4LHelper::goodLoosePhotons2015(edm::Handle<edm::View<pat::Photon> > Photons, double phoPtCut) {
+    using namespace pat;
+    using namespace std;    
+    vector<pat::Photon> bestPhotons;    
+    for(edm::View<pat::Photon>::const_iterator photon=Photons->begin(); photon != Photons->end(); ++photon) {
+        //if( fabs(photon->eta()) < 2.3 && photon->pt() > phoPtCut) {
+            bestPhotons.push_back(*photon);
+        //}
+    }
+    return bestPhotons;    
+}
+
+
 std::vector<pat::Muon> HZZ4LHelper::goodMuons2015_noIso_noPf(std::vector<pat::Muon> Muons, double muPtCut, const reco::Vertex *&vertex, double sip3dCut)
 {
     //using namespace edm;
@@ -264,25 +443,30 @@ std::vector<pat::Muon> HZZ4LHelper::goodMuons2015_noIso_noPf(std::vector<pat::Mu
     using namespace std;
     vector<pat::Muon> bestMuons;
     /********** M U O N  C U T S **********/
+    //sip3dCut = 99999;
     double muEtaCut = 2.4;
     double dxyCut = 0.5;
     double dzCut = 1;
     /**************************************/
-    for(unsigned int i = 0; i < Muons.size(); i++)
+    for(unsigned int i = 0; i < Muons.size(); i++) {
+        //std::cout<<"pt: "<<Muons[i].pt()<<std::endl;
         if( Muons[i].pt() > muPtCut && abs(Muons[i].eta()) < muEtaCut &&
             (Muons[i].isGlobalMuon() || (Muons[i].isTrackerMuon() && Muons[i].numberOfMatches() > 0 ) ) &&
             Muons[i].muonBestTrackType() != 2 ) {
-
+            //std::cout<<"test1 "<<std::endl;
             if( abs(getSIP3D(Muons[i])) < sip3dCut ) {
+                //std::cout<<"test2 "<<std::endl;
                 if( fabs(Muons[i].muonBestTrack()->dxy(vertex->position())) < dxyCut ) { //miniAOD 
+                    //std::cout<<"test3 "<<std::endl;
                     if( fabs(Muons[i].muonBestTrack()->dz(vertex->position())) < dzCut ) {// miniAOD       
 
+                        //std::cout<<"test4 "<<std::endl;
                         bestMuons.push_back(Muons[i]);
                     } //else {cout<<"muon "<<i<<" failed dz cut, |dz|="<<fabs(Muons[i].muonBestTrack()->dxy(vertex->position()))<<endl;}
                 } //else {cout<<"muon "<<i<<" failed dxy cut, |dxz|="<<fabs(Muons[i].muonBestTrack()->dz(vertex->position()))<<endl;}
             } //else {cout<<"muon "<<i<<" failed sip cut, |sip|="<<abs(getSIP3D(Muons[i]))<<endl;}
         } //else {cout<<"muon "<<i<<" failed pt, eta, or (isGlobal || isTracker)"<<endl;}
-
+    }
     return bestMuons;
 
 }
@@ -302,14 +486,16 @@ std::vector<pat::Electron> HZZ4LHelper::goodElectrons2015_noIso_noBdt(std::vecto
 
     for(unsigned int i = 0; i < Electrons.size(); i++) {
 
+        //std::cout<<"el pt: "<<Electrons[i].pt()<<" eta: "<<Electrons[i].eta()<<" phi: "<<Electrons[i].phi()<<std::endl;
+
         if( abs(getSIP3D(Electrons[i])) < sip3dCut) {
             if (fabs(Electrons[i].gsfTrack()->dxy(vertex->position())) < dxyCut) {
                 if (fabs(Electrons[i].gsfTrack()->dz(vertex->position())) < dzCut ) {                  
-                    int misHits = Electrons[i].gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS); // for miniAOD
-                    if (misHits < missingHitsCuts) { bestElectrons.push_back(Electrons[i]);}                  
-                }
-            }
-        }
+                    int misHits = Electrons[i].gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS); // for miniAOD
+                    if (misHits < missingHitsCuts) { bestElectrons.push_back(Electrons[i]);} //else {std::cout<<"el with pt "<<Electrons[i].pt()<<" failed misHitsCut "<<misHits <<std::endl;}
+                }  //else {std::cout<<"el with pt "<<Electrons[i].pt()<<" failed dzCut "<<fabs(Electrons[i].gsfTrack()->dz(vertex->position())) <<std::endl;}
+            } //else {std::cout<<"el with pt "<<Electrons[i].pt()<<" failed dxyCut "<<fabs(Electrons[i].gsfTrack()->dxy(vertex->position())) <<std::endl;}
+        } //else {std::cout<<"el with pt "<<Electrons[i].pt()<<" failed sip3dcut "<<abs(getSIP3D(Electrons[i]))<<std::endl;}
     }
   
     return bestElectrons;
@@ -326,13 +512,49 @@ std::vector<pat::Tau> HZZ4LHelper::goodTaus2015(std::vector<pat::Tau> Taus, doub
     for(unsigned int i = 0; i < Taus.size(); i++) {
 
         if ( Taus[i].pt()<tauPtCut ) continue;
-        if ( Taus[i].tauID("byLooseIsolationMVA3newDMwLT") < 0.5 ) continue;
-
+        if ( Taus[i].tauID("byLooseIsolationMVArun2v1DBnewDMwLT") < 0.5) continue;
         bestTaus.push_back(Taus[i]);
 
     }
   
     return bestTaus;
+}
+
+std::vector<pat::Photon> HZZ4LHelper::goodPhotons2015(std::vector<pat::Photon> Photons, double photonPtCut, int year)
+{
+    using namespace edm;
+    using namespace pat;
+    using namespace std;
+
+    vector<pat::Photon> bestPhotons;
+  
+    for(unsigned int i = 0; i < Photons.size(); i++) {
+
+        /*
+        if ( Photons[i].pt()<photonPtCut ) continue;
+
+        float phoid;
+        try {
+            if(year == 2016)
+                phoid=Photons[i].photonID("mvaPhoID-Spring15-25ns-nonTrig-V2p1-wp90");
+            else if(year == 2017)
+                phoid=Photons[i].photonID("PhotonMVAEstimatorRun2Spring16NonTrigV1Values");
+            else if(year == 2018)
+                phoid=Photons[i].photonID("cutBasedPhotonID-Fall17-94X-V2-loose");
+        }
+        catch(...) {
+            std::cout<<"photon ID  missing!"<<std::endl;
+            phoid=0.0;
+        }
+        if ( phoid < 0.5) continue;
+
+        if ( Photons[i].hasPixelSeed() ) continue; 
+        */ 
+        bestPhotons.push_back(Photons[i]);
+
+    }
+  
+    return bestPhotons;
 }
 
 
@@ -429,8 +651,9 @@ void HZZ4LHelper::cleanOverlappingLeptons(std::vector<pat::Muon> &Muons, std::ve
 
     for( unsigned int i = 0; i < Muons.size(); i++ ) {
         if( Muons[i].pt() > muPtCut && abs(Muons[i].eta()) < muEtaCut &&
-            Muons[i].isPFMuon() == 1 &&
-            (Muons[i].isGlobalMuon() || (Muons[i].isTrackerMuon() && Muons[i].numberOfMatches(/*reco::Muon::SegmentArbitration*/) > 0 /*numberOfMatchedStations() > 0*/ ) ) &&
+            //Muons[i].isPFMuon() == 1 &&
+            passTight_Id(Muons[i], vertex) &&
+            ( Muons[i].isGlobalMuon() || (Muons[i].isTrackerMuon() && Muons[i].numberOfMatches(/*reco::Muon::SegmentArbitration*/) > 0 /*numberOfMatchedStations() > 0*/ ) ) &&
             Muons[i].muonBestTrackType() != 2 ) {
             if( abs(getSIP3D(Muons[i])) < sip3dCut ) {	       
                 if( fabs(Muons[i].muonBestTrack()->dxy(vertex->position())) < dxyCut ) { //miniAOD                     
@@ -502,26 +725,102 @@ double HZZ4LHelper::getSIP3D(pat::Electron electron) {
     return sip;    
 }
 
-bool HZZ4LHelper::passTight_BDT_Id(pat::Electron electron, std::string elecID) {
+bool HZZ4LHelper::passTight_BDT_Id(pat::Electron electron, int year) {
     float cutVal=1000;
+    float mvaVal=-1;
     float fSCeta = fabs(electron.superCluster()->eta());
-    if(electron.pt()<=10){ 
-        if(fSCeta < 0.8) cutVal = -0.265; 
-        if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = -0.556;
-        if(fSCeta >= 1.479) cutVal = -0.551;  
+    if(year==2018)
+    {
+        if(electron.pt()<=10){
+            //if(fSCeta < 0.8) cutVal = 0.8955937602;
+            if(fSCeta < 0.8) cutVal = 0.9044286167;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.91106464032;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9094166886;
+            //if(fSCeta >= 1.479) cutVal = 0.94067753025;
+            if(fSCeta >= 1.479) cutVal = 0.9443653660;
+        }
+        else {
+            //if(fSCeta < 0.8) cutVal = 0.04240620843;
+            if(fSCeta < 0.8) cutVal = 0.1968600840;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0047338429;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0759172100;
+            //if(fSCeta >= 1.479) cutVal = -0.60423293572;
+            if(fSCeta >= 1.479) cutVal = -0.5169136775;
+        }
+        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer18ULIdIsoValues");
     }
-    else {
-        if(fSCeta < 0.8) cutVal = -0.072; 
-        if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = -0.286;
-        if(fSCeta >= 1.479) cutVal = -0.267;
+    if(year==2017)
+    {
+        if(electron.pt()<=10){
+            //if(fSCeta < 0.8) cutVal = 0.85216885148;
+            if(fSCeta < 0.8) cutVal = 0.9128577458;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.82684550976;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9056792368;
+            //if(fSCeta >= 1.479) cutVal = 0.86937630022;
+            if(fSCeta >= 1.479) cutVal = 0.9439440575;
+        }
+        else {
+            //if(fSCeta < 0.8) cutVal = 0.98248928759;
+            if(fSCeta < 0.8) cutVal = 0.1559788054;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.96919224579;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0273863727;
+            //if(fSCeta >= 1.479) cutVal = 0.79349796445;
+            if(fSCeta >= 1.479) cutVal = -0.5532483665;
+        }
+        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer17ULIdIsoValues");
     }
-    if (electron.userFloat("ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values") > cutVal ) { return true;}
+    if(year==2016)
+    {
+        if(electron.pt()<=10){
+            //if(fSCeta < 0.8) cutVal = 0.95034841889;
+            if(fSCeta < 0.8) cutVal = 0.9557993256;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.94606270058;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9475406570;
+            //if(fSCeta >= 1.479) cutVal = 0.93872558098;
+            if(fSCeta >= 1.479) cutVal = 0.9285158721;
+        }
+        else {
+            //if(fSCeta < 0.8) cutVal = 0.3782357877;
+            if(fSCeta < 0.8) cutVal = 0.3272075608;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.35871320305;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.2468345995;
+            //if(fSCeta >= 1.479) cutVal = -0.57451499543;
+            if(fSCeta >= 1.479) cutVal = -0.5955762814;
+        }
+        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16IdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16ULIdIsoValues");
+    }
+    if( mvaVal > cutVal ) { return true;}
+    //if (mvavalue > cutVal ) { return true;}
     return false;
+}
+
+bool HZZ4LHelper::passTight_Id(pat::Muon muon, const reco::Vertex *&vertex) {
+    if (muon.pt()<=200.0) return muon.isPFMuon();
+    else {
+        return ( (muon.numberOfMatchedStations() > 1 
+                  && (muon.muonBestTrack()->ptError()/muon.muonBestTrack()->pt()) < 0.3 
+                  && std::abs(muon.muonBestTrack()->dxy(vertex->position())) < 0.2 
+                  && std::abs(muon.muonBestTrack()->dz(vertex->position())) < 0.5 
+                  && muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 
+                  && muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5) || muon.isPFMuon() );
+    }
+}
+
+bool HZZ4LHelper::isTrackerHighPt(pat::Muon muon, const reco::Vertex *&vertex){
+    return ( muon.numberOfMatchedStations() > 1 
+              && (muon.muonBestTrack()->ptError()/muon.muonBestTrack()->pt()) < 0.3 
+              && std::abs(muon.muonBestTrack()->dxy(vertex->position())) < 0.2 
+              && std::abs(muon.muonBestTrack()->dz(vertex->position())) < 0.5 
+              && muon.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 
+              && muon.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 );
 }
 
 bool HZZ4LHelper::passTight_Id_SUS(pat::Muon muon, const reco::Vertex *&vertex) {
     if (muon.isPFMuon() != 1) return false;
-    if (muon.isMediumMuon() != 1) return false;
+        if (muon.isMediumMuon() != 1) return false;
     double dxyCut = 0.05;
     double dzCut = 0.1;
     if( fabs(muon.muonBestTrack()->dxy(vertex->position())) >= dxyCut ) return false;
@@ -529,7 +828,7 @@ bool HZZ4LHelper::passTight_Id_SUS(pat::Muon muon, const reco::Vertex *&vertex) 
     return true;
 }
 
-bool HZZ4LHelper::passTight_Id_SUS(pat::Electron electron, std::string elecID, const reco::Vertex *&vertex, const reco::BeamSpot BS, edm::Handle< std::vector<reco::Conversion> > theConversions) {
+bool HZZ4LHelper::passTight_Id_SUS(pat::Electron electron, std::string elecID, const reco::Vertex *&vertex, const reco::BeamSpot BS, std::vector<reco::Conversion>  theConversions, int year) {
 
     double dxyCut = 0.05;
     double dzCut = 0.1;
@@ -537,24 +836,81 @@ bool HZZ4LHelper::passTight_Id_SUS(pat::Electron electron, std::string elecID, c
     if( fabs(electron.gsfTrack()->dz(vertex->position())) >= dzCut ) return false;
 
     float cutVal=1000;
-    float fSCeta = fabs(electron.eta());
-    if(electron.pt()<=10){
-        if(fSCeta < 0.8) cutVal = 0.87;
-        if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.60;
-        if(fSCeta >= 1.479) cutVal = 0.17;
+    float mvaVal=-1;
+    //float fSCeta = fabs(electron.eta());
+    float fSCeta = fabs(electron.superCluster()->eta());
+    if(year==2018)
+    {
+        if(electron.pt()<=10){
+            //if(fSCeta < 0.8) cutVal = 0.8955937602;
+            if(fSCeta < 0.8) cutVal = 0.9044286167;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.91106464032;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9094166886;
+            //if(fSCeta >= 1.479) cutVal = 0.94067753025;
+            if(fSCeta >= 1.479) cutVal = 0.9443653660;
+        }
+        else {
+            //if(fSCeta < 0.8) cutVal = 0.04240620843;
+            if(fSCeta < 0.8) cutVal = 0.1968600840;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0047338429;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0759172100;
+            //if(fSCeta >= 1.479) cutVal = -0.60423293572;
+            if(fSCeta >= 1.479) cutVal = -0.5169136775;
+        }
+        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer18ULIdIsoValues");
     }
-    else {
-        if(fSCeta < 0.8) cutVal = 0.87;
-        if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.60;
-        if(fSCeta >= 1.479) cutVal = 0.17;
+    if(year==2017)
+    {
+        if(electron.pt()<=10){
+            //if(fSCeta < 0.8) cutVal = 0.85216885148;
+            if(fSCeta < 0.8) cutVal = 0.9128577458;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.82684550976;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9056792368;
+            //if(fSCeta >= 1.479) cutVal = 0.86937630022;
+            if(fSCeta >= 1.479) cutVal = 0.9439440575;
+        }
+        else {
+            //if(fSCeta < 0.8) cutVal = 0.98248928759;
+            if(fSCeta < 0.8) cutVal = 0.1559788054;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.96919224579;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.0273863727;
+            //if(fSCeta >= 1.479) cutVal = 0.79349796445;
+            if(fSCeta >= 1.479) cutVal = -0.5532483665;
+        }
+        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer17ULIdIsoValues");
     }
-    if (electron.userFloat("ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values") <= cutVal ) return false;
+    if(year==2016)
+    {
+        if(electron.pt()<=10){
+            //if(fSCeta < 0.8) cutVal = 0.95034841889;
+            if(fSCeta < 0.8) cutVal = 0.9557993256;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.94606270058;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.9475406570;
+            //if(fSCeta >= 1.479) cutVal = 0.93872558098;
+            if(fSCeta >= 1.479) cutVal = 0.9285158721;
+        }
+        else {
+            //if(fSCeta < 0.8) cutVal = 0.3782357877;
+            if(fSCeta < 0.8) cutVal = 0.3272075608;
+            //if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.35871320305;
+            if(fSCeta >= 0.8 && fSCeta < 1.479) cutVal = 0.2468345995;
+            //if(fSCeta >= 1.479) cutVal = -0.57451499543;
+            if(fSCeta >= 1.479) cutVal = -0.5955762814;
+        }
+        //mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16IdIsoValues");
+        mvaVal = electron.userFloat("ElectronMVAEstimatorRun2Summer16ULIdIsoValues");
+    }
+
+    //if (electron.userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues") <= cutVal ) return false;
+    if( mvaVal <= cutVal ) return false;
 
     bool vtxFitConversion = ConversionTools::hasMatchedConversion(reco::GsfElectron(electron), theConversions, BS.position());
     if( vtxFitConversion )  return false;
 
     int missingHitsCuts = 1;
-    int misHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    int misHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
     if (misHits >= missingHitsCuts) return false;
     
     if (electron.isEB()) {
@@ -1513,40 +1869,167 @@ float HZZ4LHelper::kfactor_qqZZ_qcd_Pt(float GENpTZZ, int finalState)
 
 }
 
-float HZZ4LHelper::dataMC(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScaleFac_Cracks)
+float HZZ4LHelper::dataMC(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScaleFac_Cracks, TH2F* hElecScaleFacGsf, TH2F* hElecScaleFacGsfLowET)
 {
-    float pt = std::min(electron.pt(),199.0);
-    float eta = electron.superCluster()->eta();
+    float pt = std::min(electron.pt(),499.0);
+    float sceta = electron.superCluster()->eta();
+    float eta = electron.eta();
+
+    if ( eta <= 2.5 && sceta >= 2.5) sceta = 2.49;
+    else if ( eta >= -2.5 && sceta <= -2.5) sceta = -2.49;
+
+    float fac=1.0;
     if (electron.isGap()) {
-        return hElecScaleFac_Cracks->GetBinContent(hElecScaleFac_Cracks->FindBin(pt,eta));        
+        fac*=hElecScaleFac_Cracks->GetBinContent(hElecScaleFac_Cracks->FindBin(sceta,pt));        
     } else {
-        return hElecScaleFac->GetBinContent(hElecScaleFac->FindBin(pt,eta));        
+        fac*=hElecScaleFac->GetBinContent(hElecScaleFac->FindBin(sceta,pt));        
     }
-    return 1.0;
+    // GSF SF flat vs pt
+    if (pt>20.0) {
+        fac*=hElecScaleFacGsf->GetBinContent(hElecScaleFacGsf->FindBin(sceta,pt));
+    } else {
+        fac*=hElecScaleFacGsfLowET->GetBinContent(hElecScaleFacGsfLowET->FindBin(sceta,std::max((float)10.5,pt)));
+    }    
+    return fac;
 }
 
-float HZZ4LHelper::dataMCErr(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScaleFac_Cracks)
+float HZZ4LHelper::dataMCErr(pat::Electron electron, TH2F* hElecScaleFac, TH2F* hElecScaleFacUnc_Cracks)
 {
     float pt = std::min(electron.pt(),199.0);
-    float eta = electron.superCluster()->eta();
+    float sceta = electron.superCluster()->eta();
+    
+    float unc = 0.0;
     if (electron.isGap()) {
-        return hElecScaleFac_Cracks->GetBinError(hElecScaleFac_Cracks->FindBin(pt,eta));        
+        int bin = hElecScaleFacUnc_Cracks->FindBin(sceta,pt);
+        unc+=hElecScaleFacUnc_Cracks->GetBinError(bin);
     } else {
-        return hElecScaleFac->GetBinError(hElecScaleFac->FindBin(pt,eta));        
+        int bin = hElecScaleFac->FindBin(sceta,pt);
+        unc+=hElecScaleFac->GetBinError(bin);
     }
-    return 1.0;
+    if (pt<20.0 || pt>75.0) unc+=0.01;
+
+    return unc;
+
 }
 
 float HZZ4LHelper::dataMC(pat::Muon muon, TH2F* hMuScaleFac)
 {
-    float pt = std::min(muon.pt(),79.0);
+    float pt = std::min(muon.pt(),199.0);
     float eta = muon.eta();
-    return hMuScaleFac->GetBinContent(hMuScaleFac->FindBin(eta,pt)); //opposite axes as electrons
+    return hMuScaleFac->GetBinContent(hMuScaleFac->FindBin(eta,pt)); 
 }
 
-float HZZ4LHelper::dataMCErr(pat::Muon muon, TH2F* hMuScaleFac)
+float HZZ4LHelper::dataMCErr(pat::Muon muon, TH2F* hMuScaleFacUnc)
 {
-    return 0.01;
+    float pt = std::min(muon.pt(),199.0);
+    float eta = muon.eta();
+    return hMuScaleFacUnc->GetBinContent(hMuScaleFacUnc->FindBin(eta,pt)); 
+}
+
+float HZZ4LHelper::dataMC(double pt, float eta, TH2F* hMuScaleFac)
+{
+    float PT = std::min(pt,199.0);
+    return hMuScaleFac->GetBinContent(hMuScaleFac->FindBin(eta,PT)); 
+}
+
+float HZZ4LHelper::dataMCErr(double pt, float eta, TH2F* hMuScaleFacUnc)
+{
+    float PT = std::min(pt,199.0);
+    return hMuScaleFacUnc->GetBinContent(hMuScaleFacUnc->FindBin(eta,PT)); 
+}
+
+
+
+
+float HZZ4LHelper::get_bTagEffi(float _pt_jet, float _eta_jet, TH2F* hbTagEffi)
+{
+    //float = pt = std::min(jet.pt(), 599.0);
+    //float eta = jet.eta();
+    float pt = std::min(_pt_jet, (float)599.0);
+    float aeta = abs(_eta_jet);
+    return hbTagEffi->GetBinContent(hbTagEffi->FindBin(pt,aeta));
+}
+
+float HZZ4LHelper::getDVBF2jetsConstant(float ZZMass){
+    return DjjVBFSpline->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDVBF1jetConstant(float ZZMass){
+    return DjVBFSpline->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDWHhConstant(float ZZMass){
+    return DjjWHSpline->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDZHhConstant(float ZZMass){
+    return DjjZHSpline->Eval(ZZMass);
+}
+
+
+float HZZ4LHelper::getDbkgkinConstant(int ZZflav, float ZZMass){ // ZZflav==id1*id2*id3*id4
+    if (abs(ZZflav)==11*11*11*11 || abs(ZZflav)==2*11*11*11*11 || abs(ZZflav)==2*11*11*2*11*11) return DbkgkinSpline4e->Eval(ZZMass);
+    if (abs(ZZflav)==11*11*13*13 || abs(ZZflav)==2*11*11*13*13 || abs(ZZflav)==2*11*11*2*13*13) return DbkgkinSpline2e2mu->Eval(ZZMass);
+    if (abs(ZZflav)==13*13*13*13 || abs(ZZflav)==2*13*13*13*13 || abs(ZZflav)==2*13*13*2*13*13) return DbkgkinSpline4mu->Eval(ZZMass);
+    return 0.0;
+}
+
+float HZZ4LHelper::getDbkgConstant(int ZZflav, float ZZMass){
+    return getDbkgkinConstant(ZZflav, ZZMass);
+}
+
+
+
+float HZZ4LHelper::getDbkgVBFdecConstant(int ZZflav, float ZZMass) { // ZZflav==id1*id2*id3*id4
+    if (abs(ZZflav)==11*11*11*11 || abs(ZZflav)==2*11*11*11*11 || abs(ZZflav)==2*11*11*2*11*11) return DbkgVBFdecSpline4l->Eval(ZZMass);
+    if (abs(ZZflav)==11*11*13*13 || abs(ZZflav)==2*11*11*13*13 || abs(ZZflav)==2*11*11*2*13*13) return DbkgVBFdecSpline2l2l->Eval(ZZMass);
+    if (abs(ZZflav)==13*13*13*13 || abs(ZZflav)==2*13*13*13*13 || abs(ZZflav)==2*13*13*2*13*13) return DbkgVBFdecSpline4l->Eval(ZZMass);
+    return 0.0;
+}
+
+float HZZ4LHelper::getDbkgVHdecConstant(int ZZflav, float ZZMass) { // ZZflav==id1*id2*id3*id4
+    if (abs(ZZflav)==11*11*11*11 || abs(ZZflav)==2*11*11*11*11 || abs(ZZflav)==2*11*11*2*11*11) return DbkgVHdecSpline4l->Eval(ZZMass);
+    if (abs(ZZflav)==11*11*13*13 || abs(ZZflav)==2*11*11*13*13 || abs(ZZflav)==2*11*11*2*13*13) return DbkgVHdecSpline2l2l->Eval(ZZMass);
+    if (abs(ZZflav)==13*13*13*13 || abs(ZZflav)==2*13*13*13*13 || abs(ZZflav)==2*13*13*2*13*13) return DbkgVHdecSpline4l->Eval(ZZMass);
+    return 0.0;
+}
+
+float HZZ4LHelper::getDg4Constant(float ZZMass){
+    return spline_g4->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDg2Constant(float ZZMass){
+    return spline_g2->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDL1Constant(float ZZMass){
+    return spline_L1->Eval(ZZMass);
+}
+
+float HZZ4LHelper::getDL1ZgsConstant(float ZZMass){
+    return spline_L1Zgs->Eval(ZZMass);
+}
+
+
+double HZZ4LHelper::photonPfIso03(pat::PFParticle pho, edm::Handle<pat::PackedCandidateCollection> pfcands) {
+
+    double ptsum=0.0;
+
+    for (const pat::PackedCandidate &pfc : *pfcands) {
+
+        double dr = deltaR(pho.p4(), pfc.p4());
+
+        if (dr>=0.3) continue;
+
+        if (pfc.charge()!=0 && abs(pfc.pdgId())==211 && pfc.pt()>0.2) {
+            if (dr>0.0001) ptsum+=pfc.pt();
+        } 
+        else if (pfc.charge()==0 && (abs(pfc.pdgId())==22||abs(pfc.pdgId())==130) && pfc.pt()>0.5) {
+            if (dr>0.01) ptsum+=pfc.pt();
+        }
+
+    }
+    return ptsum;
 }
 
 #endif

@@ -21,7 +21,7 @@
 <use   name="PhysicsTools/Utilities"/>
 <use   name="SimDataFormats/PileupSummaryInfo"/>
 <use   name="SimDataFormats/GeneratorProducts">
-<use   name="EgammaAnalysis/ElectronTools"/> 
+<use   name="EgammaAnalysis/ElectronTools"/>
 <use   name="RecoEgamma/EgammaTools"/>
 <use   name="RecoParticleFlow/PFClusterTools"/>
 <use   name="DataFormats/METReco"/>
@@ -38,9 +38,12 @@
 <use   name="RecoEcal/EgammaCoreTools"/>
 <use   name="PhysicsTools/SelectorUtils"/>
 <use   name="MagneticField/Records"/>
-<use   name="ZZMatrixElement/MELA"/>
-<use   name="ZZMatrixElement/MEKD"/>
-<use   name="ZZMatrixElement/MEMCalculators"/>
+<use   name="JHUGenMELA/MELA"/>
+<use   name="MelaAnalytics/EventContainer"/>
+<use   name="MelaAnalytics/GenericMEComputer"/>
+<use   name="MelaAnalytics/CandidateLOCaster"/>
+<use   name="IvyFramework/IvyDataTools"/>
+<use   name="IvyFramework/IvyAutoMELA"/>
 <use   name="KinZfitter/KinZfitter"/>
 <use   name="CondFormats/JetMETObjects"/>
 <use   name="JetMETCorrections/Objects"/>
@@ -51,5 +54,8 @@
 <use   name="JetMETCorrections/Algorithms"/>
 <use   name="JetMETCorrections/JetCorrector"/>
 <use   name="JetMETCorrections/Modules"/>
+<use   name="CondFormats/BTauObjects"/>
+<use   name="CondTools/BTau"/>
 <flags EDM_PLUGIN="1"/>
 <Flags CXXFLAGS="-g"/>
+<flags CXXFLAGS="-g -O3 -I$(CMSSW_BASE)/src/JHUGenMELA/MELA/interface/ -I$(CMSSW_BASE)/src/IvyFramework/IvyDataTools/interface/ -I$(CMSSW_BASE)/src/IvyFramework/IvyAutoMELA/interface/"/>
