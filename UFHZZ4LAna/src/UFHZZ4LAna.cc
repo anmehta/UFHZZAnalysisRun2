@@ -862,7 +862,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               cout<<"Muon pt over 200 isTrackerHighPtID? "<<helper.isTrackerHighPt(recoMuons[lep_ptindex[i]],PV)<<endl;
         }
 
-      }
+      }//leptons
 
       if (verbose) cout<<"adding photons to sorted list"<<endl;
       for(int i = 0; i < (int)recoPhotons.size(); i++) {
@@ -1879,7 +1879,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                                  edm::Handle<edm::View<pat::PackedGenParticle> > packedgenParticles,
                                  edm::Handle<edm::View<reco::GenJet> > genJets)
 {
-  int numV=0; //int numVhad=0; int numVlep=0;
+  int numV=0; int numVhad=0; int numVlep=0; int numZhad=0;int numZlep=0; int numWhad=0; int numWlep=0;
   reco::GenParticleCollection::const_iterator genPart;
   int j = -1;
   int nGENLeptons=0;
@@ -2113,7 +2113,9 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 	const reco::Candidate *Vdau0=genPart->daughter(0);
 	bool ishadronicV=false;
 	ishadronicV=(fabs(Vdau0->pdgId()) < 7  || fabs(Vdau0->pdgId())==21) ? true : false;
-	//ishadronicV ? (numVhad+=1) : (numVlep+=1);
+	ishadronicV ? (numVhad+=1) : (numVlep+=1);
+	ishadronicV ? (abs(genPart->pdgId()==23) ? (numZhad+=1) : (numWhad+=1) ):(abs(genPart->pdgId()==23) ? (numZlep+=1) : (numWlep+=1) );
+
 	GenV_hadronic.push_back(ishadronicV);	
 	GenV_pt.push_back(genPart->pt());
 	GenV_status.push_back(genPart->status());
@@ -2138,8 +2140,20 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 	}
       }
       nGenV=numV;
-      //      int category=0;
-      //category = (numVhad > 0 && numVlep > 0 && (numVhad+numVlep ==2) ) ? "semilep" : (numVlep == 2 ? "leptonic" : "hadrnic") 
+
+      std::string category="";
+      
+      category = (numVhad > 0 && numVlep > 0 && (numVhad+numVlep ==2) ) ? "semilep"  : (numVlep == 2 ? "leptonic" : "hadronic") ;
+	std::string subcategory="";
+      //subcategory= category == "semilep" ? (numWlep > 0 ? numZlep > 0            
+	if (category == "semilep"){
+	  if (numWlep == 1 && numWhad ==1){category = "semilepWW";}
+	  else if (numWlep == 1 && numZhad ==1){category = "semilepWZ";}
+	  else if (numZlep == 1 && numWhad ==1){category = "semilepZW";}
+	  else {category = "semilepZZ";}
+	}
+	else{std::cout<<"i dont care ;) "<<std::endl;	}
+      GenVVcat=category;
       //######am
       
       

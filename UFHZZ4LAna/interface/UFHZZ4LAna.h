@@ -277,6 +277,7 @@ private:
   std::string triggersPassed;
   bool passedTrig;
   int nlooseleps, ntightleps, nGenV; //##am
+  std::string GenVVcat;//##am
   float PV_x, PV_y, PV_z;
   float BS_x, BS_y, BS_z;
   float BS_xErr, BS_yErr, BS_zErr;
@@ -631,6 +632,7 @@ void UFHZZ4LAna::Reset(){
   nlooseleps=-9999; ntightleps=-9999,nGenV=-999;//##am
   finalState = -1;
   triggersPassed="";
+  GenVVcat="";//##am
   passedTrig=false;
 
   // Event Weights
