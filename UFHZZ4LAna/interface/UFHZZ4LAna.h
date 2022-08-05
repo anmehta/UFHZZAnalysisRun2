@@ -469,6 +469,7 @@ private:
   vector<int>       GenV_pdgId; 
   vector<int>       GenV_ndau;
   std::vector<bool> GenV_hadronic;
+  std::vector<bool> GenV_leptonic;
   vector<int>       GenVdau_pdgId;
   vector<int>       GenVdau_MompdgId;
   vector<double>    GenVdau_pt;
@@ -656,6 +657,7 @@ void UFHZZ4LAna::Reset(){
   GenV_pdgId.clear(); 
   GenV_ndau.clear();
   GenV_hadronic.clear();
+  GenV_leptonic.clear();
   GenVdau_pdgId.clear();
   GenVdau_MompdgId.clear();
   GenVdau_pt.clear();

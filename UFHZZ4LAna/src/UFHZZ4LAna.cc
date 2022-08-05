@@ -231,7 +231,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   LumiSect = iEvent.id().luminosityBlock();
 
   if (verbose) {
-      cout<<"Run: " << Run << ",Event: " << Event << ",LumiSect: "<<LumiSect<<endl;
+  cout<<"Run: " << Run << ",Event: " << Event << ",LumiSect: "<<LumiSect<<endl;
   }
 
   // ======= Get Collections ======= //
@@ -2106,17 +2106,40 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 
   
       //###############am  V info ##am
-      
-      if ( (genPart->pdgId()==23 || abs(genPart->pdgId())==24)  && genPart->status()== 62 ) {
+      //##am only status 62 V's have non-V daughters   
+      if ( (genPart->pdgId()==23 || abs(genPart->pdgId())==24)  && genPart->status()== 62  && genPart->statusFlags().fromHardProcess()) {
 	numV+=1;
-       	//std::cout<<"check the status"<<fabs(genPart->status())<<std::endl;
 	const reco::Candidate *Vdau0=genPart->daughter(0);
+	const reco::GenParticle& daughter = *dynamic_cast<const reco::GenParticle*>(&(*Vdau0));
 	bool ishadronicV=false;
-	ishadronicV=(fabs(Vdau0->pdgId()) < 7  || fabs(Vdau0->pdgId())==21) ? true : false;
-	ishadronicV ? (numVhad+=1) : (numVlep+=1);
-	ishadronicV ? (abs(genPart->pdgId()==23) ? (numZhad+=1) : (numWhad+=1) ):(abs(genPart->pdgId()==23) ? (numZlep+=1) : (numWlep+=1) );
+	bool isleptonicV=false;
+	bool gooddau=daughter.statusFlags().fromHardProcess() && daughter.statusFlags().isPrompt(); //check first dau and apparently is prompt also works for quarks 
+	ishadronicV= ( (fabs(daughter.pdgId()) < 6  || fabs(daughter.pdgId())==21) && gooddau)  ? true : false ;
+	isleptonicV= !ishadronicV && gooddau && (fabs(daughter.pdgId()) > 10 && fabs(daughter.pdgId()) < 17 && daughter.statusFlags().isPrompt());
+
+//##am	if(not ishadronicV){
+//##am	  cout<<"is leptonic"<< isleptonicV<<endl;
+//##am	  cout<<"IsPrompt"                             <<daughter.statusFlags().isPrompt()<<endl;
+//##am	  cout<<"isDecayedLeptonHadron"                    <<daughter.statusFlags().isDecayedLeptonHadron()<<endl;
+//##am	  cout<<"isTauDecayProduct"                        <<daughter.statusFlags().isTauDecayProduct()<<endl;
+//##am	  cout<<"isPromptTauDecayProduct"                  <<daughter.statusFlags().isPromptTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectTauDecayProduct"                  <<daughter.statusFlags().isDirectTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectPromptTauDecayProduct"            <<daughter.statusFlags().isDirectPromptTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectHadronDecayProduct"               <<daughter.statusFlags().isDirectHadronDecayProduct()<<endl;
+//##am	  cout<<"isHardProcess"                            <<daughter.statusFlags().isHardProcess()<<endl;
+//##am	  cout<<"FromHardProcess"                          <<daughter.statusFlags().fromHardProcess()<<endl;
+//##am	  cout<<"isHardProcessTauDecayProduct"             <<daughter.statusFlags().isHardProcessTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectHardProcessTauDecayProduct"       <<daughter.statusFlags().isDirectHardProcessTauDecayProduct()<<endl;
+//##am	  
+//##am	  cout<<"NHV mit dot\t"<<fabs(daughter.pdgId())<<"\tstat\t"<<daughter.status()<<endl;
+//##am	    //"\tHP\t"<<daughter.statusFlags().IsPromptTauDecayProduct()<<"\tTP\t"<<daughter.statusFlags().isDirectPromptTauDecayProduct()<<endl;
+//##am	}
+
+	ishadronicV ? (numVhad+=1) : ( isleptonicV ? (numVlep+=1) : numVlep+=0);
+	ishadronicV ? (genPart->pdgId()==23 ? (numZhad+=1) : (numWhad+=1) ): ( (isleptonicV && genPart->pdgId()==23) ? (numZlep+=1) : (numWlep+=1) );
 
 	GenV_hadronic.push_back(ishadronicV);	
+	GenV_leptonic.push_back(isleptonicV);	
 	GenV_pt.push_back(genPart->pt());
 	GenV_status.push_back(genPart->status());
 	GenV_eta.push_back(genPart->eta());
@@ -2125,10 +2148,12 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 	GenV_pdgId.push_back(genPart->pdgId());
 	int ndau = genPart->numberOfDaughters();
 	GenV_ndau.push_back(ndau);
-	for (int d=0; d<ndau; d++) { //##am might as well save only status 1 leptons
+	for (int d=0; d<ndau; d++) { 
 	  const reco::Candidate *Vdau=genPart->daughter(d);
-	  int dpid=abs(Vdau->pdgId()); int dst=Vdau->status();
-	  if ( (ishadronicV && dst == 23) || (!ishadronicV && ( (dpid == 15 && dst == 2) || (dst ==1 && (dpid == 11 || dpid == 13))))){
+	  const reco::GenParticle& vdau = *dynamic_cast<const reco::GenParticle*>(&(*genPart->daughter(d)));
+	  if (not vdau.statusFlags().fromHardProcess() ||  not vdau.statusFlags().isPrompt()) { continue;}
+
+	  if ( (ishadronicV ) || (!ishadronicV && isleptonicV && abs(Vdau->pdgId()) > 10 && abs(Vdau->pdgId()) < 17)) {
 	  GenVdau_pdgId.push_back(Vdau->pdgId());
 	  GenVdau_MompdgId.push_back(genPart->pdgId());
 	  GenVdau_pt.push_back(Vdau->pt());
@@ -2137,24 +2162,37 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 	  GenVdau_mass.push_back(Vdau->mass());
 	  GenVdau_status.push_back(Vdau->status());	  
 	  }
+	  //	  std::cout<<"hadronicV \t"<<ishadronicV<<"\t pid n status of doter\t"<<dpid<<dst<<std::endl;
 	}
       }
+      /*
+      else{
+
+	if ( (abs(genPart->pdgId()) == 23 || genPart->pdgId() == 24) && (genPart->status() !=62 ) ) {
+	  const reco::Candidate *Vdau0=genPart->daughter(0);
+	  if (genPart->pdgId() !=Vdau0->pdgId()){
+	  cout<<genPart->pdgId()<<"\t"<<genPart->status()<<"\t"<<Vdau0->pdgId()<<endl;
+	  }
+	}
+      }
+      */
       nGenV=numV;
 
       std::string category="";
-      
-      category = (numVhad > 0 && numVlep > 0 && (numVhad+numVlep ==2) ) ? "semilep"  : (numVlep == 2 ? "leptonic" : "hadronic") ;
-	std::string subcategory="";
-      //subcategory= category == "semilep" ? (numWlep > 0 ? numZlep > 0            
+      int sumVV=numVhad+numVlep;
+      category = ( sumVV == 2 ? ( (numVhad == 1 && numVlep ==1) ?  "semilep" : (numVlep == 2 ? "leptonic" : "hadronic") ) : "notvv") ;
+      if (category == "notvv" && numV > 1){
+	std::cout<<"numVhad \t"<<numVhad<<"\t numVlep \t"<<numVlep<<std::endl;
+      }
+      //      std::cout<<"ctaegory ist \t"<<category<<std::endl;
 	if (category == "semilep"){
 	  if (numWlep == 1 && numWhad ==1){category = "semilepWW";}
 	  else if (numWlep == 1 && numZhad ==1){category = "semilepWZ";}
 	  else if (numZlep == 1 && numWhad ==1){category = "semilepZW";}
 	  else {category = "semilepZZ";}
 	}
-	else{std::cout<<"i dont care ;) "<<std::endl;	}
       GenVVcat=category;
-      //######am
+
       
       
       if (abs(genPart->pdgId())>500 && abs(genPart->pdgId())<600 && genPart->status()==2) {
@@ -2619,6 +2657,7 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
  tree->Branch("GenV_pdgId",      &GenV_pdgId); 
  tree->Branch("GenV_ndau",       &GenV_ndau);
  tree->Branch("GenV_hadronic",   &GenV_hadronic);
+ tree->Branch("GenV_leptonic",   &GenV_leptonic);
  tree->Branch("GenVdau_pdgId",   &GenVdau_pdgId);
  tree->Branch("GenVdau_MompdgId",&GenVdau_MompdgId);
  tree->Branch("GenVdau_pt",      &GenVdau_pt);
@@ -2626,13 +2665,13 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
  tree->Branch("GenVdau_phi",     &GenVdau_phi);
  tree->Branch("GenVdau_mass",    &GenVdau_mass);
  tree->Branch("GenVdau_status",  &GenVdau_status);
-
-tree->Branch("lhepart_pt",    &lhepart_pt);
-tree->Branch("lhepart_eta",   &lhepart_eta);
-tree->Branch("lhepart_phi",   &lhepart_phi);
-tree->Branch("lhepart_mass",  &lhepart_mass);
-tree->Branch("lhepart_pdgId", &lhepart_pdgId);
-tree->Branch("lhepart_status",&lhepart_status);
+ tree->Branch("GenVVcat",&GenVVcat);
+ tree->Branch("lhepart_pt",    &lhepart_pt);
+ tree->Branch("lhepart_eta",   &lhepart_eta);
+ tree->Branch("lhepart_phi",   &lhepart_phi);
+ tree->Branch("lhepart_mass",  &lhepart_mass);
+ tree->Branch("lhepart_pdgId", &lhepart_pdgId);
+ tree->Branch("lhepart_status",&lhepart_status);
 
 tree->Branch("nlooseleps",    &nlooseleps);
 tree->Branch("ntightleps",    &ntightleps);
