@@ -1,598 +1,5 @@
-// -*- C++ -*-
-//
-// Package:    UFHZZ4LAna
-// Class:      UFHZZ4LAna
-//
-//
+#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/UFHZZ4LAna.h"
 
-// system include files
-#include <memory>
-#include <string>
-#include <map>
-#include <fstream>
-#include <vector>
-#include <cstdlib>
-#include <algorithm>
-#include <stdlib.h>
-#include <stdio.h>
-#include <cmath>
-#include <iomanip>
-#include <set>
-#include<TApplication.h>
-
-#define PI 3.14159
-
-// user include files
-#include "TROOT.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TTree.h"
-#include "TSpline.h"
-#include "TMath.h"
-#include "TRandom3.h"
-#include "TString.h"
-#include "TLorentzVector.h"
-#include "Math/VectorUtil.h"
-#include "TClonesArray.h"
-#include "TCanvas.h"
-
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "FWCore/Framework/interface/LuminosityBlock.h"
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/Utilities/interface/InputTag.h"
-#include "DataFormats/Common/interface/MergeableCounter.h"
-#include "DataFormats/Math/interface/Point3D.h"
-#include "DataFormats/Common/interface/RefToBase.h"
-#include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/Math/interface/deltaPhi.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
-#include "DataFormats/Common/interface/Association.h"
-#include "DataFormats/Common/interface/ValueMap.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
-#include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/HLTReco/interface/TriggerObject.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-#include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
-
-//HTXS
-#include "SimDataFormats/HTXS/interface/HiggsTemplateCrossSections.h"
-//#include "SimDataFormats/HZZFiducial/interface/HZZFiducialVolume.h"
-
-// PAT
-#include "DataFormats/PatCandidates/interface/PFParticle.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Photon.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Tau.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/PatCandidates/interface/MET.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-#include "DataFormats/Provenance/interface/Timestamp.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
-#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
-#include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
-#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-
-// Reco
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/BeamSpot/interface/BeamSpot.h"
-#include "DataFormats/MuonReco/interface/MuonSelectors.h"
-#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/EgammaReco/interface/SuperCluster.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
-#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
-
-// KD's
-#include "JHUGenMELA/MELA/interface/Mela.h"
-
-//Helper
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LHelper.h"
-//Muons
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LMuonAna.h"
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LMuonTree.h"
-//Electrons
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LElectronTree.h"
-//Photons
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LPhotonTree.h"
-//Jets
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LJetTree.h"
-//Final Leps
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LFinalLepTree.h"
-//Sip
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LSipAna.h"
-//PU
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LPileUp.h"
-#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-
-//GEN
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LGENAna.h"
-//VBF Jets
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/HZZ4LJets.h"
-
-//nJettiness
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/NJettiness.h"
-
-// Jet energy correction
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-
-#include <vector>
-
-// Kinematic Fit
-#include "KinZfitter/KinZfitter/interface/KinZfitter.h"
-#include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
-
-// EWK corrections
-#include "UFHZZAnalysisRun2/UFHZZ4LAna/interface/EwkCorrections.h"
-
-// JEC related
-#include "PhysicsTools/PatAlgos/plugins/PATJetUpdater.h"
-#include "JetMETCorrections/JetCorrector/interface/JetCorrector.h"
-
-//JER related
-#include "JetMETCorrections/Modules/interface/JetResolution.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
-
-//BTag Calibration
-
-#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondTools/BTau/interface/BTagCalibrationReader.h"
-
-//Muon MVA
-//#include "MuonMVAReader/Reader/interface/MuonGBRForestReader.hpp"
-
-// KalmanVertexFitter
-#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
-#include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
-#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
-#include "TrackingTools/Records/interface/TransientTrackRecord.h"
-#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
-// Rochester Corrections
-#include "UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/src/RoccoR.cc"
-
-#include "RecoVertex/KalmanVertexFit/interface/SingleTrackVertexConstraint.h"
-
-//Auto MELA
-//#include "IvyBase.h"
-//#include <IvyFramework/IvyAutoMELA/interface/IvyMELAHelpers.h>
-//#include <IvyFramework/IvyAutoMELA/interface/IvyMELAOutputStreamerExt.h>
-//#include <IvyFramework/IvyDataTools/interface/HostHelpersCore.h>
-
-//
-// class declaration
-//
-//using namespace IvyStreamHelpers;
-using namespace EwkCorrections;
-
-class UFHZZ4LAna : public edm::EDAnalyzer{
-public:
-  explicit UFHZZ4LAna(const edm::ParameterSet&);
-  ~UFHZZ4LAna();
-
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-  static bool sortByPt( const reco::GenParticle &p1, const reco::GenParticle &p2 ){ return (p1.pt() > p2.pt()); };
-
-private:
-  virtual void beginJob();
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
-  virtual void endJob();
-
-  virtual void beginRun(edm::Run const&, const edm::EventSetup& iSetup);
-  virtual void endRun(edm::Run const&, edm::EventSetup const&);
-  virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-  virtual void endLuminosityBlock(edm::LuminosityBlock const& lumiSeg,edm::EventSetup const& eSetup);
-
-  void setMatrixElementList(std::vector<std::string> const& MElist, bool const& isGen);
-  void setMatrixElementListFromFile(std::string fname, std::string const& MElistTypes, bool const& isGen); // MElistTypes is comman-separated
-
-
-  RoccoR  *calibrator;
-  float ApplyRoccoR(int Y, bool isMC, int charge, float pt, float eta, float phi, float genPt, float nLayers);
-
-  //Helper Class
-  HZZ4LHelper helper;
-  //GEN
-  HZZ4LGENAna genAna;
-  //VBF
-  HZZ4LJets jetHelper;
-  //PU Reweighting
-  edm::LumiReWeighting *lumiWeight;
-  HZZ4LPileUp pileUp;
-  //JES Uncertainties
-  std::unique_ptr<JetCorrectionUncertainty> jecunc;
-  std::unique_ptr<JetCorrectionUncertainty> jecmergedunc;
-  // kfactors
-  TSpline3 *kFactor_ggzz;
-  std::vector<std::vector<float> > tableEwk;
-  // data/MC scale factors
-  TH2F *hElecScaleFac;
-  TH2F *hElecScaleFac_Cracks;
-  TH2F *hElecScaleFacGsf;
-  TH2F *hElecScaleFacGsfLowET;
-  TH2F *hMuScaleFac;
-  TH2F *hMuScaleFacUnc;
-  TH1D *h_pileup;
-  TH1D *h_pileupUp;
-  TH1D *h_pileupDn;
-  std::vector<TH1F*> h_medians;
-  TH2F *hbTagEffi;
-  TH2F *hcTagEffi;
-  TH2F *hudsgTagEffi;
-
-  BTagCalibrationReader* reader;
-
-  //Saved Events Trees
-  TTree *passedEventsTree_All;
-  void bookPassedEventTree(TString treeName, TTree *tree);
-  void setTreeVariables( const edm::Event&, const edm::EventSetup&,
-                        std::vector<pat::Muon> selectedMuons, std::vector<pat::Electron> selectedElectrons,
-                        std::vector<pat::Muon> recoMuons, std::vector<pat::Electron> recoElectrons,
-                        std::vector<pat::Jet> goodJets, std::vector<float> goodJetQGTagger,
-                        std::vector<float> goodJetaxis2, std::vector<float> goodJetptD, std::vector<int> goodJetmult,
-                        std::vector<pat::Jet> selectedMergedJets,
-                        std::map<unsigned int, TLorentzVector> selectedFsrMap,
-                        edm::Handle<pat::PackedCandidateCollection> &pfcands,
-                        edm::Handle<edm::View<pat::Jet> > &jets);
-  void setGENVariables(edm::Handle<reco::GenParticleCollection> prunedgenParticles,
-                       edm::Handle<edm::View<pat::PackedGenParticle> > packedgenParticles,
-                       edm::Handle<edm::View<reco::GenJet> > genJets);
-  // -------------------------
-  // RECO level information
-  // -------------------------
-
-  // Event Variables
-  ULong64_t Run, Event, LumiSect;
-  int nVtx, nInt;
-  int finalState;
-  std::string triggersPassed;
-  bool passedTrig;
-
-  float PV_x, PV_y, PV_z;
-  float BS_x, BS_y, BS_z;
-  float BS_xErr, BS_yErr, BS_zErr;
-  float BeamWidth_x, BeamWidth_y;
-  float BeamWidth_xErr, BeamWidth_yErr;
-
-  // Event Weights
-  float genWeight, pileupWeight, pileupWeightUp, pileupWeightDn, dataMCWeight, eventWeight, prefiringWeight, prefiringWeightECAL, prefiringWeightMuon;
-  // pdf weights
-  vector<float> qcdWeights;
-  vector<float> nnloWeights;
-  vector<float> pdfWeights;
-  int posNNPDF;
-  float pdfRMSup, pdfRMSdown, pdfENVup, pdfENVdown;
-  // lepton variables
-  vector<double> lep_pt_FromMuonBestTrack, lep_eta_FromMuonBestTrack, lep_phi_FromMuonBestTrack;
-  vector<double> lep_position_x, lep_position_y, lep_position_z;
-  vector<double> lep_pt_genFromReco;
-  vector<double> lep_pt; vector<double> lep_pterr; vector<double> lep_pterrold;
-  vector<double> lep_p; vector<double> lep_ecalEnergy; vector<int> lep_isEB; vector<int> lep_isEE;
-  vector<double> lep_eta; vector<double> lep_phi; vector<double> lep_mass;
-  vector<double> lepFSR_pt; vector<double> lepFSR_eta; vector<double> lepFSR_phi; vector<double> lepFSR_mass; vector<int> lepFSR_ID;
-
-  vector<double> lep_errPre_Scale, lep_errPost_Scale, lep_errPre_noScale, lep_errPost_noScale;
-  vector<double> lep_pt_UnS, lep_pterrold_UnS;
-
-  vector<float> lep_dataMC; vector<float> lep_dataMCErr;
-
-  vector<float> lep_d0BS;
-  vector<float> lep_d0PV;
-  vector<float> lep_numberOfValidPixelHits;
-  vector<float> lep_trackerLayersWithMeasurement;
-  vector<float> dataMC_VxBS; vector<float> dataMCErr_VxBS;
-  vector<int> lep_genindex; //position of lepton in GENlep_p4 (if gen matched, -1 if not gen matched)
-  vector<int> lep_matchedR03_PdgId, lep_matchedR03_MomId, lep_matchedR03_MomMomId; // gen matching even if not in GENlep_p4
-  vector<int> lep_id;
-  vector<float> lep_mva; vector<int> lep_ecalDriven;
-  vector<int> lep_tightId; vector<int> lep_tightIdSUS; vector<int> lep_tightIdHiPt; //vector<int> lep_tightId_old;
-  vector<float> lep_Sip; vector<float> lep_IP; vector<float> lep_isoNH; vector<float> lep_isoCH; vector<float> lep_isoPhot;
-  vector<float> lep_isoPU; vector<float> lep_isoPUcorr;
-  vector<float> lep_RelIso; vector<float> lep_RelIsoNoFSR; vector<float> lep_MiniIso;
-  vector<float> lep_ptRatio; vector<float> lep_ptRel;
-  vector<int> lep_missingHits;
-  vector<string> lep_filtersMatched; // for each lepton, all filters it is matched to
-  int nisoleptons;
-  double muRho, elRho, rhoSUS;
-
-  // Z candidate variables
-  vector<float> singleBS_RecoLep_pt; vector<float> singleBS_RecoLep_ptError;  vector<float> singleBS_RecoLep_eta;  vector<float> singleBS_RecoLep_phi; vector<float> singleBS_RecoLep_mass; vector<float> singleBS_RecoLep_d0;
-
-  // photon variables
-  vector<double> pho_pt, pho_eta, pho_phi, photonCutBasedIDLoose;
-
-  // MET
-  float met; float met_phi;
-  float met_jesup, met_phi_jesup, met_jesdn, met_phi_jesdn;
-  float met_uncenup, met_phi_uncenup, met_uncendn, met_phi_uncendn;
-
-  // Jets
-  vector<int>    jet_iscleanH4l;
-  int jet1index, jet2index, jet1index_2p5, jet2index_2p5;
-  vector<double> jet_pt; vector<double> jet_eta; vector<double> jet_phi; vector<double> jet_mass; vector<double> jet_pt_raw;
-  vector<float>  jet_pumva, jet_csvv2,  jet_csvv2_; vector<int> jet_isbtag;
-  vector<int>    jet_hadronFlavour, jet_partonFlavour;
-  vector<float>  jet_QGTagger, jet_QGTagger_jesup, jet_QGTagger_jesdn;
-  vector<float> jet_axis2, jet_ptD; vector<int> jet_mult;
-  vector<float>  jet_relpterr; vector<float>  jet_phierr;
-  vector<float>  jet_bTagEffi;
-  vector<float>  jet_cTagEffi;
-  vector<float>  jet_udsgTagEffi;
-  vector<int>    jet_jesup_iscleanH4l;
-  vector<double> jet_jesup_pt; vector<double> jet_jesup_eta;
-  vector<double> jet_jesup_phi; vector<double> jet_jesup_mass;
-  vector<int>    jet_jesdn_iscleanH4l;
-  vector<double> jet_jesdn_pt; vector<double> jet_jesdn_eta;
-  vector<double> jet_jesdn_phi; vector<double> jet_jesdn_mass;
-  vector<int>    jet_jerup_iscleanH4l;
-  vector<double> jet_jerup_pt; vector<double> jet_jerup_eta;
-  vector<double> jet_jerup_phi; vector<double> jet_jerup_mass;
-  vector<int>    jet_jerdn_iscleanH4l;
-  vector<double> jet_jerdn_pt; vector<double> jet_jerdn_eta;
-  vector<double> jet_jerdn_phi; vector<double> jet_jerdn_mass;
-  int njets_pt30_eta4p7; int njets_pt30_eta4p7_jesup; int njets_pt30_eta4p7_jesdn;
-  int njets_pt30_eta4p7_jerup; int njets_pt30_eta4p7_jerdn;
-  int njets_pt30_eta2p5; int njets_pt30_eta2p5_jesup; int njets_pt30_eta2p5_jesdn;
-  int njets_pt30_eta2p5_jerup; int njets_pt30_eta2p5_jerdn;
-  int nbjets_pt30_eta4p7; int nvjets_pt40_eta2p4;
-  float pt_leadingjet_pt30_eta4p7;
-  float pt_leadingjet_pt30_eta4p7_jesup; float pt_leadingjet_pt30_eta4p7_jesdn;
-  float pt_leadingjet_pt30_eta4p7_jerup; float pt_leadingjet_pt30_eta4p7_jerdn;
-  float pt_leadingjet_pt30_eta2p5;
-  float pt_leadingjet_pt30_eta2p5_jesup; float pt_leadingjet_pt30_eta2p5_jesdn;
-  float pt_leadingjet_pt30_eta2p5_jerup; float pt_leadingjet_pt30_eta2p5_jerdn;
-  float absrapidity_leadingjet_pt30_eta4p7;
-  float absrapidity_leadingjet_pt30_eta4p7_jesup; float absrapidity_leadingjet_pt30_eta4p7_jesdn;
-  float absrapidity_leadingjet_pt30_eta4p7_jerup; float absrapidity_leadingjet_pt30_eta4p7_jerdn;
-  float absdeltarapidity_hleadingjet_pt30_eta4p7;
-  float absdeltarapidity_hleadingjet_pt30_eta4p7_jesup; float absdeltarapidity_hleadingjet_pt30_eta4p7_jesdn;
-  float absdeltarapidity_hleadingjet_pt30_eta4p7_jerup; float absdeltarapidity_hleadingjet_pt30_eta4p7_jerdn;
-  float DijetMass, DijetDEta, DijetFisher;
-
-  // merged jets
-  vector<int>   mergedjet_iscleanH4l;
-  vector<float> mergedjet_pt, mergedjet_ptrow;
-  vector<float> mergedjet_eta; vector<float> mergedjet_phi; vector<float> mergedjet_mass;
-  vector<float> mergedjet_jer;
-  vector<float> mergedjet_jer_pt, mergedjet_jer_eta, mergedjet_jer_phi, mergedjet_jer_mass;
-  vector<float> mergedjet_jerup_pt, mergedjet_jerup_eta, mergedjet_jerup_phi, mergedjet_jerup_mass;
-  vector<float> mergedjet_jerdn_pt, mergedjet_jerdn_eta, mergedjet_jerdn_phi, mergedjet_jerdn_mass;
-  vector<float> mergedjet_jer_pterr, mergedjet_jer_phierr;
-
-  vector<float> mergedjet_tau1; vector<float> mergedjet_tau2;
-  vector<float> mergedjet_btag;
-  vector<float> mergedjet_ZvsQCD;
-  vector<float> mergedjet_ZbbvsQCD;
-  vector<float> mergedjet_WvsQCD;
-  vector<float> mergedjet_ZHbbvsQCD;
-  vector<float> mergedjet_HbbvsQCD;
-  vector<float> mergedjet_H4qvsQCD;
-
-  vector<float> mergedjet_ZvsQCD_de; //de with decorrelated
-  vector<float> mergedjet_ZbbvsQCD_de;
-  vector<float> mergedjet_WvsQCD_de;
-  vector<float> mergedjet_ZHbbvsQCD_de;
-  vector<float> mergedjet_HbbvsQCD_de;
-  vector<float> mergedjet_H4qvsQCD_de;
-
-  vector<float> mergedjet_Net_Xbb_de; //particle net
-  vector<float> mergedjet_Net_Xcc_de;
-  vector<float> mergedjet_Net_Xqq_de;
-  vector<float> mergedjet_Net_QCDbb_de;
-  vector<float> mergedjet_Net_QCDcc_de;
-  vector<float> mergedjet_Net_QCDb_de;
-  vector<float> mergedjet_Net_QCDc_de;
-  vector<float> mergedjet_Net_QCDother_de;
-
-  //vector<float> mergedjet_L1;
-  //vector<float> mergedjet_prunedmass;
-  vector<float> mergedjet_softdropmass;
-
-  vector<int> mergedjet_nsubjet;
-  vector<float> mergedjet_subjet_softDropMass;
-  vector<float> mergedjet_subjet_softDropMassUncorr;
-  vector<vector<float> > mergedjet_subjet_pt; vector<vector<float> > mergedjet_subjet_eta;
-  vector<vector<float> > mergedjet_subjet_phi; vector<vector<float> > mergedjet_subjet_mass;
-  vector<vector<float> > mergedjet_subjetUncorr_pt; vector<vector<float> > mergedjet_subjetUncorr_eta;
-  vector<vector<float> > mergedjet_subjetUncorr_phi; vector<vector<float> > mergedjet_subjetUncorr_mass;
-  vector<vector<float> > mergedjet_subjet_btag;
-  vector<vector<int> > mergedjet_subjet_partonFlavour, mergedjet_subjet_hadronFlavour;
-  vector<int> mergedjet_nbHadrons, mergedjet_ncHadrons, mergedjet_hadronFlavour, mergedjet_partonFlavour;
-
-  // FSR Photons
-  int nFSRPhotons;
-  vector<int> fsrPhotons_lepindex;
-  vector<double> fsrPhotons_pt; vector<double> fsrPhotons_pterr;
-  vector<double> fsrPhotons_eta; vector<double> fsrPhotons_phi;
-  vector<double> fsrPhotons_mass;
-  vector<float> fsrPhotons_dR; vector<float> fsrPhotons_iso;
-  vector<float> allfsrPhotons_dR; vector<float> allfsrPhotons_pt; vector<float> allfsrPhotons_iso;
-
-  // Event Category
-  int EventCat;
-
-  // -------------------------
-  // GEN level information
-  // -------------------------
-
-  //Event variables
-  int GENfinalState;
-
-  // lepton variables
-  vector<double> GENlep_pt; vector<double> GENlep_eta; vector<double> GENlep_phi; vector<double> GENlep_mass;
-  vector<int> GENlep_id; vector<int> GENlep_status;
-  vector<int> GENlep_MomId; vector<int> GENlep_MomMomId;
-  int GENlep_Hindex[4];//position of Higgs candidate leptons in lep_p4: 0 = Z1 lead, 1 = Z1 sub, 2 = Z2 lead, 3 = Z3 sub
-  vector<float> GENlep_isoCH; vector<float> GENlep_isoNH; vector<float> GENlep_isoPhot; vector<float> GENlep_RelIso;
-
-  // Z candidate variables
-  vector<double> GENZ_pt; vector<double> GENZ_eta; vector<double> GENZ_phi; vector<double> GENZ_mass;
-  vector<int> GENZ_DaughtersId; vector<int> GENZ_MomId;
-
-  //hadZ and quark
-  vector<double> GEN_Zq_pt, GEN_Zq_eta, GEN_Zq_phi, GEN_Zq_mass, GEN_Zq_MomMomid, GEN_Zq_Momid;
-  vector<double> GEN_q_pt, GEN_q_eta, GEN_q_phi, GEN_q_mass;
-  vector<int> GEN_Zq_id, GEN_q_id, GEN_q_status, GEN_q_Momid, GEN_q_MomMomid,GEN_q_nDaughters, GENH_isHard, GEN_id, GEN_status, GEN_Zq_isHard;
-  vector<vector<int>> GEN_qdau_id, GEN_qdau_status;
-  vector<vector<double>> GEN_qdau_pt, GEN_qdau_eta, GEN_qdau_phi, GEN_qdau_mass;
-  // Higgs candidate variables (calculated using selected gen leptons)
-  vector<double> GENH_pt; vector<double> GENH_eta; vector<double> GENH_phi; vector<double> GENH_mass;
-  vector<double> GENH_Momid; vector<double> GENH_MomMomid; vector<double> GENH_status; vector<double> GENH_id;
-  vector<double> GENH_nDaughters;
-  vector<vector<double>> GENH_dau_pt, GENH_dau_eta,GENH_dau_phi,GENH_dau_mass;
-  vector<vector<int>> GENH_dau_id, GENH_dau_status;
-  float GENMH;
-
-  //VBF quark
-  vector<double> GEN_VBF_pt, GEN_VBF_eta, GEN_VBF_phi, GEN_VBF_mass;
-  vector<int> GEN_VBF_id, GEN_VBF_Momid, GEN_VBF_MomMomid, GEN_VBF_status;
-
-  // Jets
-  vector<double> GENjet_pt; vector<double> GENjet_eta; vector<double> GENjet_phi; vector<double> GENjet_mass;
-  int GENnjets_pt30_eta4p7; float GENpt_leadingjet_pt30_eta4p7;
-  int GENnbjets_pt30_eta4p7;
-  int GENnjets_pt30_eta2p5; float GENpt_leadingjet_pt30_eta2p5;
-  float GENabsrapidity_leadingjet_pt30_eta4p7; float GENabsdeltarapidity_hleadingjet_pt30_eta4p7;
-  int lheNb, lheNj, nGenStatus2bHad;
-
-  // Global Variables but not stored in the tree
-  vector<double> lep_ptreco;
-  vector<int> lep_ptid; vector<int> lep_ptindex;
-  vector<pat::Muon> recoMuons; vector<pat::Electron> recoElectrons; vector<pat::Electron> recoElectronsUnS;
-  vector<pat::Tau> recoTaus; vector<pat::Photon> recoPhotons;
-  vector<pat::PFParticle> fsrPhotons;
-  TLorentzVector HVec, HVecNoFSR, Z1Vec, Z2Vec;
-  TLorentzVector GENZ1Vec, GENZ2Vec;
-  bool RecoFourMuEvent, RecoFourEEvent, RecoTwoETwoMuEvent, RecoTwoMuTwoEEvent;
-  bool foundHiggsCandidate; bool foundZ1LCandidate; bool firstEntry;
-  float jet1pt, jet2pt;
-  float jet1pt2p5, jet2pt2p5;
-  TLorentzVector Jet1, Jet2, Jet1_2p5, Jet2_2p5;
-
-  vector<int> GENjet_id;
-
-  // hist container
-  std::map<std::string,TH1F*> histContainer_;
-
-  //Input edm
-  edm::EDGetTokenT<edm::View<pat::Electron> > elecSrc_;
-  edm::EDGetTokenT<edm::View<pat::Electron> > elecUnSSrc_;
-  edm::EDGetTokenT<edm::View<pat::Muon> > muonSrc_;
-  edm::EDGetTokenT<edm::View<pat::Tau> > tauSrc_;
-  edm::EDGetTokenT<edm::View<pat::Photon> > photonSrc_;
-  edm::EDGetTokenT<edm::View<pat::Jet> > jetSrc_;
-  edm::EDGetTokenT<edm::ValueMap<float> > qgTagSrc_;
-  edm::EDGetTokenT<edm::ValueMap<float> > axis2Src_;
-  edm::EDGetTokenT<edm::ValueMap<int> > multSrc_;
-  edm::EDGetTokenT<edm::ValueMap<float> > ptDSrc_;
-  edm::EDGetTokenT<edm::View<pat::Jet> > mergedjetSrc_;
-  edm::EDGetTokenT<edm::View<pat::MET> > metSrc_;
-  //edm::InputTag triggerSrc_;
-  edm::EDGetTokenT<edm::TriggerResults> triggerSrc_;
-  edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
-  edm::EDGetTokenT<reco::VertexCollection> vertexSrc_;
-  edm::EDGetTokenT<reco::BeamSpot> beamSpotSrc_;
-  edm::EDGetTokenT<std::vector<reco::Conversion> > conversionSrc_;
-  edm::EDGetTokenT<double> muRhoSrc_;
-  edm::EDGetTokenT<double> elRhoSrc_;
-  edm::EDGetTokenT<double> rhoSrcSUS_;
-  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileupSrc_;
-  edm::EDGetTokenT<pat::PackedCandidateCollection> pfCandsSrc_;
-  edm::EDGetTokenT<edm::View<pat::PFParticle> > fsrPhotonsSrc_;
-  edm::EDGetTokenT<reco::GenParticleCollection> prunedgenParticlesSrc_;
-  edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedgenParticlesSrc_;
-  edm::EDGetTokenT<edm::View<reco::GenJet> > genJetsSrc_;
-  edm::EDGetTokenT<GenEventInfoProduct> generatorSrc_;
-  edm::EDGetTokenT<LHEEventProduct> lheInfoSrc_;
-  edm::EDGetTokenT<LHERunInfoProduct> lheRunInfoToken_;
-  edm::EDGetTokenT<HTXS::HiggsClassification> htxsSrc_;
-  //edm::EDGetTokenT<HZZFid::FiducialSummary> fidRivetSrc_;
-  edm::EDGetTokenT< double > prefweight_token_;
-  edm::EDGetTokenT< double > prefweightECAL_token_;
-  edm::EDGetTokenT< double > prefweightMuon_token_;
-
-  // Configuration
-  const float Zmass;
-  float mZ1Low, mZ2Low, mZ1High, mZ2High, m4lLowCut;
-  float jetpt_cut, jeteta_cut;
-  std::string elecID;
-  bool isMC, isSignal;
-  float mH;
-  float crossSection;
-  bool weightEvents;
-  float isoCutEl, isoCutMu;
-  double isoConeSizeEl, isoConeSizeMu;
-  float sip3dCut, leadingPtCut, subleadingPtCut;
-  float genIsoCutEl, genIsoCutMu;
-  double genIsoConeSizeEl, genIsoConeSizeMu;
-  float _elecPtCut, _muPtCut, _tauPtCut, _phoPtCut;
-  float BTagCut;
-  bool reweightForPU;
-  std::string PUVersion;
-  bool doFsrRecovery,bestCandMela, doMela, GENbestM4l, GENdoMela;
-  //    bool GENdoMela;
-  bool doPUJetID;
-  int jetIDLevel;
-  bool doJER;
-  bool doJEC;
-  bool doRefit;
-  bool doTriggerMatching;
-  bool checkOnlySingle;
-  std::vector<std::string> triggerList;
-  int skimLooseLeptons, skimTightLeptons;
-  bool verbose;
-
-  int year_,year;///use to choose Muon BDT
-  bool isCode4l;
-
-  // register to the TFileService
-  edm::Service<TFileService> fs;
-
-  // Counters
-  float nEventsTotal;
-  float sumWeightsTotal;
-  float sumWeightsTotalPU;
-
-  // JER
-  JME::JetResolution resolution_pt, resolution_phi;
-  JME::JetResolutionScaleFactor resolution_sf;
-
-  JME::JetResolution ak8_resolution_pt, ak8_resolution_phi;
-  JME::JetResolutionScaleFactor ak8_resolution_sf;
-
-  string EleBDT_name_161718;
-  string heepID_name_161718;
-
-  // ME lists
-  //vector<string> lheMElist;
-  //vector<string> recoMElist;
-  //IvyMELAHelpers::GMECBlock MEblock;
-
-};
 
 UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig):
   histContainer_(),
@@ -777,21 +184,15 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig):
                BTagEntry::FLAV_B,    // btag flavour
                "comb");               // measurement type
 
-  //if(year==2018)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Autumn18IdIsoValues"; BTagCut=0.4184; heepID_name_161718 = "heepElectronID-HEEPV70";}
   if(year==2018)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer18ULIdIsoValues"; BTagCut=0.4168; heepID_name_161718 = "heepElectronID-HEEPV70";}
-  //if(year==2017)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Fall17IsoV2Values"; BTagCut=0.4941; heepID_name_161718 = "heepElectronID-HEEPV70";}
   if(year==2017)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer17ULIdIsoValues"; BTagCut=0.4506; heepID_name_161718 = "heepElectronID-HEEPV70";}
-  //if(year==2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16IdIsoValues"; BTagCut=0.6321; heepID_name_161718 = "heepElectronID-HEEPV70";}
   if(year_==2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16ULIdIsoValues"; BTagCut=0.5847; heepID_name_161718 = "heepElectronID-HEEPV70";}
   if(year_==-2016)    {EleBDT_name_161718 = "ElectronMVAEstimatorRun2Summer16ULIdIsoValues"; BTagCut=0.6001; heepID_name_161718 = "heepElectronID-HEEPV70";}
 
   std::string DATAPATH = std::getenv( "CMSSW_BASE" );
   //std::string DATAPATH = std::getenv( "CMSSW_BASE" );
-  //if(year == 2018)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v3/RoccoR2018.txt";
   if(year == 2018)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2018UL.txt";
-  //if(year == 2017)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v3/RoccoR2017.txt";
   if(year == 2017)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2017UL.txt";
-  //if(year == 2016)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v3/RoccoR2016.txt";
   if(year_ == 2016)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2016bUL.txt"; // for post VFP
   if(year_ == -2016)    DATAPATH+="/src/UFHZZAnalysisRun2/KalmanMuonCalibrationsProducer/data/roccor.Run2.v5/RoccoR2016aUL.txt"; // for pre VFP
   calibrator = new RoccoR(DATAPATH);
@@ -830,7 +231,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   LumiSect = iEvent.id().luminosityBlock();
 
   if (verbose) {
-      cout<<"Run: " << Run << ",Event: " << Event << ",LumiSect: "<<LumiSect<<endl;
+  cout<<"Run: " << Run << ",Event: " << Event << ",LumiSect: "<<LumiSect<<endl;
   }
 
   // ======= Get Collections ======= //
@@ -955,9 +356,6 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<GenEventInfoProduct> genEventInfo;
   iEvent.getByToken(generatorSrc_,genEventInfo);
 
-  //vector<edm::Handle<LHEEventProduct> > lheInfos;
-  //iEvent.getManyByType(lheInfos); // using this method because the label is not always the same (e.g. "source" in the ttH sample)
-
   edm::Handle<LHEEventProduct> lheInfo;
   iEvent.getByToken(lheInfoSrc_, lheInfo);
 
@@ -985,233 +383,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   // ============ Initialize Variables ============= //
   // Event Variables
   if (verbose) {cout<<"clear variables"<<endl;}
-  nVtx = -1.0; nInt = -1.0;
-  finalState = -1;
-  triggersPassed="";
-  passedTrig=false;
-
-  // Event Weights
-  genWeight=1.0; pileupWeight=1.0; pileupWeightUp=1.0; pileupWeightDn=1.0; dataMCWeight=1.0; eventWeight=1.0;
-
-  qcdWeights.clear(); nnloWeights.clear(); pdfWeights.clear();
-  pdfRMSup=1.0; pdfRMSdown=1.0; pdfENVup=1.0; pdfENVdown=1.0;
-
-  //lepton variables
-  lep_d0BS.clear();
-  lep_d0PV.clear();
-  lep_numberOfValidPixelHits.clear();
-  lep_trackerLayersWithMeasurement.clear();
-
-  lep_pt_FromMuonBestTrack.clear(); lep_eta_FromMuonBestTrack.clear(); lep_phi_FromMuonBestTrack.clear();
-  lep_position_x.clear();	lep_position_y.clear();	lep_position_z.clear();
-  lep_pt_genFromReco.clear();
-  lep_pt_UnS.clear(); lep_pterrold_UnS.clear();
-  lep_pt.clear(); lep_pterr.clear(); lep_pterrold.clear();
-  lep_p.clear(); lep_ecalEnergy.clear(); lep_isEB.clear(); lep_isEE.clear();
-  lep_errPre_Scale.clear(); lep_errPost_Scale.clear(); lep_errPre_noScale.clear(); lep_errPost_noScale.clear();
-  lep_eta.clear(); lep_phi.clear(); lep_mass.clear();
-  lepFSR_pt.clear(); lepFSR_eta.clear(); lepFSR_phi.clear(); lepFSR_mass.clear(); lepFSR_ID.clear();
-
-  lep_genindex.clear(); lep_id.clear(); lep_dataMC.clear(); lep_dataMCErr.clear();
-  dataMC_VxBS.clear(); dataMCErr_VxBS.clear();
-  lep_matchedR03_PdgId.clear(); lep_matchedR03_MomId.clear(); lep_matchedR03_MomMomId.clear();
-  lep_mva.clear(); lep_ecalDriven.clear();
-  lep_tightId.clear(); lep_tightIdSUS.clear(); lep_tightIdHiPt.clear(); //lep_tightId_old.clear();
-  lep_Sip.clear(); lep_IP.clear();
-  lep_isoNH.clear(); lep_isoCH.clear(); lep_isoPhot.clear(); lep_isoPU.clear(); lep_isoPUcorr.clear();
-  lep_RelIso.clear(); lep_RelIsoNoFSR.clear(); lep_MiniIso.clear();
-  lep_ptRatio.clear(); lep_ptRel.clear();
-  lep_missingHits.clear();
-  lep_filtersMatched.clear();
-  nisoleptons=0;
-
-  singleBS_RecoLep_pt.clear();
-  singleBS_RecoLep_ptError.clear();
-  singleBS_RecoLep_eta.clear();
-  singleBS_RecoLep_phi.clear();
-  singleBS_RecoLep_mass.clear();
-  singleBS_RecoLep_d0.clear();
-
-  // photon variables
-  pho_pt.clear(); pho_eta.clear(); pho_phi.clear(); photonCutBasedIDLoose.clear();
-
-  // MET
-  met=-1.0; met_phi=9999.0;
-  met_jesup=-1.0; met_phi_jesup=9999.0; met_jesdn=-1.0; met_phi_jesdn=9999.0;
-  met_uncenup=-1.0; met_phi_uncenup=9999.0; met_uncendn=-1.0; met_phi_uncendn=9999.0;
-
-  // Jets
-  jet_pt.clear(); jet_eta.clear(); jet_phi.clear(); jet_mass.clear(); jet_pt_raw.clear();
-  jet_jesup_pt.clear(); jet_jesup_eta.clear(); jet_jesup_phi.clear(); jet_jesup_mass.clear();
-  jet_jesdn_pt.clear(); jet_jesdn_eta.clear(); jet_jesdn_phi.clear(); jet_jesdn_mass.clear();
-  jet_jerup_pt.clear(); jet_jerup_eta.clear(); jet_jerup_phi.clear(); jet_jerup_mass.clear();
-  jet_jerdn_pt.clear(); jet_jerdn_eta.clear(); jet_jerdn_phi.clear(); jet_jerdn_mass.clear();
-  jet_csvv2_.clear();
-  jet_pumva.clear(); jet_csvv2.clear(); jet_isbtag.clear();
-  jet_hadronFlavour.clear(); jet_partonFlavour.clear();
-  jet_QGTagger.clear(); jet_QGTagger_jesup.clear(); jet_QGTagger_jesdn.clear();
-  jet_relpterr.clear(); jet_phierr.clear();
-  jet_bTagEffi.clear();
-  jet_cTagEffi.clear();
-  jet_udsgTagEffi.clear();
-  jet_axis2.clear(); jet_ptD.clear(); jet_mult.clear();
-
-  jet_iscleanH4l.clear();
-  jet1index=-1; jet2index=-1; jet1index_2p5 = -1, jet2index_2p5 = -1;
-  jet_jesup_iscleanH4l.clear(); jet_jesdn_iscleanH4l.clear();
-  jet_jerup_iscleanH4l.clear(); jet_jerdn_iscleanH4l.clear();
-
-  njets_pt30_eta4p7=0;
-  njets_pt30_eta4p7_jesup=0; njets_pt30_eta4p7_jesdn=0;
-  njets_pt30_eta4p7_jerup=0; njets_pt30_eta4p7_jerdn=0;
-
-  njets_pt30_eta2p5=0;
-  njets_pt30_eta2p5_jesup=0; njets_pt30_eta2p5_jesdn=0;
-  njets_pt30_eta2p5_jerup=0; njets_pt30_eta2p5_jerdn=0;
-
-  nbjets_pt30_eta4p7=0; nvjets_pt40_eta2p4=0;
-
-  pt_leadingjet_pt30_eta4p7=-1.0;
-
-  pt_leadingjet_pt30_eta4p7_jesup=-1.0; pt_leadingjet_pt30_eta4p7_jesdn=-1.0;
-  pt_leadingjet_pt30_eta4p7_jerup=-1.0; pt_leadingjet_pt30_eta4p7_jerdn=-1.0;
-
-  pt_leadingjet_pt30_eta2p5=-1.0;
-  pt_leadingjet_pt30_eta2p5_jesup=-1.0; pt_leadingjet_pt30_eta2p5_jesdn=-1.0;
-  pt_leadingjet_pt30_eta2p5_jerup=-1.0; pt_leadingjet_pt30_eta2p5_jerdn=-1.0;
-
-  absrapidity_leadingjet_pt30_eta4p7=-1.0;
-  absrapidity_leadingjet_pt30_eta4p7_jesup=-1.0; absrapidity_leadingjet_pt30_eta4p7_jesdn=-1.0;
-  absrapidity_leadingjet_pt30_eta4p7_jerup=-1.0; absrapidity_leadingjet_pt30_eta4p7_jerdn=-1.0;
-
-  absdeltarapidity_hleadingjet_pt30_eta4p7=-1.0;
-  absdeltarapidity_hleadingjet_pt30_eta4p7_jesup=-1.0; absdeltarapidity_hleadingjet_pt30_eta4p7_jesdn=-1.0;
-  absdeltarapidity_hleadingjet_pt30_eta4p7_jerup=-1.0; absdeltarapidity_hleadingjet_pt30_eta4p7_jerdn=-1.0;
-
-  DijetMass=-1.0; DijetDEta=9999.0; DijetFisher=9999.0;
-
-  mergedjet_iscleanH4l.clear();
-  mergedjet_pt.clear(); mergedjet_eta.clear(); mergedjet_phi.clear(); mergedjet_mass.clear();
-  mergedjet_jer.clear();
-  mergedjet_jer_pt.clear(); mergedjet_jer_eta.clear(); mergedjet_jer_phi.clear(); mergedjet_jer_mass.clear();
-  mergedjet_jerup_pt.clear(); mergedjet_jerup_eta.clear(); mergedjet_jerup_phi.clear(); mergedjet_jerup_mass.clear();
-  mergedjet_jerdn_pt.clear(); mergedjet_jerdn_eta.clear(); mergedjet_jerdn_phi.clear(); mergedjet_jerdn_mass.clear();
-  mergedjet_ptrow.clear();
-  mergedjet_jer_pterr.clear(); mergedjet_jer_phierr.clear();
-
-  //mergedjet_L1.clear();
-  mergedjet_softdropmass.clear();
-  //mergedjet_prunedmass.clear();
-  mergedjet_tau1.clear(); mergedjet_tau2.clear();
-  mergedjet_btag.clear();
-
-  mergedjet_ZvsQCD.clear();
-  mergedjet_ZbbvsQCD.clear();
-  mergedjet_ZHbbvsQCD.clear();
-  mergedjet_WvsQCD.clear();
-  mergedjet_ZHbbvsQCD.clear();
-  mergedjet_HbbvsQCD.clear();
-  mergedjet_H4qvsQCD.clear();
-
-  mergedjet_ZvsQCD_de.clear();
-  mergedjet_ZbbvsQCD_de.clear();
-  mergedjet_ZHbbvsQCD_de.clear();
-  mergedjet_WvsQCD_de.clear();
-  mergedjet_ZHbbvsQCD_de.clear();
-  mergedjet_HbbvsQCD_de.clear();
-  mergedjet_H4qvsQCD_de.clear();
-
-  mergedjet_Net_Xbb_de.clear();
-  mergedjet_Net_Xcc_de.clear();
-  mergedjet_Net_Xqq_de.clear();
-  mergedjet_Net_QCDbb_de.clear();
-  mergedjet_Net_QCDcc_de.clear();
-  mergedjet_Net_QCDb_de.clear();
-  mergedjet_Net_QCDc_de.clear();
-  mergedjet_Net_QCDother_de.clear();
-
-  mergedjet_nsubjet.clear();
-  mergedjet_subjet_pt.clear(); mergedjet_subjet_eta.clear();
-  mergedjet_subjet_phi.clear(); mergedjet_subjet_mass.clear();
-  mergedjet_subjetUncorr_pt.clear(); mergedjet_subjetUncorr_eta.clear();
-  mergedjet_subjetUncorr_phi.clear(); mergedjet_subjetUncorr_mass.clear(); mergedjet_subjet_softDropMassUncorr.clear();
-  mergedjet_subjet_softDropMass.clear();
-  mergedjet_subjet_btag.clear();
-  mergedjet_subjet_partonFlavour.clear(); mergedjet_subjet_hadronFlavour.clear();
-  mergedjet_nbHadrons.clear(); mergedjet_ncHadrons.clear(); mergedjet_hadronFlavour.clear(); mergedjet_partonFlavour.clear();
-
-  // FSR Photons
-  nFSRPhotons=0;
-  fsrPhotons_lepindex.clear(); fsrPhotons_pt.clear(); fsrPhotons_pterr.clear();
-  fsrPhotons_eta.clear(); fsrPhotons_phi.clear();
-  fsrPhotons_dR.clear(); fsrPhotons_iso.clear();
-  allfsrPhotons_dR.clear(); allfsrPhotons_pt.clear(); allfsrPhotons_iso.clear();
-
-  // -------------------------
-  // GEN level information
-  // -------------------------
-
-  //Event variables
-  GENfinalState=-1;
-
-  // lepton variables
-  GENlep_pt.clear(); GENlep_eta.clear(); GENlep_phi.clear(); GENlep_mass.clear();
-  GENlep_id.clear(); GENlep_status.clear(); GENlep_MomId.clear(); GENlep_MomMomId.clear();
-  for (int i=0; i<4; ++i) {GENlep_Hindex[i]=-1;};//position of Higgs candidate leptons in lep_p4: 0 = Z1 lead, 1 = Z1 sub, 2 = Z2 lead, 3 = Z3 sub
-  GENlep_isoCH.clear(); GENlep_isoNH.clear(); GENlep_isoPhot.clear(); GENlep_RelIso.clear();
-
-  // Z candidate variables
-  GENZ_pt.clear(); GENZ_eta.clear(); GENZ_phi.clear(); GENZ_mass.clear();
-  GENZ_DaughtersId.clear(); GENZ_MomId.clear();
-
-  //HadZ and quark
-  GEN_Zq_pt.clear(); GEN_Zq_eta.clear(); GEN_Zq_phi.clear(); GEN_Zq_mass.clear(); GEN_Zq_id.clear(); GEN_Zq_Momid.clear(); GEN_Zq_MomMomid.clear();
-  GEN_q_id.clear(); GEN_q_pt.clear(); GEN_q_eta.clear(); GEN_q_phi.clear(); GEN_q_mass.clear(); GEN_q_status.clear(); GEN_q_Momid.clear(); GEN_q_MomMomid.clear();
-  GEN_qdau_id.clear(); GEN_qdau_pt.clear(); GEN_qdau_eta.clear(); GEN_qdau_phi.clear(); GEN_qdau_mass.clear(); GEN_qdau_status.clear(); GEN_q_nDaughters.clear();
-  GEN_Zq_isHard.clear();
-
-  // Higgs candidate variables (calculated using selected gen leptons)
-  GENH_pt.clear(); GENH_eta.clear(); GENH_phi.clear(); GENH_mass.clear();
-  GENMH=-1.0;
-  GENH_Momid.clear(); GENH_MomMomid.clear();
-  GENH_status.clear(); GENH_id.clear(); GENH_isHard.clear();
-  GEN_id.clear(); GEN_status.clear();
-  GENH_dau_id.clear(); GENH_nDaughters.clear(); GENH_dau_status.clear(); GENH_dau_pt.clear(); GENH_dau_eta.clear(); GENH_dau_phi.clear(); GENH_dau_mass.clear();
-
-  //VBF quark
-  GEN_VBF_pt.clear(); GEN_VBF_eta.clear(); GEN_VBF_phi.clear(); GEN_VBF_mass.clear(); GEN_VBF_id.clear(); GEN_VBF_Momid.clear(); GEN_VBF_MomMomid.clear(); GEN_VBF_status.clear();
-
-  // Jets
-  GENjet_pt.clear(); GENjet_eta.clear(); GENjet_phi.clear(); GENjet_mass.clear();
-  GENnjets_pt30_eta4p7=0;
-  GENnbjets_pt30_eta4p7=0;
-  GENnjets_pt30_eta2p5=0;
-  GENpt_leadingjet_pt30_eta4p7=-1.0; GENabsrapidity_leadingjet_pt30_eta4p7=-1.0; GENabsdeltarapidity_hleadingjet_pt30_eta4p7=-1.0;
-  GENpt_leadingjet_pt30_eta2p5=-1.0;
-  GENjet_id.clear();
-  lheNb=0; lheNj=0; nGenStatus2bHad=0;
-
-  if (verbose) {cout<<"clear other variables"<<endl; }
-  // Resolution
-  //massErrorUCSD=-1.0; massErrorUCSDCorr=-1.0; massErrorUF=-1.0; massErrorUFCorr=-1.0; massErrorUFADCorr=-1.0;
-
-  // Event Category
-  EventCat=-1;
-
-  // Global variables not stored in tree
-  lep_ptreco.clear(); lep_ptid.clear(); lep_ptindex.clear();
-  recoMuons.clear(); recoElectrons.clear(); fsrPhotons.clear(); recoElectronsUnS.clear();
-  HVec.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
-  HVecNoFSR.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
-  Z1Vec.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
-  Z2Vec.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
-  GENZ1Vec.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
-  GENZ2Vec.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
-  RecoFourMuEvent = false; RecoFourEEvent = false;
-  RecoTwoETwoMuEvent = false; RecoTwoMuTwoEEvent = false;
-  foundHiggsCandidate = false; foundZ1LCandidate = false;
-  jet1pt=-1.0; jet2pt=-1.0;
-  jet1pt2p5=-1.0; jet2pt2p5=-1.0;
+  Reset();
 
   // ====================== Do Analysis ======================== //
   std::map<int, TLorentzVector> fsrmap;
@@ -1236,7 +408,6 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       }
       if (verbose) cout<<"N true interations = "<<npv<<endl;
       nInt = npv;
-      //pileupWeight = pileUp.getPUWeight(npv,PUVersion);
       pileupWeight = pileUp.getPUWeight(h_pileup,npv);
       pileupWeightUp = pileUp.getPUWeight(h_pileupUp,npv);
       pileupWeightDn = pileUp.getPUWeight(h_pileupDn,npv);
@@ -1247,7 +418,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   if (verbose) {cout<<"finished pileup reweighting"<<endl; }
 
-  if(isMC){ //gen INFO
+  if(isMC){ //lhe INFO
     float tmpWeight = genEventInfo->weight();
     genWeight = (tmpWeight > 0 ? 1.0 : -1.0);
     if (verbose) {cout<<"tmpWeight: "<<tmpWeight<<"; genWeight: "<<genWeight<<endl;}
@@ -1256,7 +427,6 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     if(lheInfo.isValid()){
 
       for(unsigned int i = 0; i < lheInfo->weights().size(); i++) {
-
           tmpWeight = genEventInfo->weight();
           tmpWeight *= lheInfo->weights()[i].wgt/lheInfo->originalXWGTUP();
           pdfWeights.push_back(tmpWeight);
@@ -1289,6 +459,15 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       for ( size_t idxParticle = 0; idxParticle < lheParticles.size(); ++idxParticle ) {
           int id = std::abs(lheEvent.IDUP[idxParticle]);
           int status = lheEvent.ISTUP[idxParticle];
+	  if ( (id >=23 && id <= 25 && status == 2) || status == 1){
+	    TLorentzVector p4(lheParticles[idxParticle][0], lheParticles[idxParticle][1], lheParticles[idxParticle][2], lheParticles[idxParticle][3]);  // x,y,z,t
+	    lhepart_pt.push_back(p4.Pt());
+	    lhepart_eta.push_back(p4.Eta());
+	    lhepart_phi.push_back(p4.Phi());
+	    lhepart_mass.push_back(p4.M());
+	    lhepart_pdgId.push_back(id);
+	    lhepart_status.push_back(status);
+	  }
           if ( status == 1 && id==5 ) {
               lheNb += 1;
           }
@@ -1296,13 +475,13 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               lheNj += 1;
           }
       }
-    }
+    }//##am
 
     if (verbose) cout<<"setting gen variables"<<endl;
     setGENVariables(prunedgenParticles,packedgenParticles,genJets);
     if (verbose) {cout<<"finshed setting gen variables"<<endl;}
 
-  }
+  }// ##am isMC for lhe info 
   sumWeightsTotal += genWeight;
   sumWeightsTotalPU += pileupWeight*genWeight;
   eventWeight = pileupWeight*genWeight;
@@ -1398,38 +577,39 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         met_phi_uncendn = (*mets)[0].shiftedPhi(pat::MET::UnclusteredEnDown);
     }
 
+    //######am PASS1
+
     if (verbose) cout<<"start lepton analysis"<<endl;
     vector<pat::Electron> AllElectrons; vector<pat::Muon> AllMuons;
     vector<pat::Electron> AllElectronsUnS;////uncorrected electron
-    vector<pat::Photon> AllPhotons;
+    vector<pat::Photon> AllPhotons; 
 
     AllElectrons = helper.goodLooseElectrons2012(electrons,_elecPtCut);
     AllElectronsUnS = helper.goodLooseElectrons2012(electrons,electronsUnS,_elecPtCut);
     AllMuons = helper.goodLooseMuons2012(muons,_muPtCut);
     AllPhotons = helper.goodLoosePhotons2015(photons,_phoPtCut);
-
-    helper.cleanOverlappingLeptons(AllMuons,AllElectrons,PV);
+    helper.cleanOverlappingLeptons(AllMuons,AllElectrons,PV);//##am https://github.com/jialin-guo1/X--ZZ--4l-codes/blob/3456d5f78ca80b2e530801b3e85b357be4813bad/UFHZZ4LAna/interface/HZZ4LHelper.h#L626 Dr cut
+    if (verbose) std::cout<<"nloose leps\t"<<AllMuons.size()+AllElectrons.size()<<std::endl;//##am
+    //##am b/w electron and muon this is too tight, we can't go below the isolation cut
     helper.cleanOverlappingLeptons(AllMuons,AllElectronsUnS,PV);
     recoMuons = helper.goodMuons2015_noIso_noPf(AllMuons,_muPtCut,PV,sip3dCut);
     recoElectrons = helper.goodElectrons2015_noIso_noBdt(AllElectrons,_elecPtCut,elecID,PV,iEvent,sip3dCut);
     recoElectronsUnS = helper.goodElectrons2015_noIso_noBdt(AllElectronsUnS,_elecPtCut,elecID,PV,iEvent,sip3dCut);
     recoPhotons = helper.goodPhotons2015(AllPhotons,_phoPtCut,year);
-
     if (verbose) cout<<AllMuons.size()<<" loose muons "<<AllElectrons.size()<<" loose electrons"<<endl;
-
+    nlooseleps=recoMuons.size() + recoElectrons.size();//##am
     //sort electrons and muons by pt
     if (verbose) cout<<recoMuons.size()<<" good muons and "<<recoElectrons.size()<<" good electrons to be sorted"<<endl;
     if (verbose) cout<<"start pt-sorting leptons"<<endl;
     if (verbose) cout<<"adding muons to sorted list"<<endl;
-
+    //##amstd::cout<<"nloose leps after further cleaning\t"<<recoMuons.size()+recoElectrons.size()<<std::endl;//##am
     edm::ESHandle<TransientTrackBuilder> ttkb_recoLepton;
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", ttkb_recoLepton);
-
+    
     if( (recoMuons.size() + recoElectrons.size()) >= (uint)skimLooseLeptons ){
       if (verbose) cout<<"found >= " <<skimLooseLeptons << " leptons"<<endl;
-
       for(unsigned int i = 0; i < recoMuons.size(); i++){
-        if (lep_ptreco.size()==0 || recoMuons[i].pt()<lep_ptreco[lep_ptreco.size()-1]){
+        if (lep_ptreco.size()==0 || recoMuons[i].pt()<lep_ptreco[lep_ptreco.size()-1]){ 
           lep_ptreco.push_back(recoMuons[i].pt());
           lep_ptid.push_back(recoMuons[i].pdgId());
           lep_ptindex.push_back(i);
@@ -1469,7 +649,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
       for(unsigned int i = 0; i < lep_ptreco.size(); i++){
         if (verbose) cout<<"sorted lepton "<<i<<" pt "<<lep_ptreco[i]<<" id "<<lep_ptid[i]<<" index "<<lep_ptindex[i]<<endl;
-
+	
         if (abs(lep_ptid[i])==11){
 
           if(n_lep_e < 2 && !isCode4l){
@@ -1548,16 +728,12 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
           lep_MiniIso.push_back(helper.miniIsolation(pfCands, dynamic_cast<const reco::Candidate *>(&recoElectrons[lep_ptindex[i]]), 0.05, 0.2, 10., rhoSUS, false));
           lep_Sip.push_back(helper.getSIP3D(recoElectrons[lep_ptindex[i]]));
-          //lep_mva.push_back(recoElectrons[lep_ptindex[i]].userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues"));
           //cout<<EleBDT_name_161718<<endl;
           lep_mva.push_back(recoElectrons[lep_ptindex[i]].userFloat(EleBDT_name_161718.c_str()));
           lep_ecalDriven.push_back(recoElectrons[lep_ptindex[i]].ecalDriven());
-          //lep_tightId.push_back(helper.passTight_BDT_Id(recoElectrons[lep_ptindex[i]],recoElectrons[lep_ptindex[i]].userFloat("ElectronMVAEstimatorRun2Autumn18IdIsoValues"), year));
           lep_tightId.push_back(helper.passTight_BDT_Id(recoElectronsUnS[lep_ptindex[i]],year));
-          //lep_tightId_old.push_back(helper.passTight_BDT_Id(recoElectronsUnS[lep_ptindex[i]],year));
           //cout<<"old "<<recoElectrons[lep_ptindex[i]].userFloat("ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values") <<" new" <<recoElectrons[lep_ptindex[i]].userFloat("ElectronMVAEstimatorRun2Spring16HZZV1Values")<<endl;
           lep_tightIdSUS.push_back(helper.passTight_Id_SUS(recoElectrons[lep_ptindex[i]],elecID,PV,BS,*theConversions, year));
-          //lep_tightIdHiPt.push_back(recoElectrons[lep_ptindex[i]].electronID("heepElectronID-HEEPV70"));
           lep_tightIdHiPt.push_back(recoElectrons[lep_ptindex[i]].electronID(heepID_name_161718.c_str()));
           lep_ptRatio.push_back(helper.ptRatio(recoElectrons[lep_ptindex[i]],jets,true)); // no L2L3 yet
           lep_ptRel.push_back(helper.ptRel(recoElectrons[lep_ptindex[i]],jets,true)); // no L2L3 yet
@@ -1608,7 +784,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
           lep_position_y.push_back(recoMuons[lep_ptindex[i]].muonBestTrack()->vy());
           lep_position_z.push_back(recoMuons[lep_ptindex[i]].muonBestTrack()->vz());
 
-          auto gen_lep = recoMuons[lep_ptindex[i]].genParticle();
+          auto gen_lep = recoMuons[lep_ptindex[i]].genParticle(); 
           if(gen_lep != 0)
               lep_pt_genFromReco.push_back(gen_lep->pt());
           else
@@ -1686,7 +862,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               cout<<"Muon pt over 200 isTrackerHighPtID? "<<helper.isTrackerHighPt(recoMuons[lep_ptindex[i]],PV)<<endl;
         }
 
-      }
+      }//leptons
 
       if (verbose) cout<<"adding photons to sorted list"<<endl;
       for(int i = 0; i < (int)recoPhotons.size(); i++) {
@@ -1696,7 +872,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
           photonCutBasedIDLoose.push_back(recoPhotons[i].photonID("cutBasedPhotonID-Fall17-94X-V2-loose"));
       }
 
-      if (doTriggerMatching){
+      if (doTriggerMatching){ //for data
 
         if (verbose) cout<<"start trigger matching"<<endl;
         // trigger Matching
@@ -1715,7 +891,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 double hlt_eta = obj.eta();
                 double hlt_phi = obj.phi();
                 double dR =  deltaR(reco_eta,reco_phi,hlt_eta,hlt_phi);
-                if (dR<0.5) {
+                if (dR<0.5) { //##am trigger obj matching
                     obj.unpackFilterLabels(iEvent, *trigger);
                     for (unsigned h = 0; h < obj.filterLabels().size(); ++h) filtersMatched += obj.filterLabels()[h];
                 }
@@ -1727,7 +903,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         }
 
       }
-
+      //
       // GEN matching
       if(isMC) {
           if (verbose) cout<<"begin gen matching"<<endl;
@@ -1776,7 +952,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                       tmpPdgId=genPart->pdgId();
                       tmpMomId=genAna.MotherID(&prunedgenParticles->at(j));
                       tmpMomMomId=genAna.MotherMotherID(&prunedgenParticles->at(j));
-
+		      //##am lep_genindex should be filled corresponding to this genpart
                       minDr=thisDr;
                   }
 
@@ -1792,7 +968,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       } //isMC
 
       unsigned int Nleptons = lep_pt.size();
-      // FSR Photons
+      // FSR Photons ##am DNT
       if(doFsrRecovery) {
 
           if (verbose) cout<<"checking "<<photonsForFsr->size()<<" fsr photon candidates"<<endl;
@@ -1814,7 +990,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                   if (phot->pt()<2.0) continue;
                   double fsrDr = deltaR(thisLep.Eta(), thisLep.Phi(), phot->eta(), phot->phi());
                   if ( verbose ) cout<<"fsr photon cand index: "<<index<<", pt: "<<phot->pt()<<" eta: "<<phot->eta()<<" phi: "<<phot->phi()<<"; fsrDr: "<<fsrDr<<endl;;
-                  if (fsrDr>0.5) continue;
+                  if (fsrDr>0.5) continue;//##am
 
                   // check super cluster veto against all electrons for each photon
                   // at the same time check that this is the closest lepton for this photon
@@ -1934,22 +1110,22 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               if (verbose) cout<<"lep pt: "<<lep_nofsr.Pt()<<" eta: "<<lep_nofsr.Eta()<<" phi: "<<lep_nofsr.Phi()<<" RelIsoNoFSR: "<<RelIsoNoFSR<<" lep mva: "<<lep_mva[i]<<" tightId? "<<lep_tightId[i]<<endl;
           }
           if (verbose) {cout<<"finished filling fsr photon candidates"<<endl;}
-      } // doFsrRecovery
+      } // doFsrRecovery ##am DNT until here
 
       // count tight ID iso leptons
       uint ntight=0;
       for (unsigned int i=0; i<Nleptons; i++) {
-          if (abs(lep_id[i])==11 && lep_RelIsoNoFSR[i]<isoCutEl && lep_tightId[i]==1) ntight+=1;
-          if (abs(lep_id[i])==13 && lep_RelIsoNoFSR[i]<isoCutMu && lep_tightId[i]==1) ntight+=1;
+	if (abs(lep_id[i])==11 && lep_RelIsoNoFSR[i]<isoCutEl && lep_tightId[i]==1) ntight+=1; //##am it's fine if FSR recvry is turned off
+	if (abs(lep_id[i])==13 && lep_RelIsoNoFSR[i]<isoCutMu && lep_tightId[i]==1) ntight+=1;
       }
 
       if ( ntight >= (uint)skimTightLeptons ){
-
+	ntightleps=ntight;
         // creat vectors for selected objects
         vector<pat::Muon> selectedMuons;
         vector<pat::Electron> selectedElectrons;
 
-
+	//##am PASS2
         // Jets
         if (verbose) cout<<"begin filling jet candidates"<<endl;
 
@@ -2053,6 +1229,8 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
 }
 
+
+
 // ------------ method called once each job just before starting event loop  ------------
 void UFHZZ4LAna::beginJob(){
     using namespace edm;
@@ -2147,18 +1325,6 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
 
   // Jet Info
   double tempDeltaR = 999.0;
-  // jets reco new declaration, TJ
-  //int jet1index_jesup=-1, jet2index_jesup=-1;
-  //float jet1pt_jesup=-1.0, jet2pt_jesup=-1.0;
-  //int jet1index2p5_jesup=-1, jet2index2p5_jesup=-1;
-  //float jet1pt2p5_jesup=-1.0, jet2pt2p5_jesup=-1.0;
-
-  //int jet1index_jesdn=-1, jet2index_jesdn=-1;
-  //float jet1pt_jesdn=-1.0, jet2pt_jesdn=-1.0;
-  //int jet1index2p5_jesdn=-1, jet2index2p5_jesdn=-1;
-  //float jet1pt2p5_jesdn=-1.0, jet2pt2p5_jesdn=-1.0;
-
-  // jets reco new declaration end, TJ
 
   vector<pat::Jet> goodJets_JECJER_pt30_eta4p7;
   for( unsigned int k = 0; k < goodJets.size(); k++) {
@@ -2713,6 +1879,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                                  edm::Handle<edm::View<pat::PackedGenParticle> > packedgenParticles,
                                  edm::Handle<edm::View<reco::GenJet> > genJets)
 {
+  int numV=0; int numVhad=0; int numVlep=0; int numZhad=0;int numZlep=0; int numWhad=0; int numWlep=0;
   reco::GenParticleCollection::const_iterator genPart;
   int j = -1;
   int nGENLeptons=0;
@@ -2744,14 +1911,14 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
       if (abs(genPart->pdgId())==11  || abs(genPart->pdgId())==13 || abs(genPart->pdgId())==15) {
 
           if (!(genPart->status()==1 || abs(genPart->pdgId())==15)) continue;
-          if (!(genAna.MotherID(&prunedgenParticles->at(j))==23 || genAna.MotherID(&prunedgenParticles->at(j))==443 || genAna.MotherID(&prunedgenParticles->at(j))==553 || abs(genAna.MotherID(&prunedgenParticles->at(j)))==24) ) continue;
+          if (!(genAna.MotherID(&prunedgenParticles->at(j))==23 || abs(genAna.MotherID(&prunedgenParticles->at(j)))==24 || genAna.MotherID(&prunedgenParticles->at(j))==443 || genAna.MotherID(&prunedgenParticles->at(j))==553 || abs(genAna.MotherID(&prunedgenParticles->at(j)))==24) ) continue;//##am added Ws
 
           nGENLeptons++;
           if (verbose) cout<<"found a gen lepton: id "<<genPart->pdgId()<<" pt: "<<genPart->pt()<<" eta: "<<genPart->eta()<<" status: "<<genPart->status()<<endl;
 
           // Collect FSR photons
           TLorentzVector lep_dressed;
-          lep_dressed.SetPtEtaPhiE(genPart->pt(),genPart->eta(),genPart->phi(),genPart->energy());
+          lep_dressed.SetPtEtaPhiE(genPart->pt(),genPart->eta(),genPart->phi(),genPart->energy()); 
           set<int> gen_fsrset;
           for(size_t k=0; k<packedgenParticles->size();k++){
               if( (*packedgenParticles)[k].status() != 1) continue; // stable particles only
@@ -2764,7 +1931,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                   if ( (*packedgenParticles)[k].mother(m)->pdgId() == genPart->pdgId() ) idmatch=true;
               }
               if (!idmatch) continue;
-              if(this_dR_lgamma<((abs(genPart->pdgId())==11)?genIsoConeSizeEl:genIsoConeSizeMu)) {
+              if(this_dR_lgamma<((abs(genPart->pdgId())==11)?genIsoConeSizeEl:genIsoConeSizeMu)) {//##am FIXME dR cut here should be 0.1
                   gen_fsrset.insert(k);
                   TLorentzVector gamma;
                   gamma.SetPtEtaPhiE((*packedgenParticles)[k].pt(),(*packedgenParticles)[k].eta(),(*packedgenParticles)[k].phi(),(*packedgenParticles)[k].energy());
@@ -2790,7 +1957,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
           double this_GENchargediso=0.0;
           if (verbose) cout<<"gen iso calculation"<<endl;
           for(size_t k=0; k<packedgenParticles->size();k++){
-              if( (*packedgenParticles)[k].status() != 1 ) continue; // stable particles only
+              if( (*packedgenParticles)[k].status() != 1 ) continue; // stable particles only  ##am these are always status1
               if (abs((*packedgenParticles)[k].pdgId())==12 || abs((*packedgenParticles)[k].pdgId())==14 || abs((*packedgenParticles)[k].pdgId())==16) continue; // exclude neutrinos
               if ((abs((*packedgenParticles)[k].pdgId())==11 || abs((*packedgenParticles)[k].pdgId())==13)) continue; // exclude leptons
               if (gen_fsrset.find(k)!=gen_fsrset.end()) continue; // exclude particles which were selected as fsr photons
@@ -2809,12 +1976,12 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 
       } // leptons
 
-      // Higgs
+      // Higgs ##am NN
       vector<int> this_id, this_status;
       vector<double> this_pt, this_eta, this_phi, this_mass;
       //if (genPart->pdgId()==25 && genPart->status()==22) {
       if (genPart->pdgId()==25) {
-
+	//##am keep higgs
           GENMH=genPart->mass();
           GENH_pt.push_back(genPart->pt());
           GENH_eta.push_back(genPart->eta());
@@ -2862,9 +2029,8 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
         GEN_Zq_MomMomid.push_back(genAna.MotherMotherID(&prunedgenParticles->at(j)));
         GEN_Zq_isHard.push_back((int)genPart->isHardProcess());
       }
-
-      //VBF quark
-      if(abs(genPart->pdgId())<=6 && abs(genAna.MotherID(&prunedgenParticles->at(j)))!=23 && genPart->status()==23 && genPart->isHardProcess()){
+      //VBF quark ##am
+      if(abs(genPart->pdgId())<=6 && ( abs(genAna.MotherID(&prunedgenParticles->at(j)))!=23 && abs(genAna.MotherID(&prunedgenParticles->at(j)))!=24) && genPart->status()==23 && genPart->isHardProcess()){
       //if(abs(genPart->pdgId())<=6 && abs(genAna.MotherID(&prunedgenParticles->at(j)))!=23 && genPart->isHardProcess()){
         GEN_VBF_pt.push_back(genPart->pt());
         GEN_VBF_eta.push_back(genPart->eta());
@@ -2876,10 +2042,12 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
         GEN_VBF_MomMomid.push_back(genAna.MotherMotherID(&prunedgenParticles->at(j)));
       }
 
-      //find quark not come from Z decay, associated quark candidate
+      // 
+
+      //find quark not come from V decay, associated quark candidate
       vector<double> dau_pt, dau_eta, dau_phi, dau_mass;
       vector<int> dau_id, dau_status;
-      if(abs(genPart->pdgId())<=6 && abs(genAna.MotherID(&prunedgenParticles->at(j)))!=23){
+      if(abs(genPart->pdgId())<=6 && abs(genAna.MotherID(&prunedgenParticles->at(j)))!=23 && abs(genAna.MotherID(&prunedgenParticles->at(j)))!=24){ //##am
         GEN_q_id.push_back(genPart->pdgId());
         GEN_q_pt.push_back(genPart->pt());
         GEN_q_eta.push_back(genPart->eta());
@@ -2935,11 +2103,105 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
           GENZ_mass.push_back(genPart->mass());
       }
 
+
+  
+      //###############am  V info ##am
+      //##am only status 62 V's have non-V daughters   
+      if ( (genPart->pdgId()==23 || abs(genPart->pdgId())==24)  && genPart->status()== 62  && genPart->statusFlags().fromHardProcess()) {
+	numV+=1;
+	const reco::Candidate *Vdau0=genPart->daughter(0);
+	const reco::GenParticle& daughter = *dynamic_cast<const reco::GenParticle*>(&(*Vdau0));
+	bool ishadronicV=false;
+	bool isleptonicV=false;
+	bool gooddau=daughter.statusFlags().fromHardProcess() && daughter.statusFlags().isPrompt(); //check first dau and apparently is prompt also works for quarks 
+	ishadronicV= ( (fabs(daughter.pdgId()) < 6  || fabs(daughter.pdgId())==21) && gooddau)  ? true : false ;
+	isleptonicV= !ishadronicV && gooddau && (fabs(daughter.pdgId()) > 10 && fabs(daughter.pdgId()) < 17 && daughter.statusFlags().isPrompt());
+
+//##am	if(not ishadronicV){
+//##am	  cout<<"is leptonic"<< isleptonicV<<endl;
+//##am	  cout<<"IsPrompt"                             <<daughter.statusFlags().isPrompt()<<endl;
+//##am	  cout<<"isDecayedLeptonHadron"                    <<daughter.statusFlags().isDecayedLeptonHadron()<<endl;
+//##am	  cout<<"isTauDecayProduct"                        <<daughter.statusFlags().isTauDecayProduct()<<endl;
+//##am	  cout<<"isPromptTauDecayProduct"                  <<daughter.statusFlags().isPromptTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectTauDecayProduct"                  <<daughter.statusFlags().isDirectTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectPromptTauDecayProduct"            <<daughter.statusFlags().isDirectPromptTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectHadronDecayProduct"               <<daughter.statusFlags().isDirectHadronDecayProduct()<<endl;
+//##am	  cout<<"isHardProcess"                            <<daughter.statusFlags().isHardProcess()<<endl;
+//##am	  cout<<"FromHardProcess"                          <<daughter.statusFlags().fromHardProcess()<<endl;
+//##am	  cout<<"isHardProcessTauDecayProduct"             <<daughter.statusFlags().isHardProcessTauDecayProduct()<<endl;
+//##am	  cout<<"isDirectHardProcessTauDecayProduct"       <<daughter.statusFlags().isDirectHardProcessTauDecayProduct()<<endl;
+//##am	  
+//##am	  cout<<"NHV mit dot\t"<<fabs(daughter.pdgId())<<"\tstat\t"<<daughter.status()<<endl;
+//##am	    //"\tHP\t"<<daughter.statusFlags().IsPromptTauDecayProduct()<<"\tTP\t"<<daughter.statusFlags().isDirectPromptTauDecayProduct()<<endl;
+//##am	}
+
+	ishadronicV ? (numVhad+=1) : ( isleptonicV ? (numVlep+=1) : numVlep+=0);
+	ishadronicV ? (genPart->pdgId()==23 ? (numZhad+=1) : (numWhad+=1) ): ( (isleptonicV && genPart->pdgId()==23) ? (numZlep+=1) : (numWlep+=1) );
+
+	GenV_hadronic.push_back(ishadronicV);	
+	GenV_leptonic.push_back(isleptonicV);	
+	GenV_pt.push_back(genPart->pt());
+	GenV_status.push_back(genPart->status());
+	GenV_eta.push_back(genPart->eta());
+	GenV_phi.push_back(genPart->phi());
+	GenV_mass.push_back(genPart->mass());
+	GenV_pdgId.push_back(genPart->pdgId());
+	int ndau = genPart->numberOfDaughters();
+	GenV_ndau.push_back(ndau);
+	for (int d=0; d<ndau; d++) { 
+	  const reco::Candidate *Vdau=genPart->daughter(d);
+	  const reco::GenParticle& vdau = *dynamic_cast<const reco::GenParticle*>(&(*genPart->daughter(d)));
+	  if (not vdau.statusFlags().fromHardProcess() ||  not vdau.statusFlags().isPrompt()) { continue;}
+
+	  if ( (ishadronicV ) || (!ishadronicV && isleptonicV && abs(Vdau->pdgId()) > 10 && abs(Vdau->pdgId()) < 17)) {
+	  GenVdau_pdgId.push_back(Vdau->pdgId());
+	  GenVdau_MompdgId.push_back(genPart->pdgId());
+	  GenVdau_pt.push_back(Vdau->pt());
+	  GenVdau_eta.push_back(Vdau->eta());
+	  GenVdau_phi.push_back(Vdau->phi());
+	  GenVdau_mass.push_back(Vdau->mass());
+	  GenVdau_status.push_back(Vdau->status());	  
+	  }
+	  //	  std::cout<<"hadronicV \t"<<ishadronicV<<"\t pid n status of doter\t"<<dpid<<dst<<std::endl;
+	}
+      }
+      /*
+      else{
+
+	if ( (abs(genPart->pdgId()) == 23 || genPart->pdgId() == 24) && (genPart->status() !=62 ) ) {
+	  const reco::Candidate *Vdau0=genPart->daughter(0);
+	  if (genPart->pdgId() !=Vdau0->pdgId()){
+	  cout<<genPart->pdgId()<<"\t"<<genPart->status()<<"\t"<<Vdau0->pdgId()<<endl;
+	  }
+	}
+      }
+      */
+      nGenV=numV;
+
+      std::string category="";
+      int sumVV=numVhad+numVlep;
+      category = ( sumVV == 2 ? ( (numVhad == 1 && numVlep ==1) ?  "semilep" : (numVlep == 2 ? "leptonic" : "hadronic") ) : "notvv") ;
+      if (category == "notvv" && numV > 1){
+	std::cout<<"numVhad \t"<<numVhad<<"\t numVlep \t"<<numVlep<<std::endl;
+      }
+      //      std::cout<<"ctaegory ist \t"<<category<<std::endl;
+	if (category == "semilep"){
+	  if (numWlep == 1 && numWhad ==1){category = "semilepWW";}
+	  else if (numWlep == 1 && numZhad ==1){category = "semilepWZ";}
+	  else if (numZlep == 1 && numWhad ==1){category = "semilepZW";}
+	  else {category = "semilepZZ";}
+	}
+      GenVVcat=category;
+
+      
+      
       if (abs(genPart->pdgId())>500 && abs(genPart->pdgId())<600 && genPart->status()==2) {
-          nGenStatus2bHad+=1;
+	nGenStatus2bHad+=1;
       }
 
-    }
+
+
+  }//gen particles
 
   // DO GEN JETS
   if (verbose) cout<<"begin filling gen jets"<<endl;
@@ -3085,7 +2347,7 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("lep_dataMCErr",&lep_dataMCErr);
   tree->Branch("dataMC_VxBS",&dataMC_VxBS);
   tree->Branch("dataMCErr_VxBS",&dataMCErr_VxBS);
-  tree->Branch("nisoleptons",&nisoleptons,"nisoleptons/I");
+  tree->Branch("nisoleptons",&nisoleptons,"nisoleptons/I"); //##am redundant
 
   tree->Branch("singleBS_RecoLep_pt",&singleBS_RecoLep_pt);
   tree->Branch("singleBS_RecoLep_ptError",&singleBS_RecoLep_ptError);
@@ -3385,6 +2647,36 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("lheNj",&lheNj,"lheNj/I");
   tree->Branch("lheNb",&lheNb,"lheNb/I");
   tree->Branch("nGenStatus2bHad",&nGenStatus2bHad,"nGenStatus2bHad/I");
+
+ tree->Branch("nGenV",           &nGenV); 
+ tree->Branch("GenV_pt",         &GenV_pt); 
+ tree->Branch("GenV_status",     &GenV_status); 
+ tree->Branch("GenV_eta",        &GenV_eta); 
+ tree->Branch("GenV_phi",        &GenV_phi); 
+ tree->Branch("GenV_mass",       &GenV_mass);  
+ tree->Branch("GenV_pdgId",      &GenV_pdgId); 
+ tree->Branch("GenV_ndau",       &GenV_ndau);
+ tree->Branch("GenV_hadronic",   &GenV_hadronic);
+ tree->Branch("GenV_leptonic",   &GenV_leptonic);
+ tree->Branch("GenVdau_pdgId",   &GenVdau_pdgId);
+ tree->Branch("GenVdau_MompdgId",&GenVdau_MompdgId);
+ tree->Branch("GenVdau_pt",      &GenVdau_pt);
+ tree->Branch("GenVdau_eta",     &GenVdau_eta);
+ tree->Branch("GenVdau_phi",     &GenVdau_phi);
+ tree->Branch("GenVdau_mass",    &GenVdau_mass);
+ tree->Branch("GenVdau_status",  &GenVdau_status);
+ tree->Branch("GenVVcat",&GenVVcat);
+ tree->Branch("lhepart_pt",    &lhepart_pt);
+ tree->Branch("lhepart_eta",   &lhepart_eta);
+ tree->Branch("lhepart_phi",   &lhepart_phi);
+ tree->Branch("lhepart_mass",  &lhepart_mass);
+ tree->Branch("lhepart_pdgId", &lhepart_pdgId);
+ tree->Branch("lhepart_status",&lhepart_status);
+
+tree->Branch("nlooseleps",    &nlooseleps);
+tree->Branch("ntightleps",    &ntightleps);
+
+
 }
 
 
