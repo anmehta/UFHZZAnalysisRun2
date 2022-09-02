@@ -1087,7 +1087,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               }
 
           } // all leptons
-
+      
           //std::cout<<"Number = "<<fsrPhotons_eta.size()<<std::endl;
 
           // subtract selected photons from all leptons isolations
@@ -1119,7 +1119,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	if (abs(lep_id[i])==13 && lep_RelIsoNoFSR[i]<isoCutMu && lep_tightId[i]==1) ntight+=1;
       }
 
-      if ( ntight >= (uint)skimTightLeptons ){
+      if ( ntight <= (uint)skimTightLeptons ){ //##am not more than two tight leptons
 	ntightleps=ntight;
         // creat vectors for selected objects
         vector<pat::Muon> selectedMuons;
@@ -1374,7 +1374,7 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
           }
       }
       if (N>0&&verbose) cout<<endl;
-
+ 
       if(isclean_H4l){
         //JER from database
         JME::JetParameters parameters;
