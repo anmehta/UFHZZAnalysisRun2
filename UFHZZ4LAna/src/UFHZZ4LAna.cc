@@ -44,8 +44,8 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig):
   mZ2High(iConfig.getUntrackedParameter<double>("mZ2High",120.0)),
   m4lLowCut(iConfig.getUntrackedParameter<double>("m4lLowCut",70.0)),
   //     m4lLowCut(iConfig.getUntrackedParameter<double>("m4lLowCut",0.0)),
-  jetpt_cut(iConfig.getUntrackedParameter<double>("jetpt_cut",10.0)),
-  jeteta_cut(iConfig.getUntrackedParameter<double>("eta_cut",4.7)),
+  jetpt_cut(iConfig.getUntrackedParameter<double>("jetpt_cut",20.0)),//##am raised to 20 from 10 but unsused
+  jeteta_cut(iConfig.getUntrackedParameter<double>("eta_cut",2.4)),//##am restricted to central from 4.7
   elecID(iConfig.getUntrackedParameter<std::string>("elecID","NonTrig")),
   isMC(iConfig.getUntrackedParameter<bool>("isMC",true)),
   isSignal(iConfig.getUntrackedParameter<bool>("isSignal",false)),
@@ -57,20 +57,20 @@ UFHZZ4LAna::UFHZZ4LAna(const edm::ParameterSet& iConfig):
   isoConeSizeEl(iConfig.getUntrackedParameter<double>("isoConeSizeEl",0.3)),
   isoConeSizeMu(iConfig.getUntrackedParameter<double>("isoConeSizeMu",0.3)),
   sip3dCut(iConfig.getUntrackedParameter<double>("sip3dCut",4)),
-  leadingPtCut(iConfig.getUntrackedParameter<double>("leadingPtCut",20.0)),
-  subleadingPtCut(iConfig.getUntrackedParameter<double>("subleadingPtCut",10.0)),
-  genIsoCutEl(iConfig.getUntrackedParameter<double>("genIsoCutEl",0.35)),
-  genIsoCutMu(iConfig.getUntrackedParameter<double>("genIsoCutMu",0.35)),
+  leadingPtCut(iConfig.getUntrackedParameter<double>("leadingPtCut",20.0)),//##am unused
+  subleadingPtCut(iConfig.getUntrackedParameter<double>("subleadingPtCut",10.0)), //##am unused 
+  genIsoCutEl(iConfig.getUntrackedParameter<double>("genIsoCutEl",0.35)), //##am unused
+  genIsoCutMu(iConfig.getUntrackedParameter<double>("genIsoCutMu",0.35)),//##am unused
   genIsoConeSizeEl(iConfig.getUntrackedParameter<double>("genIsoConeSizeEl",0.3)),
   genIsoConeSizeMu(iConfig.getUntrackedParameter<double>("genIsoConeSizeMu",0.3)),
-  _elecPtCut(iConfig.getUntrackedParameter<double>("_elecPtCut",7.0)),
-  _muPtCut(iConfig.getUntrackedParameter<double>("_muPtCut",5.0)),
-  _tauPtCut(iConfig.getUntrackedParameter<double>("_tauPtCut",20.0)),
+  _elecPtCut(iConfig.getUntrackedParameter<double>("_elecPtCut",20.0)),//##am raised from 7.0 to 20
+  _muPtCut(iConfig.getUntrackedParameter<double>("_muPtCut",20.0)), //##am raised from 5.0 to 20
+  _tauPtCut(iConfig.getUntrackedParameter<double>("_tauPtCut",20.0)),//##am unused
   _phoPtCut(iConfig.getUntrackedParameter<double>("_phoPtCut",10.0)),
   //BTagCut(iConfig.getUntrackedParameter<double>("BTagCut",0.4184)),/////2016: 0.6321; 2017: 0.4941; 2018: 0.4184
   reweightForPU(iConfig.getUntrackedParameter<bool>("reweightForPU",true)),
   PUVersion(iConfig.getUntrackedParameter<std::string>("PUVersion","Summer16_80X")),
-  doFsrRecovery(iConfig.getUntrackedParameter<bool>("doFsrRecovery",true)),
+  doFsrRecovery(iConfig.getUntrackedParameter<bool>("doFsrRecovery",false)),//##am 
   bestCandMela(iConfig.getUntrackedParameter<bool>("bestCandMela",true)),
   doMela(iConfig.getUntrackedParameter<bool>("doMela",false)),
   GENbestM4l(iConfig.getUntrackedParameter<bool>("GENbestM4l",false)),
@@ -443,7 +443,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               if (int(i)<posNNPDF) {nnloWeights.push_back(tmpWeight);}
           }
           // NNPDF30 variations
-          if (int(i)>=posNNPDF && int(i)<=(posNNPDF+100)) {
+          if (int(i)>=posNNPDF && int(i)<=(posNNPDF+100)) { //##am need to make sure all samples have 100  variations 
               rms += tmpWeight*tmpWeight;
               if (tmpWeight>pdfENVup) pdfENVup=tmpWeight;
               if (tmpWeight<pdfENVdown) pdfENVdown=tmpWeight;
@@ -475,7 +475,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               lheNj += 1;
           }
       }
-    }//##am
+    }
 
     if (verbose) cout<<"setting gen variables"<<endl;
     setGENVariables(prunedgenParticles,packedgenParticles,genJets);
@@ -602,7 +602,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     if (verbose) cout<<recoMuons.size()<<" good muons and "<<recoElectrons.size()<<" good electrons to be sorted"<<endl;
     if (verbose) cout<<"start pt-sorting leptons"<<endl;
     if (verbose) cout<<"adding muons to sorted list"<<endl;
-    //##amstd::cout<<"nloose leps after further cleaning\t"<<recoMuons.size()+recoElectrons.size()<<std::endl;//##am
+
     edm::ESHandle<TransientTrackBuilder> ttkb_recoLepton;
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", ttkb_recoLepton);
     
@@ -922,7 +922,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                   gen.SetPtEtaPhiM(GENlep_pt[j],GENlep_eta[j],GENlep_phi[j],GENlep_mass[j]);
                   double thisDr = deltaR(reco.Eta(),reco.Phi(),gen.Eta(),gen.Phi());
 
-                  if (thisDr<minDr && thisDr<0.5) {
+                  if (thisDr<minDr && thisDr<0.5) {//##am should be 0.4
                       lep_genindex[i]=j;
                       minDr=thisDr;
                   }
@@ -968,7 +968,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       } //isMC
 
       unsigned int Nleptons = lep_pt.size();
-      // FSR Photons ##am DNT
+      // FSR Photons 
       if(doFsrRecovery) {
 
           if (verbose) cout<<"checking "<<photonsForFsr->size()<<" fsr photon candidates"<<endl;
@@ -1087,7 +1087,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               }
 
           } // all leptons
-
+      
           //std::cout<<"Number = "<<fsrPhotons_eta.size()<<std::endl;
 
           // subtract selected photons from all leptons isolations
@@ -1119,7 +1119,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	if (abs(lep_id[i])==13 && lep_RelIsoNoFSR[i]<isoCutMu && lep_tightId[i]==1) ntight+=1;
       }
 
-      if ( ntight >= (uint)skimTightLeptons ){
+      if ( ntight <= (uint)skimTightLeptons ){ //##am not more than two tight leptons
 	ntightleps=ntight;
         // creat vectors for selected objects
         vector<pat::Muon> selectedMuons;
@@ -1175,7 +1175,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               // Configured now that SF is 1.0
               if (verbose) cout<<"adding pu jet scale factors..."<<endl;
               bool dropit=false;
-              if (abs(jet.eta())>3.0 && isMC){
+              if (abs(jet.eta())>3.0 && isMC){ //##am would be redundant after the new jet eta cut of 2.4
                 TRandom3 rand;
                 rand.SetSeed(abs(static_cast<int>(sin(jet.phi())*100000)));
                 float coin = rand.Uniform(1.);
@@ -1204,7 +1204,7 @@ void UFHZZ4LAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         double pt = double(mergedjet.pt());
         double eta = double(mergedjet.eta());
 
-        if(pt>200 && abs(eta)<2.5) selectedMergedJets.push_back(mergedjet);
+        if(pt>200 && abs(eta)<2.5) selectedMergedJets.push_back(mergedjet); //##am why 2.5?
 
         } // all merged jets
 
@@ -1374,7 +1374,7 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
           }
       }
       if (N>0&&verbose) cout<<endl;
-
+ 
       if(isclean_H4l){
         //JER from database
         JME::JetParameters parameters;
@@ -1432,7 +1432,7 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
         //if(!(passPU_ || !doPUJetID || jet_jer->Pt()>50)) continue;
         if(!(passPU_ || !doPUJetID || goodJets[k].pt()>50)) continue;
 
-        if(jet_jer->Pt()<10) continue;
+        if(jet_jer->Pt()<10) continue; //##am should be 20
         if (verbose) cout<<"Jet nominal: "<<goodJets[k].pt()<<" JER corrected: "<<jet_jer->Pt()<<" JER up: "<<jet_jerup->Pt()<<" JER dn: "<<jet_jerdn->Pt()<<" check Delta between jet and lep / pho: "<<isclean_H4l<<std::endl;
 
         jecunc->setJetPt(jet_jer->Pt());
@@ -1442,7 +1442,7 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
         jecunc->setJetEta(goodJets[k].eta());
         double jecunc_dn = 1.0-jecunc->getUncertainty(false);
 
-        if (jet_jer->Pt() > 30.0 && fabs(goodJets[k].eta())<4.7) {
+        if (jet_jer->Pt() > 30.0 && fabs(goodJets[k].eta())<4.7) { //##am could be changed to 2.4
             if (isclean_H4l) {
                 pat::Jet goodJets_JECJER_pt30_eta4p7_tmp=goodJets[k];
                 goodJets_JECJER_pt30_eta4p7_tmp.setP4(reco::Particle::PolarLorentzVector(jet_jer->Pt(), jet_jer->Eta(), jet_jer->Phi(), jet_jer->M()));
@@ -1454,13 +1454,13 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
                     pt_leadingjet_pt30_eta4p7 = jet_jer->Pt();
                     absrapidity_leadingjet_pt30_eta4p7 = jet_jer->Rapidity(); //take abs later
             }
-                if (jet_jer->Pt() > jet1pt )  {
+	    if (jet_jer->Pt() > jet1pt )  { 
                 jet2pt=jet1pt; jet2index=jet1index;
                   jet1pt=jet_jer->Pt(); jet1index=(int)jet_pt.size();
                 } else if (jet_jer->Pt()>jet2pt) {
                     jet2pt=jet_jer->Pt(); jet2index=(int)jet_pt.size();
                 }
-                if (fabs(goodJets[k].eta())<2.5) {
+                if (fabs(goodJets[k].eta())<2.5) { //##am 2.4
                     njets_pt30_eta2p5++;
                 if (jet_jer->Pt() > pt_leadingjet_pt30_eta2p5) {
                         pt_leadingjet_pt30_eta2p5 = jet_jer->Pt();
@@ -1528,7 +1528,7 @@ void UFHZZ4LAna::setTreeVariables( const edm::Event& iEvent, const edm::EventSet
             jet_udsgTagEffi.push_back(helper.get_bTagEffi(jet_jer->Pt(), jet_jer->Eta(), hudsgTagEffi));
         }   // if (jet_jer->Pt() > 30.0 && fabs(goodJets[k].eta())<4.7)
 
-        // JER up
+        // JER up //##am change 4.7 to 2.4
         if (jet_jerup->Pt() > 30.0 && fabs(jet_jerup->Eta())<4.7) {
             if (isclean_H4l) {
                 njets_pt30_eta4p7_jerup++;
@@ -1931,7 +1931,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
                   if ( (*packedgenParticles)[k].mother(m)->pdgId() == genPart->pdgId() ) idmatch=true;
               }
               if (!idmatch) continue;
-              if(this_dR_lgamma<((abs(genPart->pdgId())==11)?genIsoConeSizeEl:genIsoConeSizeMu)) {//##am FIXME dR cut here should be 0.1
+              if(this_dR_lgamma<0.1){ //##am ((abs(genPart->pdgId())==11)?genIsoConeSizeEl:genIsoConeSizeMu)) 
                   gen_fsrset.insert(k);
                   TLorentzVector gamma;
                   gamma.SetPtEtaPhiE((*packedgenParticles)[k].pt(),(*packedgenParticles)[k].eta(),(*packedgenParticles)[k].phi(),(*packedgenParticles)[k].energy());
@@ -1976,7 +1976,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
 
       } // leptons
 
-      // Higgs ##am NN
+      // Higgs 
       vector<int> this_id, this_status;
       vector<double> this_pt, this_eta, this_phi, this_mass;
       //if (genPart->pdgId()==25 && genPart->status()==22) {
@@ -2211,7 +2211,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
     double pt = genjet->pt();
     //double eta = genjet->eta();
     //if (pt<30.0 || abs(eta)>4.7) continue;
-    if (pt<30.0) continue;
+    if (pt<30.0) continue; //##am should be changed to 20
 
     bool inDR_pt30_eta4p7 = false;
     unsigned int N=GENlep_pt.size();
@@ -2238,7 +2238,7 @@ void UFHZZ4LAna::setGENVariables(edm::Handle<reco::GenParticleCollection> pruned
         GENpt_leadingjet_pt30_eta4p7=pt;
         GENabsrapidity_leadingjet_pt30_eta4p7=genjet->rapidity(); //take abs later
       }
-      if (abs(genjet->eta())<2.5) {
+      if (abs(genjet->eta())<2.5) {//##am should be 2.4 
         GENnjets_pt30_eta2p5++;
         if (pt>GENpt_leadingjet_pt30_eta2p5) {
           GENpt_leadingjet_pt30_eta2p5=pt;
@@ -2347,7 +2347,7 @@ void UFHZZ4LAna::bookPassedEventTree(TString treeName, TTree *tree){
   tree->Branch("lep_dataMCErr",&lep_dataMCErr);
   tree->Branch("dataMC_VxBS",&dataMC_VxBS);
   tree->Branch("dataMCErr_VxBS",&dataMCErr_VxBS);
-  tree->Branch("nisoleptons",&nisoleptons,"nisoleptons/I"); //##am redundant
+  tree->Branch("nisoleptons",&nisoleptons,"nisoleptons/I"); 
 
   tree->Branch("singleBS_RecoLep_pt",&singleBS_RecoLep_pt);
   tree->Branch("singleBS_RecoLep_ptError",&singleBS_RecoLep_ptError);
