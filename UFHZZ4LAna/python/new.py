@@ -218,7 +218,21 @@ process.rivetProducerHZZFid = cms.EDProducer('HZZRivetProducer',
   HepMCCollection = cms.InputTag('myGenerator','unsmeared'),
 )
 
-
+process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
+    compressionLevel = cms.untracked.int32(4),
+    compressionAlgorithm = cms.untracked.string('LZMA'),
+    eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
+    outputCommands = cms.untracked.vstring( "keep *_*_*_*"
+                                            ),
+    fileName = cms.untracked.string('corMETMiniAOD.root'),
+    dataset = cms.untracked.PSet(
+        filterName = cms.untracked.string(''),
+        dataTier = cms.untracked.string('')
+    ),
+    dropMetaData = cms.untracked.string('ALL'),
+    fastCloning = cms.untracked.bool(False),
+    overrideInputFileSplitLevels = cms.untracked.bool(True)
+)
 
 # Analyzer
 process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
@@ -296,7 +310,8 @@ process.Ana = cms.EDAnalyzer('UFHZZ4LAna',
                               bestCandMela = cms.untracked.bool(False),   # for differential measurements
                               year = cms.untracked.int32(-2016),####for year put 2016,2017, or 2018 to select correct Muon training and electron MVA
                              )
-process.metSequence = cms.Sequence(process.fullPatMetSequence+process.fullPatMetSequencePuppi)
+process.metSequence = cms.Sequence(process.fullPatMetSequence+process.puppiMETSequence*process.fullPatMetSequencePuppi)
+##process.MINIAODSIMoutput_step = cms.EndPath(process.MINIAODSIMoutput) //checking miniaodsimout
 process.p = cms.Path(process.fsrPhotonSequence*
                      process.boostedMuons*
                      process.calibratedMuons*
